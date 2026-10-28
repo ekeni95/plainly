@@ -1,0 +1,1733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plainly – your medical papers, explained</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<style>
+  /* All text/background pairs below are checked to WCAG 2.2 AA (≥4.5:1 text, ≥3:1 UI parts). */
+  :root{
+    --paper:#F7F4EF; --card:#FFFFFF; --ink:#1E2A2E; --muted:#4D5B60; --line:#E3DED6; --edge:#767E7B;
+    --teal:#3B4CCA; --teal-ink:#2C3A9E; --teal-soft:#EEF0FD;
+    --red-bg:#FDECEA; --red-ink:#9B1C13; --red:#B42318;
+    --amb-bg:#FFF1DC; --amb-ink:#7A3E00; --amb:#B45309;
+    --grn-bg:#E7F4EA; --grn-ink:#1E5E2F; --grn:#2E7D32;
+    --violet-soft:#ECEAF8; --violet-ink:#3F3880;
+    --focus:#1B4DD6;
+    --radius:16px; --shadow:0 1px 2px rgba(30,42,46,.06),0 6px 24px rgba(30,42,46,.06);
+    font-size:18px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--paper);color:var(--ink);font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased}
+  a{color:var(--teal-ink)}
+  .skip{position:absolute;left:12px;top:-60px;background:var(--ink);color:#fff;padding:.6rem 1rem;border-radius:10px;z-index:10;text-decoration:none;font-weight:700}
+  .skip:focus{top:12px}
+  .wrap{max-width:880px;margin:0 auto;padding:16px 20px 80px}
+  header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 0 14px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{width:44px;height:44px;border-radius:12px;background:var(--teal);display:grid;place-items:center;flex:none}
+  .brand h1{font-size:1.45rem;margin:0;letter-spacing:-.01em;line-height:1.2}
+  .brand p{margin:0;color:var(--muted);font-size:.9rem}
+  .top-right{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .ui-lang{display:flex;align-items:center;gap:6px;color:var(--teal-ink)}
+  .ui-lang select{border:1.5px solid var(--edge);border-radius:10px;padding:.35rem .5rem;background:#fff;min-height:40px;color:var(--ink)}
+  .sizer{display:flex;gap:6px;align-items:center}
+  .sizer .lbl{color:var(--muted);font-size:.85rem}
+  button,input,select,textarea{font:inherit;color:inherit}
+  .btn{appearance:none;border:1.5px solid var(--edge);background:var(--card);border-radius:12px;padding:.55rem .95rem;cursor:pointer;display:inline-flex;align-items:center;gap:.45rem;line-height:1.2;min-height:44px;transition:background .15s}
+  .btn:hover{background:#F3F1EC}
+  .btn.primary{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:700;padding:.85rem 1.4rem;font-size:1.08rem}
+  .btn.primary:hover{background:var(--teal-ink)}
+  .btn[disabled]{opacity:.55;cursor:not-allowed}
+  .btn.small{padding:.4rem .75rem;font-size:.9rem;border-radius:10px;min-height:40px}
+  .btn.link{border:0;background:none;color:var(--teal-ink);text-decoration:underline;padding:.3rem .2rem;min-height:32px}
+  .sizer .btn{min-width:44px;justify-content:center}
+  .sizer .btn[aria-pressed="true"]{background:var(--teal-soft);border-color:var(--teal);color:var(--teal-ink);font-weight:700}
+  :focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+  .choice input:focus-visible+span,.check input:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+  .drop:focus-within{outline:3px solid var(--focus);outline-offset:2px}
+
+  /* account bar */
+  .acct{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:14px;padding:10px 14px;margin:0 0 18px;box-shadow:var(--shadow);flex-wrap:wrap}
+  .acct .who{flex:1;min-width:220px;display:flex;gap:10px;align-items:center}
+  .acct .avatar{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;flex:none;background:var(--teal-soft);color:var(--teal-ink);font-weight:700}
+  .acct .who small{display:block;color:var(--muted);font-size:.85rem;line-height:1.3}
+  .demo-tag{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;background:var(--violet-soft);color:var(--violet-ink);border-radius:6px;padding:.05rem .4rem;margin-left:.35rem;vertical-align:middle}
+
+  .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 24px;margin:0 0 18px}
+  .step-label{display:flex;align-items:center;gap:10px;margin:0 0 12px;font-size:1.15rem}
+  .num{width:32px;height:32px;border-radius:50%;background:var(--teal-soft);color:var(--teal-ink);display:grid;place-items:center;font-weight:700;font-size:.95rem;flex:none}
+  .hint{color:var(--muted);font-size:.92rem;margin:.2rem 0 0}
+  .drop{border:2px dashed var(--edge);border-radius:14px;padding:26px;text-align:center;background:#FBFAF7;cursor:pointer;display:block;position:relative}
+  .drop.over{background:var(--teal-soft);border-color:var(--teal)}
+  .drop strong{display:block;font-size:1.08rem;margin:8px 0 4px}
+  .drop input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+  .files{list-style:none;padding:0;margin:12px 0 0;display:grid;gap:8px}
+  .files li{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:12px;padding:6px 8px 6px 12px;background:#fff}
+  .files .fname{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .files .fmeta{color:var(--muted);font-size:.88rem;white-space:nowrap}
+  .files .err{color:var(--red-ink)}
+  details.paste{margin-top:12px}
+  summary{cursor:pointer;color:var(--teal-ink);font-weight:700;min-height:32px;padding:4px 0}
+  textarea{width:100%;min-height:130px;border:1.5px solid var(--edge);border-radius:12px;padding:12px;margin-top:10px;background:#fff;resize:vertical}
+  .opts{display:grid;gap:20px}
+  fieldset{border:0;padding:0;margin:0;min-width:0}
+  legend,.lbl{display:block;font-weight:700;margin-bottom:6px;padding:0}
+  .lang-row input{width:100%;border:1.5px solid var(--edge);border-radius:12px;padding:.65rem .8rem;background:#fff;min-height:44px}
+  ::placeholder{color:#5B6468;opacity:1}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .chip{border:1.5px solid var(--edge);background:#fff;border-radius:999px;padding:.25rem .8rem;font-size:.9rem;cursor:pointer;min-height:32px}
+  .chip:hover{background:var(--teal-soft)}
+  .chip[aria-pressed="true"]{background:var(--teal);border-color:var(--teal);color:#fff}
+  .choices{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  @media (max-width:640px){.choices{grid-template-columns:1fr}}
+  .choice{position:relative;display:block;cursor:pointer}
+  .choice input{position:absolute;opacity:0;width:1px;height:1px}
+  .choice span{display:block;border:1.5px solid var(--edge);border-radius:12px;padding:12px 14px;height:100%;background:#fff}
+  .choice span b{display:block}
+  .choice span small{color:var(--muted);font-size:.88rem;line-height:1.35;display:block;margin-top:2px}
+  .choice input:checked+span{border-color:var(--teal);border-width:3px;padding:10.5px 12.5px;background:var(--teal-soft)}
+  .check{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+  .check input{width:24px;height:24px;margin-top:2px;accent-color:var(--teal);flex:none}
+  .go-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:6px}
+  .privacy{color:var(--muted);font-size:.88rem;flex:1;min-width:240px;margin:0}
+
+  .notice{border-radius:14px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;margin:0 0 18px;font-size:.95rem}
+  .notice svg{flex:none;margin-top:2px}
+  .notice.info{background:var(--teal-soft);color:var(--teal-ink)}
+  .notice.warn{background:var(--amb-bg);color:var(--amb-ink);border:1px solid var(--amb)}
+  .notice.err{background:var(--red-bg);color:var(--red-ink);border:1px solid var(--red)}
+  .notice p{margin:0}
+  .status{display:flex;align-items:center;gap:14px}
+  .spinner{width:26px;height:26px;border-radius:50%;border:3px solid var(--teal-soft);border-top-color:var(--teal);animation:spin 1s linear infinite;flex:none}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .status .msg{flex:1}
+  .status .sub{color:var(--muted);font-size:.9rem}
+
+  /* results */
+  .res-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+  .doc-type{display:inline-block;background:var(--violet-soft);color:var(--violet-ink);border-radius:999px;padding:.15rem .7rem;font-size:.85rem;font-weight:700;margin-bottom:6px}
+  .res-title{font-size:1.6rem;line-height:1.25;margin:0 0 4px}
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap}
+  .summary{font-size:1.12rem;margin:14px 0 0}
+  h3.sec{font-size:1.2rem;margin:0 0 12px;display:flex;align-items:center;gap:10px}
+  h3.sec .ic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex:none}
+
+  /* traffic light */
+  .overall{display:inline-flex;align-items:center;gap:10px;border-radius:999px;padding:.4rem 1rem .4rem .45rem;font-weight:700;margin-top:14px;border:2px solid}
+  .overall .tl-ic{width:30px;height:30px}
+  .lvl-red{--bg:var(--red-bg);--ink:var(--red-ink);--acc:var(--red)}
+  .lvl-orange{--bg:var(--amb-bg);--ink:var(--amb-ink);--acc:var(--amb)}
+  .lvl-green{--bg:var(--grn-bg);--ink:var(--grn-ink);--acc:var(--grn)}
+  .overall{background:var(--bg);color:var(--ink);border-color:var(--acc)}
+  .tl-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 14px;list-style:none;padding:0}
+  @media (max-width:560px){.tl-tiles{grid-template-columns:1fr}}
+  .tl-tile a{display:flex;align-items:center;gap:12px;background:var(--bg);color:var(--ink);border:2px solid var(--acc);border-radius:14px;padding:12px 14px;text-decoration:none;height:100%}
+  .tl-tile a:hover{filter:brightness(.98)}
+  .tl-tile .n{font-size:1.6rem;font-weight:700;line-height:1}
+  .tl-tile .t{font-weight:700;line-height:1.2}
+  .tl-tile .h{font-size:.85rem;display:block;font-weight:400}
+  .tl-tile.empty a{opacity:.8;border-style:dashed}
+  .cluster{border-radius:var(--radius);padding:18px 20px;margin:0 0 14px;background:var(--bg);border:2px solid var(--acc);color:var(--ink)}
+  .cluster h3{margin:0 0 4px;font-size:1.2rem;display:flex;align-items:center;gap:10px}
+  .cluster > p{margin:0 0 12px;font-size:.95rem}
+  .cluster ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+  .cluster li{background:#fff;border-radius:12px;padding:12px 14px;color:var(--ink);border-left:6px solid var(--acc)}
+  .cluster li b,.cluster li .det{display:block}
+  .cluster li .when{display:inline-block;margin-top:6px;font-size:.88rem;font-weight:700;color:var(--ink)}
+  .cluster li .when::before{content:"⏱ ";}
+  .legend{font-size:.88rem;color:var(--muted);margin:0 0 12px}
+
+  .meds{display:grid;gap:10px}
+  .med{border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .med b{font-size:1.05rem}
+  .med div{margin-top:2px}
+  .med .k{color:var(--muted);font-size:.85rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em;margin-right:6px}
+  dl.terms{margin:0;display:grid;gap:10px}
+  dl.terms div{border-left:4px solid var(--violet-ink);padding:2px 0 2px 12px}
+  dl.terms dt{font-weight:700}
+  dl.terms dd{margin:0}
+  ol.qs{margin:0;padding-left:1.3rem}
+  ol.qs li{margin:.3rem 0}
+  details.more{border-top:1px solid var(--line);padding-top:10px;margin-top:12px}
+  details.more:first-of-type{border-top:0;margin-top:0;padding-top:0}
+  details.more > summary{font-size:1.05rem}
+  details.more > div{padding:10px 0 4px}
+
+  /* services & coverage */
+  .svc-filters{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}
+  .svc{display:grid;grid-template-columns:1fr auto;gap:4px 12px;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:8px}
+  .svc .nm{font-weight:700}
+  .svc .why{grid-column:1/-1;color:var(--muted);font-size:.92rem}
+  .cov{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:.15rem .7rem;font-size:.88rem;font-weight:700;white-space:nowrap;align-self:start;border:1.5px solid}
+  .cov.full{background:var(--grn-bg);color:var(--grn-ink);border-color:var(--grn)}
+  .cov.part{background:var(--amb-bg);color:var(--amb-ink);border-color:var(--amb)}
+  .cov.none{background:var(--red-bg);color:var(--red-ink);border-color:var(--red)}
+  .cov.unk{background:#F1EEE8;color:var(--muted);border-color:var(--edge)}
+  .svc .cost{grid-column:1/-1;font-size:.92rem}
+  .signin-cta{display:flex;gap:12px;align-items:center;background:var(--teal-soft);color:var(--teal-ink);border-radius:12px;padding:12px 14px;margin-bottom:12px;flex-wrap:wrap}
+  .signin-cta p{margin:0;flex:1;min-width:200px}
+
+  .chat{display:grid;gap:10px;margin-bottom:12px}
+  .bubble{padding:10px 14px;border-radius:14px;max-width:88%;white-space:pre-wrap}
+  .bubble.me{background:var(--teal);color:#fff;justify-self:end;border-bottom-right-radius:4px}
+  .bubble.ai{background:#F1EEE8;justify-self:start;border-bottom-left-radius:4px}
+  .ask-row{display:flex;gap:8px}
+  .ask-row input{flex:1;border:1.5px solid var(--edge);border-radius:12px;padding:.65rem .8rem;background:#fff;min-width:0;min-height:44px}
+  pre.origtext{white-space:pre-wrap;font-family:inherit;font-size:.92rem;background:#FBFAF7;border:1px solid var(--line);border-radius:12px;padding:12px;max-height:340px;overflow:auto}
+
+  /* dialog */
+  dialog{border:0;border-radius:18px;padding:0;max-width:560px;width:calc(100% - 32px);box-shadow:0 20px 60px rgba(0,0,0,.25);color:var(--ink)}
+  dialog::backdrop{background:rgba(30,42,46,.55)}
+  .dlg{padding:22px 24px}
+  .dlg h2{margin:0 0 6px;font-size:1.3rem}
+  .dlg .opt{display:block;width:100%;text-align:left;border:1.5px solid var(--edge);background:#fff;border-radius:14px;padding:14px 16px;margin:10px 0;cursor:pointer}
+  .dlg .opt:hover{background:#F3F1EC}
+  .dlg .opt b{display:block;font-size:1.05rem}
+  .dlg .opt span{color:var(--muted);font-size:.92rem}
+  .dlg label.f{display:block;font-weight:700;margin:14px 0 6px}
+  .dlg select{width:100%;border:1.5px solid var(--edge);border-radius:12px;padding:.6rem .7rem;background:#fff;min-height:44px}
+  .dlg .row{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
+  .dlg .fake-id{display:flex;align-items:center;gap:12px;border:1.5px dashed var(--edge);border-radius:14px;padding:14px;margin:12px 0;background:#FBFAF7}
+
+  /* procedure steps + resources */
+  ol.steps-list{margin:0 0 18px;padding-left:1.4rem;display:grid;gap:8px}
+  ol.steps-list li b{display:block}
+  h4.res-h{font-size:1.05rem;margin:6px 0 4px}
+  ul.resources{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:10px}
+  ul.resources li{border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .r-top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}
+  .r-name{font-weight:700;font-size:1.05rem}
+  .r-kind{font-size:.85rem;font-weight:700;background:var(--teal-soft);color:var(--teal-ink);border-radius:999px;padding:.1rem .6rem}
+  .r-org{display:block;color:var(--muted);font-size:.9rem}
+  ul.resources p{margin:6px 0 10px}
+  /* who to see */
+  .urgent{display:flex;gap:12px;align-items:flex-start;background:var(--red-bg);color:var(--red-ink);border:2px solid var(--red);border-radius:14px;padding:14px 16px;margin:0 0 12px}
+  .urgent p{margin:0}
+  .urgent a{color:var(--red-ink);font-weight:700}
+  .consult{border:1px solid var(--line);border-left:6px solid var(--acc);border-radius:12px;padding:12px 14px;margin-bottom:10px}
+  .consult .top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}
+  .consult .who{font-weight:700;font-size:1.05rem}
+  .lvl-tag{display:inline-flex;align-items:center;gap:6px;font-size:.85rem;font-weight:700;color:var(--ink);background:var(--bg);border:1.5px solid var(--acc);border-radius:999px;padding:.1rem .6rem .1rem .25rem}
+  .lvl-tag .tl-ic{width:20px;height:20px}
+  .consult .why{margin:4px 0 8px}
+  .consult .meta{font-size:.9rem;color:var(--muted);margin:0 0 8px}
+  .book{display:flex;gap:8px;flex-wrap:wrap}
+  a.btn{text-decoration:none;color:var(--ink)}
+  .ext::after{content:" ↗";}
+  .fine{font-size:.85rem;color:var(--muted);margin:10px 0 0}
+  /* doctor review */
+  .review-card{border:2px solid var(--teal);}
+  .review-points{margin:8px 0 14px;padding-left:1.2rem}
+  .tiers{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 14px}
+  @media (max-width:560px){.tiers{grid-template-columns:1fr}}
+  .tracker{list-style:none;padding:0;margin:10px 0 0;display:grid;gap:8px}
+  .tracker li{display:flex;gap:10px;align-items:center}
+  .tracker .dotx{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;flex:none;border:2px solid var(--edge);background:#fff;font-weight:700;font-size:.85rem}
+  .tracker li.done .dotx{background:var(--grn);border-color:var(--grn);color:#fff}
+  .tracker li.now .dotx{border-color:var(--teal);color:var(--teal-ink)}
+  .cta-review{display:inline-block;margin-top:12px;margin-left:10px;font-weight:700}
+  .hidden{display:none!important}
+  .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  footer{color:var(--muted);font-size:.85rem;text-align:center;margin-top:30px}
+  html{scroll-padding-bottom:110px}
+  body{overflow-wrap:break-word}
+  dialog{max-height:calc(100dvh - 32px);overflow:auto}
+
+  /* "tell me more" */
+  .more-btn{appearance:none;background:none;border:0;padding:.35rem 0;margin-top:6px;min-height:32px;color:var(--teal-ink);font-weight:700;text-decoration:underline;cursor:pointer;display:inline-flex;align-items:center;gap:.35rem}
+  .more-btn::before{content:"+";display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;border:2px solid currentColor;font-size:.85rem;line-height:1;text-decoration:none}
+  .more-btn[aria-expanded="true"]::before{content:"\2212"}
+  .more-box{margin-top:6px;background:#F5F6FE;border:1px solid #D5DBF8;border-radius:10px;padding:10px 12px;color:var(--ink)}
+  .more-text{white-space:pre-wrap}
+  .more-actions{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;margin-top:6px}
+  .more-actions .fine{margin:0}
+
+  /* floating ask button + panel */
+  .fab{position:fixed;right:20px;bottom:20px;z-index:20;display:inline-flex;align-items:center;gap:8px;background:var(--teal);color:#fff;border:2px solid #fff;border-radius:999px;padding:.75rem 1.2rem;font-weight:700;box-shadow:0 6px 20px rgba(0,0,0,.28);min-height:52px;cursor:pointer}
+  .fab:hover{background:var(--teal-ink)}
+  .fab:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+  .chat-panel{position:fixed;right:20px;bottom:88px;z-index:21;width:min(420px,calc(100vw - 40px));max-height:min(72dvh,620px);display:flex;flex-direction:column;background:#fff;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.3);padding:16px;border:1px solid var(--line)}
+  .cp-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .cp-head h2{margin:0;font-size:1.1rem}
+  .chat-panel .hint{margin:4px 0 0}
+  .chat-panel .chat{flex:1;overflow:auto;min-height:100px;margin:10px 0;padding-right:2px}
+  .chat-empty{color:var(--muted);font-size:.92rem}
+
+
+  /* ===== calmer results: summary hero + tabs ===== */
+  html{scroll-padding-top:84px}
+  .hero{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 22px 16px;margin:0 0 12px;border-top:6px solid var(--acc)}
+  .hero-top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px}
+  .hero-top .doc-type{margin:0}
+  .hero-actions{display:flex;gap:2px;flex-wrap:wrap;margin-left:auto}
+  .icon-btn{display:inline-flex;align-items:center;gap:6px;background:none;border:0;border-radius:10px;padding:.4rem .6rem;min-height:40px;color:#2C3A9E;font-weight:700;font-size:.9rem;cursor:pointer}
+  .icon-btn:hover{background:#EEF0FD}
+  .hero .res-title{color:#1E2A2E}
+  .hero .summary{color:#1E2A2E;margin-top:8px}
+  .hero .overall{margin-top:12px}
+  .counts{list-style:none;padding:0;margin:10px 0 0;display:flex;gap:4px 16px;flex-wrap:wrap}
+  .count{display:inline-flex;align-items:center;gap:6px;color:#1E2A2E;text-decoration:underline;text-underline-offset:3px;min-height:32px;font-size:.95rem}
+  .count .tl-ic{width:20px;height:20px}
+  .ai-note{display:flex;gap:8px;align-items:flex-start;margin:14px 0 0;padding-top:12px;border-top:1px solid var(--line);color:var(--muted);font-size:.85rem;line-height:1.45}
+  .ai-note svg{flex:none;margin-top:2px}
+  .tabs-wrap{position:sticky;top:0;z-index:5;background:var(--paper);padding:8px 0 10px;margin:0 0 2px}
+  .tabs{display:flex;gap:4px;background:#E9E5DE;border-radius:14px;padding:4px;overflow-x:auto;scrollbar-width:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{flex:1 0 auto;border:0;background:none;border-radius:10px;padding:.5rem .9rem;min-height:44px;font-weight:700;color:#3F4D52;cursor:pointer;white-space:nowrap}
+  .tab:hover{color:#1E2A2E}
+  .tab[aria-selected="true"]{background:#fff;color:#1E2A2E;box-shadow:0 1px 3px rgba(0,0,0,.14)}
+  .panel:focus-visible{outline:3px solid var(--focus);outline-offset:4px;border-radius:12px}
+  .group{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 18px 6px;margin:0 0 12px}
+  .group.lvl-red{background:var(--red-bg);box-shadow:none;border:1.5px solid var(--red)}
+  .group h3{display:flex;align-items:center;gap:8px 10px;margin:0 0 2px;font-size:1.1rem;flex-wrap:wrap;color:var(--ink)}
+  .group h3 .tl-ic{width:24px;height:24px}
+  .g-hint{font-weight:400;font-size:.88rem;color:var(--muted)}
+  .rows{list-style:none;margin:0;padding:0}
+  .rows li{padding:12px 0;border-top:1px solid rgba(30,42,46,.1);color:#1E2A2E}
+  .rows li:first-child{border-top:0}
+  .rows li b{display:block}
+  .rows .det{display:block;color:#36454A}
+  .rows .when{display:inline-block;margin-top:4px;font-size:.88rem;font-weight:700}
+  .rows .when::before{content:"⏱ "}
+  .rows .k{color:var(--muted);font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em;margin-right:6px}
+  .group.lvl-red .rows .det{color:#1E2A2E}
+  .nudge{display:flex;justify-content:space-between;align-items:center;width:100%;background:var(--teal);color:#fff;border:0;border-radius:14px;padding:14px 18px;font-weight:700;min-height:52px;cursor:pointer;text-align:left;gap:10px;margin:4px 0 14px;font-size:1rem}
+  .nudge:hover{background:var(--teal-ink)}
+  @media (max-width:600px){
+    .hero{padding:14px 16px}
+    .hero-actions .icon-btn span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+    .hero-actions .icon-btn{min-width:44px;min-height:44px;justify-content:center}
+    .tab{padding:.5rem .7rem;font-size:.95rem}
+    .group{padding:12px 14px 4px}
+  }
+  .rows li{position:relative;padding-right:44px}
+  .rows .more-btn{position:absolute;top:8px;right:0;margin:0;font-size:0;width:44px;height:44px;justify-content:center;padding:0;text-decoration:none}
+  .rows .more-btn::before{font-size:1rem;width:26px;height:26px}
+  .rows .more-box{margin-right:-44px}
+  .rev-row{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap}
+  .res-details{border-top:1px solid var(--line);padding-top:10px;margin-top:14px}
+  @media (max-width:600px){ .acct small{display:none} }
+  /* tablet */
+  @media (max-width:900px){
+    .wrap{padding:14px 16px 110px}
+  }
+  /* phone */
+  @media (max-width:600px){
+    :root{--radius:14px}
+    .wrap{padding:10px 12px 110px}
+    .card{padding:16px}
+    .brand h1{font-size:1.25rem}
+    .logo{width:38px;height:38px}
+    .sizer .lbl{display:none}
+    .res-title{font-size:1.35rem}
+    .summary{font-size:1.05rem}
+    .cluster{padding:14px}
+    .cluster li{padding:10px 12px}
+    .acct .who{min-width:0}
+    .acct .btn{width:100%;justify-content:center}
+    .go-row .btn.primary{width:100%;justify-content:center}
+    .toolbar{width:100%}
+    .toolbar .btn{flex:1 1 auto;justify-content:center}
+    .svc{grid-template-columns:1fr}
+    .cov{justify-self:start}
+    .consult .book .btn{flex:1 1 100%;justify-content:center}
+    ul.resources .btn{width:100%;justify-content:center}
+    .dlg{padding:18px}
+    .dlg .row .btn{flex:1 1 auto;justify-content:center}
+    .overall{border-radius:14px}
+    .fab{right:12px;bottom:12px}
+    .chat-panel{left:0;right:0;bottom:0;width:100%;max-height:88dvh;border-radius:18px 18px 0 0}
+    body.chat-open .fab{display:none}
+  }
+  @media (prefers-reduced-motion: reduce){*{transition:none!important;scroll-behavior:auto!important}.spinner{animation-duration:3s}}
+
+  /* ================= 2026 refresh: sleek, warm, medical, dyslexia-friendly =================
+     Dyslexia guidance applied: rounded open sans-serif (Lexend), generous letter/word/line spacing,
+     cream background with soft dark text (no pure black/white glare), left-aligned text, short line
+     length, no italics, no ALL CAPS, clear headings, optional extra spacing. */
+  :root{
+    --paper:#FAF7F2; --card:#FFFFFF; --ink:#22303A; --muted:#556269; --line:#ECE6DC; --edge:#7D8582;
+    --teal:#3B4CCA; --teal-ink:#2C3A9E; --teal-soft:#EEF0FD; --peach:#F6E7D8; --peach-ink:#8A5A2B;
+    --radius:20px; --shadow:0 1px 2px rgba(34,48,58,.04),0 10px 30px rgba(34,48,58,.06);
+  }
+  body{font-family:"Lexend",system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.012em;word-spacing:.08em;line-height:1.7;color:var(--ink);
+    background:radial-gradient(1200px 420px at 50% -120px,#EFE6D8 0%,rgba(239,230,216,0) 70%),var(--paper);background-attachment:scroll;text-align:left;hyphens:none;font-weight:400}
+  body.airy{letter-spacing:.05em;word-spacing:.18em;line-height:1.9}
+  body.airy p,body.airy li{margin-bottom:.4em}
+  h1,h2,h3,h4,b,strong,legend,.lbl,summary,.btn,.tab,.chip,.count b,.r-name,.consult .who,.nm{font-weight:600}
+  .acct .who{font-weight:400}
+  .sizer .lbl{display:none!important}
+  em,i{font-style:normal}
+  p,li,dd,.det,.summary{max-width:68ch}
+  .wrap{max-width:860px}
+  header.top{background:rgba(255,255,255,.85);backdrop-filter:saturate(1.2) blur(6px);border:1px solid var(--line);border-radius:22px;padding:10px 14px;margin:6px 0 14px;box-shadow:0 1px 2px rgba(34,48,58,.04)}
+  .logo{width:46px;height:46px;border-radius:15px;background:linear-gradient(140deg,#3B4CCA 0%,#6A5AE0 100%);box-shadow:0 4px 12px rgba(59,76,202,.25)}
+  .brand h1{font-size:1.4rem;letter-spacing:-.01em}
+  .brand p{font-size:.88rem}
+  .ui-lang select{border-radius:999px;padding:.35rem .8rem;border-color:var(--edge)}
+  .sizer .btn{border-radius:999px;min-width:42px;min-height:42px}
+  .spacing-btn{gap:6px}
+  .card,.hero,.group,.acct{border-radius:var(--radius);border:1px solid var(--line);box-shadow:var(--shadow)}
+  .acct{background:var(--card)}
+  .acct .avatar{background:var(--peach);color:var(--peach-ink)}
+  .btn{border-radius:999px;border-color:#B9B2A6;padding:.6rem 1.1rem}
+  .btn:hover{background:#F5F1EA}
+  .btn.small{border-radius:999px}
+  .btn.primary{background:linear-gradient(180deg,#3B4CCA 0%,#3B4CCA 100%);border-color:#3B4CCA;box-shadow:0 6px 16px rgba(59,76,202,.22);padding:.9rem 1.6rem}
+  .btn.primary:hover{background:#2C3A9E}
+  .step-label{font-size:1.2rem}
+  .num{background:var(--teal);color:#fff;width:34px;height:34px}
+  .drop{border:2px dashed #AEB8F2;background:linear-gradient(180deg,#F6F7FE,#F1F3FE);border-radius:18px;padding:30px}
+  .drop:hover{border-color:var(--teal)}
+  .files li{border-radius:14px}
+  textarea,.lang-row input,.ask-row input,.dlg select{border-radius:14px;border-color:var(--edge)}
+  .choice span{border-radius:16px;border-color:#B9B2A6}
+  .chip{border-color:#B9B2A6}
+  .privacy{font-size:.9rem}
+  .doc-type{background:var(--peach);color:var(--peach-ink);font-weight:600}
+  .demo-tag{text-transform:none;letter-spacing:.01em;font-size:.78rem;border-radius:999px;padding:.05rem .5rem}
+  .k,.med .k,.rows .k{text-transform:none!important;letter-spacing:0!important;font-size:.88rem!important}
+  .hero{border-top:none;position:relative;overflow:hidden;padding:22px 24px 18px}
+  .hero::before{content:"";position:absolute;inset:0 0 auto 0;height:6px;background:var(--acc)}
+  .res-title{font-size:1.6rem;line-height:1.3;letter-spacing:-.005em}
+  .overall{border-width:1.5px;padding:.35rem 1rem .35rem .4rem}
+  .tabs{background:#EDE7DD;border-radius:999px;padding:5px}
+  .tab{border-radius:999px;color:#3F4D52}
+  .tab[aria-selected="true"]{box-shadow:0 2px 8px rgba(34,48,58,.12)}
+  .tabs-wrap{background:linear-gradient(180deg,var(--paper) 80%,rgba(250,247,242,0))}
+  .group h3,h3.sec{font-size:1.15rem}
+  h3.sec .ic{border-radius:12px;width:36px;height:36px}
+  .rows li{padding-top:14px;padding-bottom:14px}
+  .more-box{border-radius:14px;background:#F5F6FE;border-color:#D5DBF8}
+  .nudge{border-radius:18px;background:linear-gradient(180deg,#3B4CCA 0%,#3B4CCA 100%);box-shadow:0 6px 16px rgba(59,76,202,.2)}
+  .consult,.svc,ul.resources li,.med{border-radius:16px}
+  .urgent{border-radius:16px}
+  .fab{background:linear-gradient(180deg,#3B4CCA 0%,#3B4CCA 100%)}
+  .chat-panel{border-radius:22px}
+  .bubble{border-radius:18px}
+  dialog{border-radius:24px}
+  .dlg .opt{border-radius:18px;border-color:#B9B2A6}
+  .notice{border-radius:16px}
+  footer{font-size:.85rem}
+  .spacing-btn span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .ui-lang select{width:auto}
+  @media (min-width:901px){ header.top{flex-wrap:nowrap} .top-right{flex-wrap:nowrap} .brand{min-width:0;flex:1 1 auto} .top-right{flex:none} }
+  @media (max-width:900px){ .spacing-btn span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap} }
+  @media (max-width:600px){
+    header.top{border-radius:18px;padding:10px 12px}
+    .spacing-btn span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+    .hero{padding:18px 16px 14px}
+    .res-title{font-size:1.35rem}
+  }
+
+  /* ================= v3: modern indigo, warm neutrals, flat ================= */
+  :root{
+    --paper:#F7F6F3; --card:#FFFFFF; --ink:#1F2633; --muted:#5A6170; --line:#ECEAE5; --edge:#8A8F99;
+    --teal:#3B4CCA; --teal-ink:#2C3A9E; --teal-soft:#EEF0FD; --peach:#FCEBE4; --peach-ink:#9A3B1E; --coral:#E8836B;
+    --focus:#1F2633;
+    --shadow:0 1px 2px rgba(31,38,51,.04),0 6px 24px rgba(31,38,51,.05);
+  }
+  body{background:var(--paper)}
+  :focus-visible,.choice input:focus-visible+span,.check input:focus-visible,.drop:focus-within{outline:3px solid var(--focus);outline-offset:3px}
+  header.top{background:#fff;border:0;box-shadow:var(--shadow)}
+  .logo{background:linear-gradient(145deg,#3B4CCA 0%,#6A5AE0 100%);box-shadow:0 6px 14px rgba(59,76,202,.25)}
+  .card,.hero,.group,.acct{border:0}
+  .btn{border:0;background:#EFEDE8;color:var(--ink)}
+  .btn:hover{background:#E6E3DC}
+  .btn.primary{background:var(--teal);box-shadow:none;color:#fff}
+  .btn.primary:hover{background:var(--teal-ink)}
+  .sizer .btn[aria-pressed="true"],.spacing-btn[aria-pressed="true"]{background:var(--teal-soft);color:var(--teal-ink);box-shadow:inset 0 0 0 2px var(--teal)}
+  .chip{border:0;background:#EFEDE8}
+  .chip:hover{background:#E6E3DC}
+  .chip[aria-pressed="true"]{background:var(--teal);color:#fff}
+  .choice span{border:1.5px solid #D9D5CD;background:#fff}
+  .choice input:checked+span{border-color:var(--teal);background:var(--teal-soft)}
+  .drop{border:1.5px dashed #AEB8F2;background:#F6F7FE}
+  .num{background:var(--teal)}
+  .files li{border:0;background:#F7F6F3}
+  .acct .avatar{background:var(--peach);color:var(--peach-ink)}
+  .doc-type{background:var(--peach);color:var(--peach-ink)}
+  .tabs{background:#ECEAE5}
+  .tab{color:#3F4652}
+  .icon-btn{color:var(--teal-ink)}
+  .icon-btn:hover{background:var(--teal-soft)}
+  .count{color:var(--ink)}
+  .nudge{background:var(--teal);box-shadow:none}
+  .nudge:hover{background:var(--teal-ink)}
+  .fab{background:var(--teal);border:0;box-shadow:0 10px 30px rgba(59,76,202,.35)}
+  .fab:hover{background:var(--teal-ink)}
+  .more-btn{color:var(--teal-ink)}
+  .more-box{background:#F5F6FE;border-color:#D5DBF8}
+  .consult,.svc,ul.resources li,.med{border-color:#ECEAE5}
+  .r-kind{background:var(--teal-soft);color:var(--teal-ink)}
+  .signin-cta{background:var(--teal-soft);color:var(--teal-ink)}
+  .review-card{border:0;box-shadow:inset 0 0 0 2px var(--teal),var(--shadow)}
+  .bubble.me{background:var(--teal)}
+  .bubble.ai{background:#F1EFEA}
+  .dlg .opt{border:1.5px solid #D9D5CD}
+  .dlg .opt:hover{border-color:var(--teal);background:#fff}
+  a{color:var(--teal-ink)}
+  .tracker li.done .dotx{background:#2E7D32;border-color:#2E7D32}
+  .tracker li.now .dotx{border-color:var(--teal);color:var(--teal-ink)}
+  .ui-lang{color:var(--teal-ink)}
+  .ui-lang select,textarea,.lang-row input,.ask-row input,.dlg select{border:1.5px solid var(--edge)}
+  .notice.info{background:var(--teal-soft);color:var(--teal-ink)}
+
+  /* ================= v4: glass + neumorphism (soft UI) =================
+     Glass panels sit on soft colour blobs; controls are soft-extruded (raised) and press inward when active.
+     Text always sits on near-opaque surfaces and inputs keep a 3:1 outline, so WCAG AA contrast holds. */
+  :root{--base:#ECEEF5; --neu-dark:rgba(150,158,190,.45); --neu-light:rgba(255,255,255,.95);
+    --raise:6px 6px 14px var(--neu-dark),-6px -6px 14px var(--neu-light);
+    --raise-sm:3px 3px 8px var(--neu-dark),-3px -3px 8px var(--neu-light);
+    --press:inset 3px 3px 7px var(--neu-dark),inset -3px -3px 7px var(--neu-light);
+    --glass:rgba(255,255,255,.66); --glass-strong:rgba(255,255,255,.82); --glass-edge:rgba(255,255,255,.75);
+    --paper:var(--base)}
+  body{background:var(--base)}
+  body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:
+      radial-gradient(620px 420px at 8% 0%,rgba(106,90,224,.30),transparent 65%),
+      radial-gradient(520px 380px at 96% 18%,rgba(232,131,107,.26),transparent 65%),
+      radial-gradient(760px 520px at 50% 105%,rgba(59,76,202,.20),transparent 65%),
+      radial-gradient(420px 300px at 85% 75%,rgba(242,166,90,.16),transparent 65%)}
+  header.top,.acct,.card,.hero,.group,.chat-panel{background:var(--glass);-webkit-backdrop-filter:blur(18px) saturate(1.5);backdrop-filter:blur(18px) saturate(1.5);
+    border:1px solid var(--glass-edge);box-shadow:0 8px 32px rgba(59,76,202,.10),inset 0 1px 0 rgba(255,255,255,.8)}
+  .hero{background:var(--glass-strong)}
+  .group.lvl-red{background:rgba(253,236,234,.88);border:1.5px solid var(--red)}
+  dialog{background:rgba(255,255,255,.92);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border:1px solid var(--glass-edge)}
+  dialog::backdrop{background:rgba(31,38,51,.35);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+  .tabs-wrap{background:transparent}
+  .tabs{background:rgba(236,238,245,.75);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:var(--press);border:1px solid rgba(255,255,255,.6)}
+  .tab[aria-selected="true"]{background:var(--base);box-shadow:var(--raise-sm);color:var(--ink)}
+  /* raised soft controls */
+  .btn,.chip,.sizer .btn,.spacing-btn{background:var(--base);box-shadow:var(--raise-sm);border:0}
+  .btn:hover,.chip:hover{background:#F1F3F9}
+  .btn:active,.chip:active{box-shadow:var(--press)}
+  .sizer .btn[aria-pressed="true"],.spacing-btn[aria-pressed="true"]{background:var(--base);box-shadow:var(--press),inset 0 0 0 2px var(--teal);color:var(--teal-ink)}
+  .chip[aria-pressed="true"]{background:var(--teal);color:#fff;box-shadow:inset 2px 2px 5px rgba(20,28,110,.45),inset -2px -2px 5px rgba(120,135,255,.35)}
+  .btn.primary,.nudge{background:linear-gradient(145deg,#4558DA 0%,#3443BF 100%);color:#fff;box-shadow:6px 6px 16px rgba(59,76,202,.35),-4px -4px 12px rgba(255,255,255,.85),inset 0 1px 0 rgba(255,255,255,.25)}
+  .btn.primary:hover,.nudge:hover{background:linear-gradient(145deg,#3B4CCA 0%,#2C3A9E 100%)}
+  .btn.primary:active,.nudge:active{box-shadow:inset 3px 3px 8px rgba(20,28,110,.5)}
+  .btn[disabled]{box-shadow:none}
+  .fab{background:linear-gradient(145deg,#4558DA 0%,#3443BF 100%);box-shadow:8px 8px 22px rgba(59,76,202,.4),-4px -4px 12px rgba(255,255,255,.7)}
+  .num{box-shadow:3px 3px 8px rgba(59,76,202,.35),-2px -2px 6px rgba(255,255,255,.9)}
+  .logo{box-shadow:6px 6px 14px rgba(59,76,202,.35),-4px -4px 10px rgba(255,255,255,.9)}
+  .choice span{background:var(--base);border:1.5px solid rgba(138,143,153,.55);box-shadow:var(--raise-sm)}
+  .choice input:checked+span{background:#E7EAFB;box-shadow:var(--press);border-color:var(--teal)}
+  .dlg .opt{background:var(--base);box-shadow:var(--raise-sm);border:1.5px solid transparent}
+  .dlg .opt:hover{border-color:var(--teal);background:var(--base)}
+  /* pressed-in (inset) surfaces */
+  .drop{background:rgba(236,238,245,.7);border:1.5px dashed #9AA6EE;box-shadow:var(--press)}
+  textarea,.lang-row input,.ask-row input,.dlg select,.ui-lang select{background:#F4F5FA;border:1.5px solid var(--edge);box-shadow:inset 2px 2px 5px rgba(150,158,190,.35),inset -2px -2px 5px rgba(255,255,255,.9)}
+  .files li{background:rgba(236,238,245,.8);box-shadow:var(--press)}
+  .more-box{background:rgba(238,240,253,.85);box-shadow:inset 2px 2px 6px rgba(150,158,190,.3);border-color:#D5DBF8}
+  .more-btn::before{background:var(--base);box-shadow:var(--raise-sm);border-color:var(--teal)}
+  .more-btn[aria-expanded="true"]::before{box-shadow:var(--press)}
+  .icon-btn:hover{background:rgba(238,240,253,.9)}
+  .consult,.svc,ul.resources li,.med{background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.8);box-shadow:var(--raise-sm)}
+  .urgent{box-shadow:var(--raise-sm)}
+  .acct .avatar,.doc-type{box-shadow:var(--raise-sm)}
+  h3.sec .ic{box-shadow:var(--raise-sm)}
+  .bubble.ai{background:var(--base);box-shadow:var(--raise-sm)}
+  .bubble.me{box-shadow:4px 4px 10px rgba(59,76,202,.3)}
+  .review-card{box-shadow:inset 0 0 0 2px var(--teal),0 8px 32px rgba(59,76,202,.10)}
+  @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+    header.top,.acct,.card,.hero,.group,.chat-panel{background:rgba(255,255,255,.92)}
+  }
+  @media (prefers-reduced-transparency: reduce){
+    header.top,.acct,.card,.hero,.group,.chat-panel,.tabs{background:#fff;backdrop-filter:none;-webkit-backdrop-filter:none}
+  }
+  @media (prefers-contrast: more){
+    .btn,.chip,.choice span{box-shadow:none;border:2px solid var(--ink)}
+  }
+</style>
+</head>
+<body>
+<a class="skip" href="#main" data-i18n="skip">Skip to main content</a>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><path d="M6.5 3.5h9l5 5v14a1 1 0 0 1-1 1h-13a1 1 0 0 1-1-1v-18a1 1 0 0 1 1-1z" fill="#fff"/><path d="M15.5 3.5v5h5" fill="#DCE1FB"/><path d="M13 11.5v6M10 14.5h6" stroke="#3B4CCA" stroke-width="2.2" stroke-linecap="round"/><circle cx="19.5" cy="20" r="3.2" fill="#F2A65A" stroke="#fff" stroke-width="1.4"/></svg>
+      </div>
+      <div>
+        <h1>Plainly</h1>
+        <p data-i18n="tagline">Your medical papers, explained in plain words</p>
+      </div>
+    </div>
+    <div class="top-right">
+      <div class="ui-lang">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z" stroke="currentColor" stroke-width="1.8"/></svg>
+        <label for="uiLangSel" class="sr-only" data-i18n="uiLang">App language</label>
+        <select id="uiLangSel"></select>
+      </div>
+      <div class="sizer" role="group" aria-label="Text size" data-i18n-aria="textSize">
+        <span class="lbl" aria-hidden="true" data-i18n="textSize">Text size</span>
+        <button class="btn small" type="button" data-size="18" aria-pressed="true" aria-label="Normal text size" data-i18n-aria="sizeN">A</button>
+        <button class="btn small" type="button" data-size="21" aria-pressed="false" aria-label="Large text size" data-i18n-aria="sizeL" style="font-size:1rem">A</button>
+        <button class="btn small" type="button" data-size="24" aria-pressed="false" aria-label="Extra large text size" data-i18n-aria="sizeXL" style="font-size:1.15rem">A</button>
+        <button class="btn small spacing-btn" type="button" id="spaceBtn" aria-pressed="false"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M2 4v16M22 4v16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" opacity=".6"/></svg><span data-i18n="spacing">Extra spacing</span></button>
+      </div>
+    </div>
+  </header>
+
+  <!-- account bar -->
+  <section class="acct" aria-label="Your account" data-i18n-aria="acctRegion">
+    <div class="who">
+      <span class="avatar" id="acctAvatar" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8.5" r="4" stroke="currentColor" stroke-width="2"/><path d="M4 20c1-4 4.2-6 8-6s7 2 8 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </span>
+      <div id="acctText"><b>Using Plainly without an account</b><small>Nothing is saved. Sign in to see what your health insurance covers.</small></div>
+    </div>
+    <button class="btn small" type="button" id="acctBtn">Sign in</button>
+  </section>
+
+  <main id="main" tabindex="-1">
+  <div id="unavailable" class="notice warn hidden" role="status">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 7v6M12 16.5v.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+    <p data-i18n="unavailable">To explain documents, this prototype needs Claude. Open this page in Claude while you're signed in, then allow it to use Claude when asked.</p>
+  </div>
+
+  <!-- INPUT -->
+  <section id="inputView" aria-label="Explain a document" data-i18n-aria="inputRegion">
+    <div class="card">
+      <h2 class="step-label"><span class="num" aria-hidden="true">1</span><span data-i18n="step1">Add your document</span></h2>
+      <div class="drop" id="drop">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5" stroke="#3B4CCA" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" stroke="#3B4CCA" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <strong id="dropTitle" data-i18n="dropTitle">Choose a file or drop it here</strong>
+        <span class="hint" id="dropHint" data-i18n="dropHint">A letter, test result, scan report or leaflet: PDF, Word, text, or a photo of each page</span>
+        <input type="file" id="fileInput" multiple accept=".pdf,.docx,.txt,image/jpeg,image/png,image/webp,image/gif" aria-labelledby="dropTitle" aria-describedby="dropHint">
+      </div>
+      <ul class="files" id="fileList" aria-live="polite" aria-label="Added files" data-i18n-aria="filesLabel"></ul>
+      <details class="paste">
+        <summary data-i18n="pasteSummary">Or type or paste the text</summary>
+        <label for="pasteBox" class="sr-only" data-i18n="pasteLabel">Document text</label>
+        <textarea id="pasteBox" data-i18n-ph="pastePh" placeholder="Paste the text from your letter or report here…"></textarea>
+      </details>
+    </div>
+
+    <div class="card">
+      <h2 class="step-label"><span class="num" aria-hidden="true">2</span><span data-i18n="step2">How should we explain it?</span></h2>
+      <div class="opts">
+        <div>
+          <label class="lbl" for="langInput" data-i18n="langLabel">Language of the explanation</label>
+          <div class="lang-row"><input id="langInput" list="langList" autocomplete="off" aria-describedby="langHint" data-i18n-ph="langPh" placeholder="Type any language, e.g. Dutch, Arabic, Polish"></div>
+          <p class="hint" id="langHint" data-i18n="langHint">Type any language, or pick one below.</p>
+          <datalist id="langList"></datalist>
+          <div class="chips" id="langChips" role="group" aria-label="Common languages" data-i18n-aria="commonLangs"></div>
+        </div>
+        <fieldset>
+          <legend data-i18n="howSimple">How simple?</legend>
+          <div class="choices">
+            <label class="choice"><input type="radio" name="level" value="easy"><span><b data-i18n="lvlEasy">Very simple</b><small data-i18n="lvlEasyD">Short sentences, everyday words. Like an easy-read leaflet.</small></span></label>
+            <label class="choice"><input type="radio" name="level" value="plain" checked><span><b data-i18n="lvlPlain">Simple</b><small data-i18n="lvlPlainD">Clear, everyday language with the key details.</small></span></label>
+            <label class="choice"><input type="radio" name="level" value="detailed"><span><b data-i18n="lvlDet">More detail</b><small data-i18n="lvlDetD">Plain language, but explains more of the medical background.</small></span></label>
+          </div>
+        </fieldset>
+      </div>
+    </div>
+
+    <div class="go-row">
+      <button class="btn primary" type="button" id="goBtn" disabled aria-describedby="goHint">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9z" fill="currentColor"/></svg>
+        <span data-i18n="go">Explain it to me</span>
+      </button>
+      <p class="privacy" id="goHint">Add a document first. Your document is read on this page and sent to Claude only to write your explanation. It isn't saved.</p>
+    </div>
+  </section>
+
+  <!-- PROGRESS -->
+  <section id="progressView" class="card hidden" aria-label="Progress" data-i18n-aria="progress">
+    <div class="status" role="status" aria-live="polite">
+      <div class="spinner" aria-hidden="true"></div>
+      <div class="msg"><b id="progMsg">Reading your document…</b><div class="sub" id="progSub">This usually takes under a minute.</div></div>
+      <button class="btn small" type="button" id="stopBtn" data-i18n="stop">Stop</button>
+    </div>
+  </section>
+
+  <div id="errorBox" class="notice err hidden" role="alert"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 7v6M12 16.5v.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg><p id="errorMsg"></p></div>
+
+  <!-- RESULTS -->
+  <section id="resultView" class="hidden" aria-label="Your explanation" data-i18n-aria="resultsRegion">
+    <div id="results"></div>
+  </section>
+  </main>
+
+  <footer data-i18n="footer">Plainly is a prototype. It explains documents; it does not diagnose or give medical advice. Account and insurance features are a demo with made-up data.</footer>
+</div>
+
+<!-- FLOATING QUESTIONS -->
+<button id="fab" class="fab hidden" type="button" aria-expanded="false" aria-controls="chatPanel">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M8.5 9.5h7M8.5 12.5h4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  <span id="fabTxt" data-i18n="ask">Ask about your document</span>
+</button>
+<div id="chatPanel" class="chat-panel hidden" role="dialog" aria-modal="false" aria-labelledby="chatTitle">
+  <div class="cp-head">
+    <h2 id="chatTitle" data-i18n="ask">Ask about your document</h2>
+    <button class="btn small" type="button" id="chatClose"><span data-i18n="close">Close</span><span class="sr-only" data-i18n="questionsSr"> questions</span></button>
+  </div>
+  <p class="hint" id="chatHint"></p>
+  <div class="chat" id="chatLog" role="log" aria-live="polite"></div>
+  <div class="ask-row"><label for="askInput" class="sr-only" data-i18n="yourQuestion">Your question</label><input id="askInput" type="text" dir="auto" data-i18n-ph="askPh" placeholder="Type your question…"><button class="btn primary" type="button" id="askSend" style="padding:.6rem 1rem;font-size:1rem" data-i18n="askBtn">Ask</button></div>
+</div>
+
+<!-- ACCOUNT DIALOG (demo) -->
+<dialog id="acctDlg" aria-labelledby="dlgTitle">
+  <div class="dlg" id="dlgBody"></div>
+</dialog>
+
+<script>
+(() => {
+  "use strict";
+  const $ = (s, r = document) => r.querySelector(s);
+  const el = (tag, attrs = {}, ...kids) => {
+    const n = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs)) {
+      if (v == null || v === false) continue;
+      if (k === "class") n.className = v;
+      else if (k === "text") n.textContent = v;
+      else if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
+      else n.setAttribute(k, v === true ? "" : v);
+    }
+    for (const c of kids.flat(Infinity)) if (c != null && c !== false) n.append(c.nodeType ? c : document.createTextNode(String(c)));
+    return n;
+  };
+  const svgEl = html => { const t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstChild; };
+  const str = v => (v == null ? "" : String(v)).trim();
+  const arr = v => Array.isArray(v) ? v : [];
+  const reduceMotion = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  /* ---------- interface languages ---------- */
+  const UI_LANGS = { en: "English", de: "Deutsch", fr: "Français", nl: "Nederlands", es: "Español" };
+  const I18N = {
+    en: {
+      spacing: "Extra spacing",
+      howWorks: "How it works", fromPrice: "From €{price}",
+      tabNext: "Next steps", tabCosts: "Costs", resultTabs: "Parts of your explanation", nudgeNext: "See who to contact and what to do next",
+      skip: "Skip to main content", tagline: "Your medical papers, explained in plain words", textSize: "Text size", sizeN: "Normal text size", sizeL: "Large text size", sizeXL: "Extra large text size", uiLang: "App language",
+      acctRegion: "Your account", unavailable: "To explain documents, this prototype needs Claude. Open this page in Claude while you're signed in, then allow it to use Claude when asked.",
+      inputRegion: "Explain a document", step1: "Add your document", dropTitle: "Choose a file or drop it here", dropHint: "A letter, test result, scan report or leaflet: PDF, Word, text, or a photo of each page", filesLabel: "Added files",
+      pasteSummary: "Or type or paste the text", pasteLabel: "Document text", pastePh: "Paste the text from your letter or report here…",
+      step2: "How should we explain it?", langLabel: "Language of the explanation", langPh: "Type any language, e.g. Dutch, Arabic, Polish", langHint: "Type any language, or pick one below.", commonLangs: "Common languages", howSimple: "How simple?",
+      lvlEasy: "Very simple", lvlEasyD: "Short sentences, everyday words. Like an easy-read leaflet.", lvlPlain: "Simple", lvlPlainD: "Clear, everyday language with the key details.", lvlDet: "More detail", lvlDetD: "Plain language, but explains more of the medical background.",
+      go: "Explain it to me", goHintAnon: "Your document is read on this page and sent to Claude only to write your explanation. It isn't saved.", goHintAcct: "Your document is sent to Claude only to write your explanation. With your demo account, we also check your insurance cover.",
+      progress: "Progress", progRead: "Reading your document…", progReadSub: "Claude is reading it carefully. This usually takes under a minute.", progWrite: "Writing your explanation…", progWriteSub: "Almost there.", stop: "Stop",
+      resultsRegion: "Your explanation", footer: "Plainly is a prototype. It explains documents; it does not diagnose or give medical advice. Account and insurance features are a demo with made-up data.",
+      ask: "Ask about your document", close: "Close", questionsSr: " questions", yourQuestion: "Your question", askPh: "Type your question…", askBtn: "Ask",
+      chatEmpty: "For example: “What does this result mean for me?” or “Can I shower after the operation?”", chatHint: "Answers come in {lang}. For anything about your own treatment, your care team has the final word.",
+      acctAnonT: "Using Plainly without an account", acctAnonS: "Nothing is saved. Sign in to see what your health insurance covers.", signIn: "Sign in", demo: "Demo", hospitalPlan: "Hospital plan", increased: "Increased reimbursement", acctBtn: "Account & insurance", standardCover: "Standard cover", demoPatient: "Demo patient",
+      cancel: "Cancel", back: "Back", dlgChooseT: "How do you want to use Plainly?", dlgChooseHint: "You can always explain documents without an account.", optAnonT: "Continue without an account", optAnonD: "Anonymous. Nothing is saved, and we don't know who you are. You won't see your insurance cover.", optSignT: "Sign in and link my health insurance", optSignD: "See which care is covered by your insurance and what you may have to pay yourself.",
+      eidT: "Sign in", eidP: "In the real service you would sign in with your Belgian eID or a digital identity app. In this demo, nothing is checked.", idCard: "Identity card ending ••• 042", signInAs: "Sign in as Demo patient",
+      insT: "Link your health insurance", insHint: "These insurers and figures are made up for this demo.", insLabel: "Your health insurer", incT: "I have increased reimbursement", incD: "A status that lowers what you pay yourself, e.g. with a low income.", hpT: "I have a hospital plan", hpD: "Extra insurance for hospital stays and some aids.", insConsent: "I agree that Plainly checks my insurance cover for the care in my documents. I can unlink it at any time.", consentErr: "Please tick the box to agree, or choose Cancel.", signOut: "Sign out", save: "Save", linkIns: "Link insurance",
+      revT: "Request a doctor check", revP: "A doctor registered in Belgium compares this explanation with your original document and sends you a checked version.", revSpeed: "How fast do you need it?", revPay: "You pay this yourself. Some supplementary insurance plans refund part of it.", revConsent: "I agree that a doctor sees my document and this explanation, only to check it.", continuePay: "Continue to payment",
+      payT: "Payment", payLine: "{tier} doctor check: €{price}", payP: "In the real service you would pay securely through a payment provider, for example with Bancontact or a bank card. This demo doesn't ask for payment details and doesn't take any money.", confirmDemo: "Confirm (demo, no charge)",
+      tierStandard: "Standard", tierExpress: "Express", within48: "within 48 hours", within24: "within 24 hours", answerIn: "Answer {time}",
+      readErr: "Could not read this file.", photo: "Photo", heic: "iPhone HEIC photos aren't supported. Please send it as JPG or take a screenshot.", wordDoc: "Word document", wordEmpty: "This Word file seems to be empty.", textFile: "Text", unsupported: "This file type isn't supported. Try a PDF, Word file, text file or photo.", loadErr: "The {what} didn't load. Check your connection and try again.", pdfReader: "PDF reader", wordReader: "Word reader", pages: "{n} pages", page1: "1 page", scanned: "Scanned, {pages}", reading: "Reading…", remove: "Remove", removeX: "Remove {name}",
+      e_not_granted: "Plainly wasn't allowed to use Claude. Reload the page and choose Allow to try again.", e_sampling_disabled: "Claude isn't available for this account right now.", e_rate_limited: "You've reached a usage limit for now. Please wait a little and try again.", e_session_expired: "Your session has ended. Please sign in to Claude again.", e_prompt_too_large: "This document is too long to explain in one go. Try sending fewer pages.", e_image_rejected: "One of the pictures couldn't be read. Try a clearer JPG or PNG photo.", e_refused: "Claude couldn't explain this document. Check that it's a medical document and try again.", e_invalid_json: "Something went wrong while writing the explanation. Please try again.", e_images_unavailable: "Photos can't be sent from this view. Paste the text instead, or use a PDF with selectable text.", e_generic: "Something went wrong. Please try again.",
+      aiLabel: "Written by AI (Claude) from your document, in {lang}. It can make mistakes. Always check important details with your doctor, nurse or pharmacist. In an emergency, call 112.",
+      yourDoc: "Your document", readAloud: "🔊 Read aloud", stopReading: "■ Stop reading", noVoice: "No voice for this language", copyText: "Copy text", copied: "Copied ✓", copyFail: "Couldn't copy", newDoc: "New document", unsure: "Unsure? Have a doctor check this →", overview: "Overview",
+      learnMore: "Learn more", original: "Original document", picsOne: "Your document was sent as 1 picture.", picsMany: "Your document was sent as {n} pictures.",
+      noCare: "No follow-up care was found in this document.", signinCta: "Sign in and link your health insurance to see what's covered and what you may pay yourself.", coverUnknown: "Cover unknown", checkedAgainst: "Checked against {ins} ({plan}).", demoFigures: "Demo figures", filterBy: "Filter by cover",
+      fAll: "All", fFull: "Fully covered", fPart: "You pay part", fNone: "Not covered", fUnk: "Ask your insurer", costFull: "You pay nothing extra.", costPart: "You pay about €{amount} {unit}; the rest is paid by your insurer.", costNone: "Not reimbursed: you pay the full price.", costUnk: "We couldn't match this to your cover. Ask your insurer.",
+      u_visit: "per visit", u_day: "per day", u_estimate: "(estimate)", u_scan: "per scan", u_session: "per session", u_pack: "per pack", n_mh: "First 8 sessions a year", n_med: "Depends on the medicine", n_otc: "You pay the pharmacy price",
+      urgentT: "If you have a red warning sign now, don't wait for an appointment.", urgentA: "Emergency: call ", urgentB: ". Evenings, nights and weekends, the GP on call: ", covered: "Covered by your insurance", payVisit: "You pay about €{amount} per visit", notCovered: "Not covered by your insurance", searchFor: "Search for: ", bookOn: "Book on {name}", opensOther: " (opens another website)", orCall: "or call your doctor's office", bookingFine: "Doctena and Doctoranytime are independent booking websites. Plainly doesn't send them your document or any data. Take this explanation and your original document to the appointment.",
+      revCardT: "Have a doctor check this", revIntro: "AI can make mistakes. For extra certainty, a licensed doctor can check this explanation against your original document.", rp1: "Corrects anything the AI got wrong or left out", rp2: "Confirms which items are red, orange or green", rp3: "Adds a short personal note, in your language", rp4: "Done online – no appointment needed", revFine: "Prices are examples for this demo. A doctor check doesn't replace a consultation. For anything urgent, use the contacts above.",
+      ts1: "Request received", ts2: "Doctor assigned", ts3: "Doctor is checking your explanation", ts4: "Checked explanation ready", requested: "{tier} doctor check requested", expected: " – answer expected {time}. ", trackLabel: "Progress of your doctor check", sDone: " (done)", sNow: " (current step)", sNot: " (not yet)", currentStep: "Current step: {s}", inAccount: "You'll find the checked explanation in your account. ", refCode: "Your reference code is {code}. Keep it to open the checked explanation later. ", demoNoDoctor: "In this demo, no doctor sees your document and no money is taken.", cancelReq: "Cancel request",
+      copyFooter: "Written by AI (Claude) with Plainly. It can make mistakes: check important details with your care team.",
+      watchT: "Watch how it's done: trusted videos and animations", madeBy: "Made by health organisations, not by AI. Search term: “{term}”.", resFine: "These are independent websites. They show the procedure in general; yours may be a little different. Many are in English: your browser can translate the pages. Plainly doesn't send them any of your data.",
+      r_aha: "Animations and illustrations of heart and stroke conditions, treatments and procedures. Choose your topic from the “Select a Topic” menu.", r_mlp: "Animated videos, interactive tutorials and surgery videos with plain-language explanations.", r_nhs: "Clear guides on tests, treatments and operations, many with videos: why it's done, what happens and recovery.", r_ta: "Dutch GP-written information with short videos.", r_gw: "Belgian evidence-based health information in plain Dutch.", r_iq: "Independent German health information, many topics with videos and graphics.", r_am: "French public health insurance's patient guides to tests and treatments.",
+      k_anim: "Animations", k_vid: "Videos & tutorials", k_guidevid: "Guides & videos", k_guide: "Guides", l_en: "English", l_es: "Spanish", l_ensome: "English (some Spanish)", l_nl: "Dutch", l_de: "German", l_fr: "French", openX: "Open {name}", searchX: "Search {name}",
+      aiWritten: "AI-written – check with your care team.", more: "Tell me more", less: "Show less", askAbout: "Ask a question about this"
+    },
+    de: {
+      spacing: "Mehr Abstand",
+      howWorks: "So funktioniert es", fromPrice: "Ab {price} €",
+      tabNext: "Nächste Schritte", tabCosts: "Kosten", resultTabs: "Teile Ihrer Erklärung", nudgeNext: "Wen Sie kontaktieren sollten und was als Nächstes zu tun ist",
+      skip: "Zum Hauptinhalt springen", tagline: "Ihre medizinischen Unterlagen, einfach erklärt", textSize: "Textgröße", sizeN: "Normale Textgröße", sizeL: "Große Textgröße", sizeXL: "Sehr große Textgröße", uiLang: "Sprache der App",
+      acctRegion: "Ihr Konto", unavailable: "Um Dokumente zu erklären, braucht dieser Prototyp Claude. Öffnen Sie diese Seite in Claude, während Sie angemeldet sind, und erlauben Sie die Nutzung von Claude, wenn Sie gefragt werden.",
+      inputRegion: "Ein Dokument erklären lassen", step1: "Dokument hinzufügen", dropTitle: "Datei auswählen oder hierher ziehen", dropHint: "Ein Arztbrief, Laborbefund, Bildgebungsbericht oder Merkblatt: PDF, Word, Text oder ein Foto jeder Seite", filesLabel: "Hinzugefügte Dateien",
+      pasteSummary: "Oder Text eingeben oder einfügen", pasteLabel: "Text des Dokuments", pastePh: "Fügen Sie hier den Text Ihres Briefes oder Befundes ein…",
+      step2: "Wie sollen wir es erklären?", langLabel: "Sprache der Erklärung", langPh: "Beliebige Sprache eingeben, z. B. Niederländisch, Arabisch, Polnisch", langHint: "Geben Sie eine beliebige Sprache ein oder wählen Sie unten eine aus.", commonLangs: "Häufige Sprachen", howSimple: "Wie einfach?",
+      lvlEasy: "Sehr einfach", lvlEasyD: "Kurze Sätze, Alltagswörter. Wie ein Text in Leichter Sprache.", lvlPlain: "Einfach", lvlPlainD: "Klare Alltagssprache mit den wichtigsten Details.", lvlDet: "Ausführlicher", lvlDetD: "Einfache Sprache, aber mit mehr medizinischem Hintergrund.",
+      go: "Erklären Sie es mir", goHintAnon: "Ihr Dokument wird auf dieser Seite gelesen und nur an Claude gesendet, um Ihre Erklärung zu schreiben. Es wird nicht gespeichert.", goHintAcct: "Ihr Dokument wird nur an Claude gesendet, um Ihre Erklärung zu schreiben. Mit Ihrem Demo-Konto prüfen wir außerdem Ihren Versicherungsschutz.",
+      progress: "Fortschritt", progRead: "Ihr Dokument wird gelesen…", progReadSub: "Claude liest es sorgfältig. Das dauert meist weniger als eine Minute.", progWrite: "Ihre Erklärung wird geschrieben…", progWriteSub: "Gleich fertig.", stop: "Abbrechen",
+      resultsRegion: "Ihre Erklärung", footer: "Plainly ist ein Prototyp. Es erklärt Dokumente; es stellt keine Diagnosen und gibt keinen medizinischen Rat. Konto- und Versicherungsfunktionen sind eine Demo mit erfundenen Daten.",
+      ask: "Fragen zu Ihrem Dokument", close: "Schließen", questionsSr: " (Fragen)", yourQuestion: "Ihre Frage", askPh: "Ihre Frage eingeben…", askBtn: "Fragen",
+      chatEmpty: "Zum Beispiel: „Was bedeutet dieser Wert für mich?“ oder „Darf ich nach der Operation duschen?“", chatHint: "Antworten kommen auf {lang}. Bei allem, was Ihre eigene Behandlung betrifft, hat Ihr Behandlungsteam das letzte Wort.",
+      acctAnonT: "Sie nutzen Plainly ohne Konto", acctAnonS: "Nichts wird gespeichert. Melden Sie sich an, um zu sehen, was Ihre Krankenkasse übernimmt.", signIn: "Anmelden", demo: "Demo", hospitalPlan: "Krankenhauszusatz", increased: "Erhöhte Kostenerstattung", acctBtn: "Konto & Versicherung", standardCover: "Grundversicherung", demoPatient: "Demo-Patient",
+      cancel: "Abbrechen", back: "Zurück", dlgChooseT: "Wie möchten Sie Plainly nutzen?", dlgChooseHint: "Dokumente erklären lassen können Sie immer auch ohne Konto.", optAnonT: "Ohne Konto weiter", optAnonD: "Anonym. Nichts wird gespeichert und wir wissen nicht, wer Sie sind. Ihren Versicherungsschutz sehen Sie nicht.", optSignT: "Anmelden und Krankenkasse verknüpfen", optSignD: "Sehen Sie, welche Versorgung Ihre Kasse übernimmt und was Sie eventuell selbst zahlen.",
+      eidT: "Anmelden", eidP: "Im echten Dienst würden Sie sich mit Ihrem belgischen eID oder einer digitalen Identitäts-App anmelden. In dieser Demo wird nichts geprüft.", idCard: "Personalausweis endet auf ••• 042", signInAs: "Als Demo-Patient anmelden",
+      insT: "Krankenkasse verknüpfen", insHint: "Diese Kassen und Beträge sind für die Demo erfunden.", insLabel: "Ihre Krankenkasse", incT: "Ich habe Anspruch auf erhöhte Kostenerstattung", incD: "Ein Status, der Ihren Eigenanteil senkt, z. B. bei geringem Einkommen.", hpT: "Ich habe eine Krankenhauszusatzversicherung", hpD: "Zusätzliche Versicherung für Krankenhausaufenthalte und manche Hilfsmittel.", insConsent: "Ich bin einverstanden, dass Plainly meinen Versicherungsschutz für die Versorgung in meinen Dokumenten prüft. Ich kann die Verknüpfung jederzeit aufheben.", consentErr: "Bitte setzen Sie das Häkchen, um zuzustimmen, oder wählen Sie Abbrechen.", signOut: "Abmelden", save: "Speichern", linkIns: "Kasse verknüpfen",
+      revT: "Ärztliche Prüfung anfordern", revP: "Eine in Belgien zugelassene Ärztin oder ein Arzt vergleicht diese Erklärung mit Ihrem Originaldokument und schickt Ihnen eine geprüfte Fassung.", revSpeed: "Wie schnell brauchen Sie sie?", revPay: "Sie zahlen dies selbst. Manche Zusatzversicherungen erstatten einen Teil.", revConsent: "Ich bin einverstanden, dass eine Ärztin oder ein Arzt mein Dokument und diese Erklärung nur zur Prüfung sieht.", continuePay: "Weiter zur Zahlung",
+      payT: "Zahlung", payLine: "Ärztliche Prüfung {tier}: {price} €", payP: "Im echten Dienst würden Sie sicher über einen Zahlungsanbieter zahlen, zum Beispiel mit Bancontact oder Bankkarte. Diese Demo fragt keine Zahlungsdaten ab und bucht kein Geld ab.", confirmDemo: "Bestätigen (Demo, kostenlos)",
+      tierStandard: "Standard", tierExpress: "Express", within48: "innerhalb von 48 Stunden", within24: "innerhalb von 24 Stunden", answerIn: "Antwort {time}",
+      readErr: "Diese Datei konnte nicht gelesen werden.", photo: "Foto", heic: "HEIC-Fotos vom iPhone werden nicht unterstützt. Bitte senden Sie es als JPG oder machen Sie einen Screenshot.", wordDoc: "Word-Dokument", wordEmpty: "Diese Word-Datei scheint leer zu sein.", textFile: "Text", unsupported: "Dieser Dateityp wird nicht unterstützt. Versuchen Sie PDF, Word, Text oder ein Foto.", loadErr: "Der {what} wurde nicht geladen. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.", pdfReader: "PDF-Leser", wordReader: "Word-Leser", pages: "{n} Seiten", page1: "1 Seite", scanned: "Gescannt, {pages}", reading: "Wird gelesen…", remove: "Entfernen", removeX: "{name} entfernen",
+      e_not_granted: "Plainly durfte Claude nicht nutzen. Laden Sie die Seite neu und wählen Sie Erlauben.", e_sampling_disabled: "Claude ist für dieses Konto gerade nicht verfügbar.", e_rate_limited: "Sie haben vorerst ein Nutzungslimit erreicht. Bitte warten Sie kurz und versuchen Sie es erneut.", e_session_expired: "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut bei Claude an.", e_prompt_too_large: "Dieses Dokument ist zu lang, um es auf einmal zu erklären. Senden Sie weniger Seiten.", e_image_rejected: "Eines der Bilder konnte nicht gelesen werden. Versuchen Sie ein schärferes JPG- oder PNG-Foto.", e_refused: "Claude konnte dieses Dokument nicht erklären. Prüfen Sie, ob es ein medizinisches Dokument ist, und versuchen Sie es erneut.", e_invalid_json: "Beim Schreiben der Erklärung ist etwas schiefgelaufen. Bitte versuchen Sie es erneut.", e_images_unavailable: "Fotos können in dieser Ansicht nicht gesendet werden. Fügen Sie stattdessen den Text ein oder nutzen Sie ein PDF mit markierbarem Text.", e_generic: "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
+      aiLabel: "Von KI (Claude) aus Ihrem Dokument geschrieben, auf {lang}. Sie kann Fehler machen. Prüfen Sie wichtige Details immer mit Ihrer Ärztin, Pflegekraft oder Apotheke. Im Notfall rufen Sie 112 an.",
+      yourDoc: "Ihr Dokument", readAloud: "🔊 Vorlesen", stopReading: "■ Vorlesen stoppen", noVoice: "Keine Stimme für diese Sprache", copyText: "Text kopieren", copied: "Kopiert ✓", copyFail: "Kopieren nicht möglich", newDoc: "Neues Dokument", unsure: "Unsicher? Lassen Sie es ärztlich prüfen →", overview: "Übersicht",
+      learnMore: "Mehr erfahren", original: "Originaldokument", picsOne: "Ihr Dokument wurde als 1 Bild gesendet.", picsMany: "Ihr Dokument wurde als {n} Bilder gesendet.",
+      noCare: "In diesem Dokument wurde keine Nachsorge gefunden.", signinCta: "Melden Sie sich an und verknüpfen Sie Ihre Krankenkasse, um zu sehen, was übernommen wird und was Sie eventuell selbst zahlen.", coverUnknown: "Kostenübernahme unbekannt", checkedAgainst: "Geprüft mit {ins} ({plan}).", demoFigures: "Demo-Beträge", filterBy: "Nach Kostenübernahme filtern",
+      fAll: "Alle", fFull: "Voll übernommen", fPart: "Eigenanteil", fNone: "Nicht übernommen", fUnk: "Bei der Kasse fragen", costFull: "Sie zahlen nichts zusätzlich.", costPart: "Sie zahlen etwa {amount} € {unit}; den Rest zahlt Ihre Kasse.", costNone: "Nicht erstattet: Sie zahlen den vollen Preis.", costUnk: "Wir konnten dies Ihrem Schutz nicht zuordnen. Fragen Sie Ihre Kasse.",
+      u_visit: "pro Besuch", u_day: "pro Tag", u_estimate: "(geschätzt)", u_scan: "pro Untersuchung", u_session: "pro Sitzung", u_pack: "pro Packung", n_mh: "Die ersten 8 Sitzungen pro Jahr", n_med: "Hängt vom Medikament ab", n_otc: "Sie zahlen den Apothekenpreis",
+      urgentT: "Wenn Sie jetzt ein rotes Warnzeichen haben, warten Sie nicht auf einen Termin.", urgentA: "Notfall: Rufen Sie ", urgentB: " an. Abends, nachts und am Wochenende erreichen Sie den ärztlichen Bereitschaftsdienst unter ", covered: "Von Ihrer Kasse übernommen", payVisit: "Sie zahlen etwa {amount} € pro Besuch", notCovered: "Nicht von Ihrer Kasse übernommen", searchFor: "Suchbegriff: ", bookOn: "Bei {name} buchen", opensOther: " (öffnet eine andere Website)", orCall: "oder rufen Sie die Praxis an", bookingFine: "Doctena und Doctoranytime sind unabhängige Buchungsseiten. Plainly sendet ihnen weder Ihr Dokument noch andere Daten. Nehmen Sie diese Erklärung und Ihr Originaldokument mit zum Termin.",
+      revCardT: "Ärztlich prüfen lassen", revIntro: "KI kann Fehler machen. Für mehr Sicherheit kann eine zugelassene Ärztin oder ein Arzt diese Erklärung mit Ihrem Originaldokument vergleichen.", rp1: "Korrigiert, was die KI falsch verstanden oder ausgelassen hat", rp2: "Bestätigt, welche Punkte rot, orange oder grün sind", rp3: "Fügt eine kurze persönliche Notiz in Ihrer Sprache hinzu", rp4: "Online – ohne Termin", revFine: "Die Preise sind Beispiele für diese Demo. Eine ärztliche Prüfung ersetzt keine Sprechstunde. Nutzen Sie bei Dringendem die Kontakte oben.",
+      ts1: "Anfrage erhalten", ts2: "Ärztin/Arzt zugewiesen", ts3: "Ihre Erklärung wird geprüft", ts4: "Geprüfte Erklärung bereit", requested: "Ärztliche Prüfung ({tier}) angefordert", expected: " – Antwort {time}. ", trackLabel: "Fortschritt Ihrer ärztlichen Prüfung", sDone: " (erledigt)", sNow: " (aktueller Schritt)", sNot: " (noch nicht)", currentStep: "Aktueller Schritt: {s}", inAccount: "Die geprüfte Erklärung finden Sie in Ihrem Konto. ", refCode: "Ihr Referenzcode lautet {code}. Bewahren Sie ihn auf, um die geprüfte Erklärung später zu öffnen. ", demoNoDoctor: "In dieser Demo sieht keine Ärztin und kein Arzt Ihr Dokument, und es wird kein Geld abgebucht.", cancelReq: "Anfrage zurückziehen",
+      copyFooter: "Von KI (Claude) mit Plainly geschrieben. Sie kann Fehler machen: Prüfen Sie wichtige Details mit Ihrem Behandlungsteam.",
+      watchT: "So läuft es ab: vertrauenswürdige Videos und Animationen", madeBy: "Von Gesundheitsorganisationen erstellt, nicht von KI. Suchbegriff: „{term}“.", resFine: "Dies sind unabhängige Websites. Sie zeigen den Eingriff allgemein; Ihrer kann etwas anders sein. Viele sind auf Englisch: Ihr Browser kann die Seiten übersetzen. Plainly sendet ihnen keine Ihrer Daten.",
+      r_aha: "Animationen und Abbildungen zu Herz- und Schlaganfallerkrankungen, Behandlungen und Eingriffen. Wählen Sie Ihr Thema im Menü „Select a Topic“.", r_mlp: "Animierte Videos, interaktive Tutorials und OP-Videos mit verständlichen Erklärungen.", r_nhs: "Klare Leitfäden zu Untersuchungen, Behandlungen und Operationen, viele mit Videos: warum, was passiert und Erholung.", r_ta: "Niederländische Informationen von Hausärzten mit kurzen Videos.", r_gw: "Belgische, evidenzbasierte Gesundheitsinformationen in einfachem Niederländisch.", r_iq: "Unabhängige deutsche Gesundheitsinformationen, viele Themen mit Videos und Grafiken.", r_am: "Patientenratgeber der französischen gesetzlichen Krankenversicherung zu Untersuchungen und Behandlungen.",
+      k_anim: "Animationen", k_vid: "Videos & Tutorials", k_guidevid: "Ratgeber & Videos", k_guide: "Ratgeber", l_en: "Englisch", l_es: "Spanisch", l_ensome: "Englisch (teils Spanisch)", l_nl: "Niederländisch", l_de: "Deutsch", l_fr: "Französisch", openX: "{name} öffnen", searchX: "In {name} suchen",
+      aiWritten: "Von KI geschrieben – mit Ihrem Behandlungsteam prüfen.", more: "Mehr dazu", less: "Weniger anzeigen", askAbout: "Eine Frage dazu stellen"
+    },
+    fr: {
+      spacing: "Plus d’espace",
+      howWorks: "Comment ça marche", fromPrice: "À partir de {price} €",
+      tabNext: "Prochaines étapes", tabCosts: "Coûts", resultTabs: "Parties de votre explication", nudgeNext: "Qui contacter et que faire ensuite",
+      skip: "Aller au contenu principal", tagline: "Vos documents médicaux, expliqués simplement", textSize: "Taille du texte", sizeN: "Taille de texte normale", sizeL: "Grand texte", sizeXL: "Très grand texte", uiLang: "Langue de l’application",
+      acctRegion: "Votre compte", unavailable: "Pour expliquer des documents, ce prototype a besoin de Claude. Ouvrez cette page dans Claude en étant connecté, puis autorisez l’utilisation de Claude lorsque cela vous est demandé.",
+      inputRegion: "Faire expliquer un document", step1: "Ajoutez votre document", dropTitle: "Choisissez un fichier ou déposez-le ici", dropHint: "Une lettre, un résultat d’analyse, un compte rendu d’imagerie ou une notice : PDF, Word, texte ou une photo de chaque page", filesLabel: "Fichiers ajoutés",
+      pasteSummary: "Ou tapez ou collez le texte", pasteLabel: "Texte du document", pastePh: "Collez ici le texte de votre lettre ou de votre compte rendu…",
+      step2: "Comment voulez-vous l’explication ?", langLabel: "Langue de l’explication", langPh: "Tapez une langue, p. ex. néerlandais, arabe, polonais", langHint: "Tapez n’importe quelle langue ou choisissez-en une ci-dessous.", commonLangs: "Langues courantes", howSimple: "Quel niveau de simplicité ?",
+      lvlEasy: "Très simple", lvlEasyD: "Phrases courtes, mots de tous les jours. Comme un texte « facile à lire ».", lvlPlain: "Simple", lvlPlainD: "Langage clair et courant, avec les détails importants.", lvlDet: "Plus détaillé", lvlDetD: "Langage simple, mais avec plus de contexte médical.",
+      go: "Expliquez-le-moi", goHintAnon: "Votre document est lu sur cette page et envoyé à Claude uniquement pour rédiger votre explication. Il n’est pas enregistré.", goHintAcct: "Votre document est envoyé à Claude uniquement pour rédiger votre explication. Avec votre compte de démonstration, nous vérifions aussi votre couverture.",
+      progress: "Progression", progRead: "Lecture de votre document…", progReadSub: "Claude le lit attentivement. Cela prend généralement moins d’une minute.", progWrite: "Rédaction de votre explication…", progWriteSub: "Presque terminé.", stop: "Arrêter",
+      resultsRegion: "Votre explication", footer: "Plainly est un prototype. Il explique des documents ; il ne pose pas de diagnostic et ne donne pas d’avis médical. Les fonctions de compte et d’assurance sont une démonstration avec des données fictives.",
+      ask: "Questions sur votre document", close: "Fermer", questionsSr: " (questions)", yourQuestion: "Votre question", askPh: "Tapez votre question…", askBtn: "Demander",
+      chatEmpty: "Par exemple : « Que signifie ce résultat pour moi ? » ou « Puis-je me doucher après l’opération ? »", chatHint: "Les réponses sont en {lang}. Pour tout ce qui concerne votre traitement, votre équipe soignante a le dernier mot.",
+      acctAnonT: "Vous utilisez Plainly sans compte", acctAnonS: "Rien n’est enregistré. Connectez-vous pour voir ce que couvre votre mutualité.", signIn: "Se connecter", demo: "Démo", hospitalPlan: "Assurance hospitalisation", increased: "Intervention majorée", acctBtn: "Compte et assurance", standardCover: "Couverture de base", demoPatient: "Patient de démo",
+      cancel: "Annuler", back: "Retour", dlgChooseT: "Comment voulez-vous utiliser Plainly ?", dlgChooseHint: "Vous pouvez toujours faire expliquer des documents sans compte.", optAnonT: "Continuer sans compte", optAnonD: "Anonyme. Rien n’est enregistré et nous ne savons pas qui vous êtes. Vous ne verrez pas votre couverture.", optSignT: "Me connecter et lier ma mutualité", optSignD: "Voyez quels soins sont couverts par votre mutualité et ce que vous pourriez payer vous-même.",
+      eidT: "Se connecter", eidP: "Dans le vrai service, vous vous connecteriez avec votre eID belge ou une application d’identité numérique. Dans cette démo, rien n’est vérifié.", idCard: "Carte d’identité se terminant par ••• 042", signInAs: "Se connecter comme patient de démo",
+      insT: "Lier votre mutualité", insHint: "Ces mutualités et montants sont inventés pour cette démo.", insLabel: "Votre mutualité", incT: "J’ai droit à l’intervention majorée", incD: "Un statut qui réduit ce que vous payez vous-même, p. ex. avec un faible revenu.", hpT: "J’ai une assurance hospitalisation", hpD: "Assurance complémentaire pour les séjours à l’hôpital et certaines aides.", insConsent: "J’accepte que Plainly vérifie ma couverture pour les soins mentionnés dans mes documents. Je peux supprimer ce lien à tout moment.", consentErr: "Veuillez cocher la case pour accepter, ou choisissez Annuler.", signOut: "Se déconnecter", save: "Enregistrer", linkIns: "Lier la mutualité",
+      revT: "Demander une vérification médicale", revP: "Un médecin agréé en Belgique compare cette explication avec votre document original et vous envoie une version vérifiée.", revSpeed: "Dans quel délai en avez-vous besoin ?", revPay: "Vous payez ce service vous-même. Certaines assurances complémentaires en remboursent une partie.", revConsent: "J’accepte qu’un médecin voie mon document et cette explication, uniquement pour les vérifier.", continuePay: "Continuer vers le paiement",
+      payT: "Paiement", payLine: "Vérification médicale {tier} : {price} €", payP: "Dans le vrai service, vous paieriez de façon sécurisée via un prestataire de paiement, par exemple avec Bancontact ou une carte bancaire. Cette démo ne demande aucune donnée de paiement et ne prélève aucun argent.", confirmDemo: "Confirmer (démo, gratuit)",
+      tierStandard: "Standard", tierExpress: "Express", within48: "sous 48 heures", within24: "sous 24 heures", answerIn: "Réponse {time}",
+      readErr: "Impossible de lire ce fichier.", photo: "Photo", heic: "Les photos HEIC d’iPhone ne sont pas prises en charge. Envoyez-la en JPG ou faites une capture d’écran.", wordDoc: "Document Word", wordEmpty: "Ce fichier Word semble vide.", textFile: "Texte", unsupported: "Ce type de fichier n’est pas pris en charge. Essayez un PDF, un fichier Word, un texte ou une photo.", loadErr: "Le {what} ne s’est pas chargé. Vérifiez votre connexion et réessayez.", pdfReader: "lecteur PDF", wordReader: "lecteur Word", pages: "{n} pages", page1: "1 page", scanned: "Scanné, {pages}", reading: "Lecture…", remove: "Retirer", removeX: "Retirer {name}",
+      e_not_granted: "Plainly n’a pas été autorisé à utiliser Claude. Rechargez la page et choisissez Autoriser.", e_sampling_disabled: "Claude n’est pas disponible pour ce compte pour le moment.", e_rate_limited: "Vous avez atteint une limite d’utilisation. Patientez un peu et réessayez.", e_session_expired: "Votre session a expiré. Reconnectez-vous à Claude.", e_prompt_too_large: "Ce document est trop long pour être expliqué en une fois. Envoyez moins de pages.", e_image_rejected: "Une des images n’a pas pu être lue. Essayez une photo JPG ou PNG plus nette.", e_refused: "Claude n’a pas pu expliquer ce document. Vérifiez qu’il s’agit d’un document médical et réessayez.", e_invalid_json: "Un problème est survenu pendant la rédaction. Veuillez réessayer.", e_images_unavailable: "Les photos ne peuvent pas être envoyées depuis cette vue. Collez plutôt le texte, ou utilisez un PDF dont le texte est sélectionnable.", e_generic: "Un problème est survenu. Veuillez réessayer.",
+      aiLabel: "Rédigé par une IA (Claude) à partir de votre document, en {lang}. Elle peut se tromper. Vérifiez toujours les détails importants avec votre médecin, votre infirmier·ère ou votre pharmacien·ne. En cas d’urgence, appelez le 112.",
+      yourDoc: "Votre document", readAloud: "🔊 Lire à voix haute", stopReading: "■ Arrêter la lecture", noVoice: "Pas de voix pour cette langue", copyText: "Copier le texte", copied: "Copié ✓", copyFail: "Copie impossible", newDoc: "Nouveau document", unsure: "Un doute ? Faites vérifier par un médecin →", overview: "Vue d’ensemble",
+      learnMore: "En savoir plus", original: "Document original", picsOne: "Votre document a été envoyé sous forme d’1 image.", picsMany: "Votre document a été envoyé sous forme de {n} images.",
+      noCare: "Aucun suivi n’a été trouvé dans ce document.", signinCta: "Connectez-vous et liez votre mutualité pour voir ce qui est couvert et ce que vous pourriez payer vous-même.", coverUnknown: "Couverture inconnue", checkedAgainst: "Vérifié auprès de {ins} ({plan}).", demoFigures: "Montants de démo", filterBy: "Filtrer par couverture",
+      fAll: "Tout", fFull: "Entièrement couvert", fPart: "Ticket modérateur", fNone: "Non couvert", fUnk: "Demandez à votre mutualité", costFull: "Vous ne payez rien de plus.", costPart: "Vous payez environ {amount} € {unit} ; le reste est payé par votre mutualité.", costNone: "Non remboursé : vous payez le prix plein.", costUnk: "Nous n’avons pas pu relier ceci à votre couverture. Demandez à votre mutualité.",
+      u_visit: "par visite", u_day: "par jour", u_estimate: "(estimation)", u_scan: "par examen", u_session: "par séance", u_pack: "par boîte", n_mh: "8 premières séances par an", n_med: "Dépend du médicament", n_otc: "Vous payez le prix en pharmacie",
+      urgentT: "Si vous avez maintenant un signe d’alerte rouge, n’attendez pas un rendez-vous.", urgentA: "Urgence : appelez le ", urgentB: ". Le soir, la nuit et le week-end, le médecin de garde : ", covered: "Couvert par votre mutualité", payVisit: "Vous payez environ {amount} € par visite", notCovered: "Non couvert par votre mutualité", searchFor: "Rechercher : ", bookOn: "Réserver sur {name}", opensOther: " (ouvre un autre site)", orCall: "ou appelez le cabinet", bookingFine: "Doctena et Doctoranytime sont des sites de réservation indépendants. Plainly ne leur envoie ni votre document ni aucune donnée. Apportez cette explication et votre document original au rendez-vous.",
+      revCardT: "Faire vérifier par un médecin", revIntro: "L’IA peut se tromper. Pour plus de certitude, un médecin agréé peut comparer cette explication avec votre document original.", rp1: "Corrige ce que l’IA a mal compris ou oublié", rp2: "Confirme quels points sont rouges, orange ou verts", rp3: "Ajoute une courte note personnelle, dans votre langue", rp4: "En ligne – sans rendez-vous", revFine: "Les prix sont des exemples pour cette démo. Une vérification ne remplace pas une consultation. Pour toute urgence, utilisez les contacts ci-dessus.",
+      ts1: "Demande reçue", ts2: "Médecin attribué", ts3: "Le médecin vérifie votre explication", ts4: "Explication vérifiée prête", requested: "Vérification médicale {tier} demandée", expected: " – réponse {time}. ", trackLabel: "Progression de votre vérification médicale", sDone: " (fait)", sNow: " (étape en cours)", sNot: " (pas encore)", currentStep: "Étape en cours : {s}", inAccount: "Vous trouverez l’explication vérifiée dans votre compte. ", refCode: "Votre code de référence est {code}. Conservez-le pour ouvrir l’explication vérifiée plus tard. ", demoNoDoctor: "Dans cette démo, aucun médecin ne voit votre document et aucun argent n’est prélevé.", cancelReq: "Annuler la demande",
+      copyFooter: "Rédigé par une IA (Claude) avec Plainly. Elle peut se tromper : vérifiez les détails importants avec votre équipe soignante.",
+      watchT: "Comment ça se passe : vidéos et animations fiables", madeBy: "Réalisé par des organismes de santé, pas par une IA. Terme de recherche : « {term} ».", resFine: "Ce sont des sites indépendants. Ils montrent l’intervention en général ; la vôtre peut être un peu différente. Beaucoup sont en anglais : votre navigateur peut traduire les pages. Plainly ne leur envoie aucune de vos données.",
+      r_aha: "Animations et illustrations sur les maladies du cœur et l’AVC, leurs traitements et interventions. Choisissez votre sujet dans le menu « Select a Topic ».", r_mlp: "Vidéos animées, tutoriels interactifs et vidéos de chirurgie avec des explications simples.", r_nhs: "Guides clairs sur les examens, traitements et opérations, souvent avec vidéos : pourquoi, déroulement et récupération.", r_ta: "Informations néerlandaises rédigées par des généralistes, avec de courtes vidéos.", r_gw: "Informations de santé belges fondées sur les preuves, en néerlandais simple.", r_iq: "Informations de santé allemandes indépendantes, souvent avec vidéos et graphiques.", r_am: "Guides patients de l’Assurance Maladie sur les examens et traitements.",
+      k_anim: "Animations", k_vid: "Vidéos et tutoriels", k_guidevid: "Guides et vidéos", k_guide: "Guides", l_en: "anglais", l_es: "espagnol", l_ensome: "anglais (en partie espagnol)", l_nl: "néerlandais", l_de: "allemand", l_fr: "français", openX: "Ouvrir {name}", searchX: "Rechercher sur {name}",
+      aiWritten: "Rédigé par une IA – à vérifier avec votre équipe soignante.", more: "En savoir plus", less: "Afficher moins", askAbout: "Poser une question à ce sujet"
+    },
+    nl: {
+      spacing: "Meer ruimte",
+      howWorks: "Zo werkt het", fromPrice: "Vanaf € {price}",
+      tabNext: "Volgende stappen", tabCosts: "Kosten", resultTabs: "Onderdelen van uw uitleg", nudgeNext: "Wie u kunt contacteren en wat u nu doet",
+      skip: "Naar de hoofdinhoud", tagline: "Uw medische documenten, eenvoudig uitgelegd", textSize: "Tekstgrootte", sizeN: "Normale tekstgrootte", sizeL: "Grote tekst", sizeXL: "Extra grote tekst", uiLang: "Taal van de app",
+      acctRegion: "Uw account", unavailable: "Om documenten uit te leggen heeft dit prototype Claude nodig. Open deze pagina in Claude terwijl u aangemeld bent, en sta het gebruik van Claude toe als daarom gevraagd wordt.",
+      inputRegion: "Een document laten uitleggen", step1: "Voeg uw document toe", dropTitle: "Kies een bestand of sleep het hierheen", dropHint: "Een brief, labo-uitslag, verslag van een scan of folder: pdf, Word, tekst of een foto van elke pagina", filesLabel: "Toegevoegde bestanden",
+      pasteSummary: "Of typ of plak de tekst", pasteLabel: "Tekst van het document", pastePh: "Plak hier de tekst van uw brief of verslag…",
+      step2: "Hoe moeten we het uitleggen?", langLabel: "Taal van de uitleg", langPh: "Typ een taal, bv. Nederlands, Arabisch, Pools", langHint: "Typ een taal of kies er hieronder een.", commonLangs: "Veelgebruikte talen", howSimple: "Hoe eenvoudig?",
+      lvlEasy: "Heel eenvoudig", lvlEasyD: "Korte zinnen, gewone woorden. Zoals een tekst in eenvoudige taal.", lvlPlain: "Eenvoudig", lvlPlainD: "Duidelijke, gewone taal met de belangrijkste details.", lvlDet: "Meer uitleg", lvlDetD: "Eenvoudige taal, maar met meer medische achtergrond.",
+      go: "Leg het me uit", goHintAnon: "Uw document wordt op deze pagina gelezen en alleen naar Claude gestuurd om uw uitleg te schrijven. Het wordt niet bewaard.", goHintAcct: "Uw document wordt alleen naar Claude gestuurd om uw uitleg te schrijven. Met uw demo-account controleren we ook wat uw ziekenfonds terugbetaalt.",
+      progress: "Voortgang", progRead: "Uw document wordt gelezen…", progReadSub: "Claude leest het zorgvuldig. Dit duurt meestal minder dan een minuut.", progWrite: "Uw uitleg wordt geschreven…", progWriteSub: "Bijna klaar.", stop: "Stoppen",
+      resultsRegion: "Uw uitleg", footer: "Plainly is een prototype. Het legt documenten uit; het stelt geen diagnose en geeft geen medisch advies. Account- en verzekeringsfuncties zijn een demo met verzonnen gegevens.",
+      ask: "Vragen over uw document", close: "Sluiten", questionsSr: " (vragen)", yourQuestion: "Uw vraag", askPh: "Typ uw vraag…", askBtn: "Vragen",
+      chatEmpty: "Bijvoorbeeld: ‘Wat betekent deze uitslag voor mij?’ of ‘Mag ik douchen na de operatie?’", chatHint: "Antwoorden komen in het {lang}. Voor alles over uw eigen behandeling heeft uw zorgteam het laatste woord.",
+      acctAnonT: "U gebruikt Plainly zonder account", acctAnonS: "Er wordt niets bewaard. Meld u aan om te zien wat uw ziekenfonds terugbetaalt.", signIn: "Aanmelden", demo: "Demo", hospitalPlan: "Hospitalisatieverzekering", increased: "Verhoogde tegemoetkoming", acctBtn: "Account en verzekering", standardCover: "Basisdekking", demoPatient: "Demopatiënt",
+      cancel: "Annuleren", back: "Terug", dlgChooseT: "Hoe wilt u Plainly gebruiken?", dlgChooseHint: "U kunt documenten altijd zonder account laten uitleggen.", optAnonT: "Verder zonder account", optAnonD: "Anoniem. Er wordt niets bewaard en we weten niet wie u bent. U ziet uw terugbetaling niet.", optSignT: "Aanmelden en mijn ziekenfonds koppelen", optSignD: "Zie welke zorg uw ziekenfonds terugbetaalt en wat u mogelijk zelf betaalt.",
+      eidT: "Aanmelden", eidP: "In de echte dienst meldt u zich aan met uw Belgische eID of een app voor digitale identiteit. In deze demo wordt niets gecontroleerd.", idCard: "Identiteitskaart eindigend op ••• 042", signInAs: "Aanmelden als demopatiënt",
+      insT: "Uw ziekenfonds koppelen", insHint: "Deze ziekenfondsen en bedragen zijn verzonnen voor deze demo.", insLabel: "Uw ziekenfonds", incT: "Ik heb recht op verhoogde tegemoetkoming", incD: "Een statuut dat uw eigen bijdrage verlaagt, bv. bij een laag inkomen.", hpT: "Ik heb een hospitalisatieverzekering", hpD: "Extra verzekering voor ziekenhuisopnames en sommige hulpmiddelen.", insConsent: "Ik ga ermee akkoord dat Plainly mijn terugbetaling controleert voor de zorg in mijn documenten. Ik kan de koppeling altijd verwijderen.", consentErr: "Vink het vakje aan om akkoord te gaan, of kies Annuleren.", signOut: "Afmelden", save: "Opslaan", linkIns: "Ziekenfonds koppelen",
+      revT: "Controle door een arts aanvragen", revP: "Een in België erkende arts vergelijkt deze uitleg met uw originele document en stuurt u een gecontroleerde versie.", revSpeed: "Hoe snel heeft u het nodig?", revPay: "U betaalt dit zelf. Sommige aanvullende verzekeringen betalen een deel terug.", revConsent: "Ik ga ermee akkoord dat een arts mijn document en deze uitleg ziet, alleen om ze te controleren.", continuePay: "Verder naar betalen",
+      payT: "Betaling", payLine: "Controle door een arts ({tier}): € {price}", payP: "In de echte dienst betaalt u veilig via een betaaldienst, bijvoorbeeld met Bancontact of een bankkaart. Deze demo vraagt geen betaalgegevens en rekent niets aan.", confirmDemo: "Bevestigen (demo, gratis)",
+      tierStandard: "Standaard", tierExpress: "Express", within48: "binnen 48 uur", within24: "binnen 24 uur", answerIn: "Antwoord {time}",
+      readErr: "Dit bestand kon niet gelezen worden.", photo: "Foto", heic: "HEIC-foto’s van een iPhone worden niet ondersteund. Stuur hem als JPG of maak een schermafbeelding.", wordDoc: "Word-document", wordEmpty: "Dit Word-bestand lijkt leeg.", textFile: "Tekst", unsupported: "Dit bestandstype wordt niet ondersteund. Probeer pdf, Word, tekst of een foto.", loadErr: "De {what} is niet geladen. Controleer uw verbinding en probeer opnieuw.", pdfReader: "pdf-lezer", wordReader: "Word-lezer", pages: "{n} pagina’s", page1: "1 pagina", scanned: "Gescand, {pages}", reading: "Bezig met lezen…", remove: "Verwijderen", removeX: "{name} verwijderen",
+      e_not_granted: "Plainly mocht Claude niet gebruiken. Laad de pagina opnieuw en kies Toestaan.", e_sampling_disabled: "Claude is nu niet beschikbaar voor dit account.", e_rate_limited: "U heeft voorlopig een gebruikslimiet bereikt. Wacht even en probeer opnieuw.", e_session_expired: "Uw sessie is verlopen. Meld u opnieuw aan bij Claude.", e_prompt_too_large: "Dit document is te lang om in één keer uit te leggen. Stuur minder pagina’s.", e_image_rejected: "Een van de afbeeldingen kon niet gelezen worden. Probeer een scherpere JPG- of PNG-foto.", e_refused: "Claude kon dit document niet uitleggen. Controleer of het een medisch document is en probeer opnieuw.", e_invalid_json: "Er ging iets mis bij het schrijven van de uitleg. Probeer opnieuw.", e_images_unavailable: "Foto’s kunnen in deze weergave niet verstuurd worden. Plak de tekst of gebruik een pdf met selecteerbare tekst.", e_generic: "Er ging iets mis. Probeer opnieuw.",
+      aiLabel: "Geschreven door AI (Claude) op basis van uw document, in het {lang}. Ze kan fouten maken. Controleer belangrijke details altijd bij uw arts, verpleegkundige of apotheker. Bel bij een noodgeval 112.",
+      yourDoc: "Uw document", readAloud: "🔊 Voorlezen", stopReading: "■ Stoppen met voorlezen", noVoice: "Geen stem voor deze taal", copyText: "Tekst kopiëren", copied: "Gekopieerd ✓", copyFail: "Kopiëren mislukt", newDoc: "Nieuw document", unsure: "Twijfelt u? Laat het door een arts controleren →", overview: "Overzicht",
+      learnMore: "Meer weten", original: "Origineel document", picsOne: "Uw document is verstuurd als 1 afbeelding.", picsMany: "Uw document is verstuurd als {n} afbeeldingen.",
+      noCare: "In dit document is geen vervolgzorg gevonden.", signinCta: "Meld u aan en koppel uw ziekenfonds om te zien wat terugbetaald wordt en wat u mogelijk zelf betaalt.", coverUnknown: "Terugbetaling onbekend", checkedAgainst: "Gecontroleerd bij {ins} ({plan}).", demoFigures: "Demobedragen", filterBy: "Filteren op terugbetaling",
+      fAll: "Alle", fFull: "Volledig terugbetaald", fPart: "Eigen bijdrage", fNone: "Niet terugbetaald", fUnk: "Vraag het uw ziekenfonds", costFull: "U betaalt niets extra.", costPart: "U betaalt ongeveer € {amount} {unit}; de rest betaalt uw ziekenfonds.", costNone: "Niet terugbetaald: u betaalt de volle prijs.", costUnk: "We konden dit niet koppelen aan uw dekking. Vraag het uw ziekenfonds.",
+      u_visit: "per bezoek", u_day: "per dag", u_estimate: "(schatting)", u_scan: "per onderzoek", u_session: "per sessie", u_pack: "per verpakking", n_mh: "Eerste 8 sessies per jaar", n_med: "Hangt af van het geneesmiddel", n_otc: "U betaalt de apotheekprijs",
+      urgentT: "Heeft u nu een rood waarschuwingsteken? Wacht dan niet op een afspraak.", urgentA: "Noodgeval: bel ", urgentB: ". ’s Avonds, ’s nachts en in het weekend: de huisarts van wacht op ", covered: "Terugbetaald door uw ziekenfonds", payVisit: "U betaalt ongeveer € {amount} per bezoek", notCovered: "Niet terugbetaald door uw ziekenfonds", searchFor: "Zoek naar: ", bookOn: "Boeken via {name}", opensOther: " (opent een andere website)", orCall: "of bel de praktijk", bookingFine: "Doctena en Doctoranytime zijn onafhankelijke boekingssites. Plainly stuurt hen uw document of andere gegevens niet. Neem deze uitleg en uw originele document mee naar de afspraak.",
+      revCardT: "Laat een arts dit controleren", revIntro: "AI kan fouten maken. Voor meer zekerheid kan een erkende arts deze uitleg vergelijken met uw originele document.", rp1: "Verbetert wat de AI verkeerd had of wegliet", rp2: "Bevestigt welke punten rood, oranje of groen zijn", rp3: "Voegt een korte persoonlijke noot toe, in uw taal", rp4: "Online – geen afspraak nodig", revFine: "De prijzen zijn voorbeelden voor deze demo. Een controle vervangt geen consultatie. Gebruik voor dringende zaken de contacten hierboven.",
+      ts1: "Aanvraag ontvangen", ts2: "Arts toegewezen", ts3: "Arts controleert uw uitleg", ts4: "Gecontroleerde uitleg klaar", requested: "Controle door een arts ({tier}) aangevraagd", expected: " – antwoord {time}. ", trackLabel: "Voortgang van uw controle door een arts", sDone: " (klaar)", sNow: " (huidige stap)", sNot: " (nog niet)", currentStep: "Huidige stap: {s}", inAccount: "U vindt de gecontroleerde uitleg in uw account. ", refCode: "Uw referentiecode is {code}. Bewaar hem om de gecontroleerde uitleg later te openen. ", demoNoDoctor: "In deze demo ziet geen arts uw document en wordt er niets aangerekend.", cancelReq: "Aanvraag annuleren",
+      copyFooter: "Geschreven door AI (Claude) met Plainly. Ze kan fouten maken: controleer belangrijke details bij uw zorgteam.",
+      watchT: "Zo gaat het: betrouwbare video’s en animaties", madeBy: "Gemaakt door gezondheidsorganisaties, niet door AI. Zoekterm: ‘{term}’.", resFine: "Dit zijn onafhankelijke websites. Ze tonen de ingreep in het algemeen; die van u kan wat anders zijn. Veel zijn in het Engels: uw browser kan de pagina’s vertalen. Plainly stuurt hen geen gegevens van u.",
+      r_aha: "Animaties en illustraties over hart- en vaatziekten, beroerte, behandelingen en ingrepen. Kies uw onderwerp in het menu ‘Select a Topic’.", r_mlp: "Geanimeerde video’s, interactieve uitleg en operatievideo’s met eenvoudige uitleg.", r_nhs: "Duidelijke gidsen over onderzoeken, behandelingen en operaties, vaak met video’s: waarom, wat er gebeurt en herstel.", r_ta: "Informatie van Nederlandse huisartsen, met korte video’s.", r_gw: "Belgische, wetenschappelijk onderbouwde gezondheidsinformatie in eenvoudig Nederlands.", r_iq: "Onafhankelijke Duitse gezondheidsinformatie, vaak met video’s en afbeeldingen.", r_am: "Patiëntengidsen van de Franse ziekteverzekering over onderzoeken en behandelingen.",
+      k_anim: "Animaties", k_vid: "Video’s en uitleg", k_guidevid: "Gidsen en video’s", k_guide: "Gidsen", l_en: "Engels", l_es: "Spaans", l_ensome: "Engels (deels Spaans)", l_nl: "Nederlands", l_de: "Duits", l_fr: "Frans", openX: "{name} openen", searchX: "Zoeken op {name}",
+      aiWritten: "Geschreven door AI – controleer bij uw zorgteam.", more: "Meer uitleg", less: "Minder tonen", askAbout: "Hier een vraag over stellen"
+    },
+    es: {
+      spacing: "Más espacio",
+      howWorks: "Cómo funciona", fromPrice: "Desde {price} €",
+      tabNext: "Próximos pasos", tabCosts: "Costes", resultTabs: "Partes de su explicación", nudgeNext: "A quién contactar y qué hacer ahora",
+      skip: "Ir al contenido principal", tagline: "Sus documentos médicos, explicados con palabras sencillas", textSize: "Tamaño del texto", sizeN: "Texto normal", sizeL: "Texto grande", sizeXL: "Texto muy grande", uiLang: "Idioma de la aplicación",
+      acctRegion: "Su cuenta", unavailable: "Para explicar documentos, este prototipo necesita Claude. Abra esta página en Claude con su sesión iniciada y permita el uso de Claude cuando se le pida.",
+      inputRegion: "Explicar un documento", step1: "Añada su documento", dropTitle: "Elija un archivo o arrástrelo aquí", dropHint: "Una carta, un resultado de análisis, un informe de imagen o un folleto: PDF, Word, texto o una foto de cada página", filesLabel: "Archivos añadidos",
+      pasteSummary: "O escriba o pegue el texto", pasteLabel: "Texto del documento", pastePh: "Pegue aquí el texto de su carta o informe…",
+      step2: "¿Cómo quiere la explicación?", langLabel: "Idioma de la explicación", langPh: "Escriba cualquier idioma, p. ej. neerlandés, árabe, polaco", langHint: "Escriba cualquier idioma o elija uno abajo.", commonLangs: "Idiomas frecuentes", howSimple: "¿Qué tan sencillo?",
+      lvlEasy: "Muy sencillo", lvlEasyD: "Frases cortas, palabras cotidianas. Como un texto de lectura fácil.", lvlPlain: "Sencillo", lvlPlainD: "Lenguaje claro y cotidiano con los detalles importantes.", lvlDet: "Más detalle", lvlDetD: "Lenguaje sencillo, pero con más contexto médico.",
+      go: "Explíquemelo", goHintAnon: "Su documento se lee en esta página y se envía a Claude solo para redactar su explicación. No se guarda.", goHintAcct: "Su documento se envía a Claude solo para redactar su explicación. Con su cuenta de demostración, también comprobamos su cobertura.",
+      progress: "Progreso", progRead: "Leyendo su documento…", progReadSub: "Claude lo lee con atención. Suele tardar menos de un minuto.", progWrite: "Redactando su explicación…", progWriteSub: "Casi listo.", stop: "Detener",
+      resultsRegion: "Su explicación", footer: "Plainly es un prototipo. Explica documentos; no hace diagnósticos ni da consejos médicos. Las funciones de cuenta y seguro son una demostración con datos inventados.",
+      ask: "Preguntas sobre su documento", close: "Cerrar", questionsSr: " (preguntas)", yourQuestion: "Su pregunta", askPh: "Escriba su pregunta…", askBtn: "Preguntar",
+      chatEmpty: "Por ejemplo: «¿Qué significa este resultado para mí?» o «¿Puedo ducharme después de la operación?»", chatHint: "Las respuestas llegan en {lang}. Para todo lo que afecte a su propio tratamiento, su equipo médico tiene la última palabra.",
+      acctAnonT: "Usa Plainly sin cuenta", acctAnonS: "No se guarda nada. Inicie sesión para ver qué cubre su seguro de salud.", signIn: "Iniciar sesión", demo: "Demo", hospitalPlan: "Seguro de hospitalización", increased: "Reembolso aumentado", acctBtn: "Cuenta y seguro", standardCover: "Cobertura básica", demoPatient: "Paciente de demo",
+      cancel: "Cancelar", back: "Atrás", dlgChooseT: "¿Cómo quiere usar Plainly?", dlgChooseHint: "Siempre puede explicar documentos sin cuenta.", optAnonT: "Seguir sin cuenta", optAnonD: "Anónimo. No se guarda nada y no sabemos quién es. No verá su cobertura.", optSignT: "Iniciar sesión y vincular mi seguro de salud", optSignD: "Vea qué atención cubre su seguro y qué podría pagar usted.",
+      eidT: "Iniciar sesión", eidP: "En el servicio real iniciaría sesión con su eID belga o una aplicación de identidad digital. En esta demo no se comprueba nada.", idCard: "Documento de identidad terminado en ••• 042", signInAs: "Entrar como paciente de demo",
+      insT: "Vincular su seguro de salud", insHint: "Estas aseguradoras y cifras son inventadas para esta demo.", insLabel: "Su seguro de salud", incT: "Tengo reembolso aumentado", incD: "Un estatus que reduce lo que paga usted, p. ej. con ingresos bajos.", hpT: "Tengo seguro de hospitalización", hpD: "Seguro adicional para estancias en el hospital y algunas ayudas.", insConsent: "Acepto que Plainly compruebe mi cobertura para la atención que aparece en mis documentos. Puedo desvincularlo en cualquier momento.", consentErr: "Marque la casilla para aceptar o elija Cancelar.", signOut: "Cerrar sesión", save: "Guardar", linkIns: "Vincular seguro",
+      revT: "Pedir revisión médica", revP: "Un médico colegiado en Bélgica compara esta explicación con su documento original y le envía una versión revisada.", revSpeed: "¿Con qué rapidez la necesita?", revPay: "Usted paga este servicio. Algunos seguros complementarios reembolsan una parte.", revConsent: "Acepto que un médico vea mi documento y esta explicación, solo para revisarlos.", continuePay: "Continuar al pago",
+      payT: "Pago", payLine: "Revisión médica {tier}: {price} €", payP: "En el servicio real pagaría de forma segura a través de un proveedor de pagos, por ejemplo con Bancontact o tarjeta bancaria. Esta demo no pide datos de pago ni cobra dinero.", confirmDemo: "Confirmar (demo, gratis)",
+      tierStandard: "Estándar", tierExpress: "Exprés", within48: "en 48 horas", within24: "en 24 horas", answerIn: "Respuesta {time}",
+      readErr: "No se pudo leer este archivo.", photo: "Foto", heic: "Las fotos HEIC del iPhone no son compatibles. Envíela como JPG o haga una captura de pantalla.", wordDoc: "Documento Word", wordEmpty: "Este archivo Word parece vacío.", textFile: "Texto", unsupported: "Este tipo de archivo no es compatible. Pruebe con PDF, Word, texto o una foto.", loadErr: "El {what} no se cargó. Compruebe su conexión e inténtelo de nuevo.", pdfReader: "lector de PDF", wordReader: "lector de Word", pages: "{n} páginas", page1: "1 página", scanned: "Escaneado, {pages}", reading: "Leyendo…", remove: "Quitar", removeX: "Quitar {name}",
+      e_not_granted: "Plainly no tuvo permiso para usar Claude. Recargue la página y elija Permitir.", e_sampling_disabled: "Claude no está disponible para esta cuenta ahora mismo.", e_rate_limited: "Ha alcanzado un límite de uso. Espere un poco e inténtelo de nuevo.", e_session_expired: "Su sesión ha terminado. Vuelva a iniciar sesión en Claude.", e_prompt_too_large: "Este documento es demasiado largo para explicarlo de una vez. Envíe menos páginas.", e_image_rejected: "No se pudo leer una de las imágenes. Pruebe con una foto JPG o PNG más nítida.", e_refused: "Claude no pudo explicar este documento. Compruebe que es un documento médico e inténtelo de nuevo.", e_invalid_json: "Algo salió mal al redactar la explicación. Inténtelo de nuevo.", e_images_unavailable: "Desde esta vista no se pueden enviar fotos. Pegue el texto o use un PDF con texto seleccionable.", e_generic: "Algo salió mal. Inténtelo de nuevo.",
+      aiLabel: "Redactado por IA (Claude) a partir de su documento, en {lang}. Puede equivocarse. Compruebe siempre los detalles importantes con su médico, enfermera o farmacéutico. En una emergencia, llame al 112.",
+      yourDoc: "Su documento", readAloud: "🔊 Leer en voz alta", stopReading: "■ Dejar de leer", noVoice: "No hay voz para este idioma", copyText: "Copiar texto", copied: "Copiado ✓", copyFail: "No se pudo copiar", newDoc: "Nuevo documento", unsure: "¿Dudas? Pida que lo revise un médico →", overview: "Resumen",
+      learnMore: "Saber más", original: "Documento original", picsOne: "Su documento se envió como 1 imagen.", picsMany: "Su documento se envió como {n} imágenes.",
+      noCare: "No se encontró atención de seguimiento en este documento.", signinCta: "Inicie sesión y vincule su seguro de salud para ver qué está cubierto y qué podría pagar usted.", coverUnknown: "Cobertura desconocida", checkedAgainst: "Comprobado con {ins} ({plan}).", demoFigures: "Cifras de demo", filterBy: "Filtrar por cobertura",
+      fAll: "Todo", fFull: "Cubierto por completo", fPart: "Paga una parte", fNone: "No cubierto", fUnk: "Pregunte a su seguro", costFull: "No paga nada extra.", costPart: "Paga unos {amount} € {unit}; el resto lo paga su seguro.", costNone: "Sin reembolso: paga el precio completo.", costUnk: "No pudimos relacionarlo con su cobertura. Pregunte a su seguro.",
+      u_visit: "por visita", u_day: "por día", u_estimate: "(estimación)", u_scan: "por prueba", u_session: "por sesión", u_pack: "por envase", n_mh: "Las 8 primeras sesiones al año", n_med: "Depende del medicamento", n_otc: "Paga el precio de la farmacia",
+      urgentT: "Si ahora tiene una señal de alarma roja, no espere a una cita.", urgentA: "Emergencia: llame al ", urgentB: ". Por la tarde, por la noche y el fin de semana, el médico de guardia: ", covered: "Cubierto por su seguro", payVisit: "Paga unos {amount} € por visita", notCovered: "No cubierto por su seguro", searchFor: "Buscar: ", bookOn: "Reservar en {name}", opensOther: " (abre otro sitio web)", orCall: "o llame a la consulta", bookingFine: "Doctena y Doctoranytime son sitios de reserva independientes. Plainly no les envía su documento ni ningún dato. Lleve esta explicación y su documento original a la cita.",
+      revCardT: "Pida que lo revise un médico", revIntro: "La IA puede equivocarse. Para más seguridad, un médico colegiado puede comparar esta explicación con su documento original.", rp1: "Corrige lo que la IA entendió mal u omitió", rp2: "Confirma qué puntos son rojos, naranjas o verdes", rp3: "Añade una breve nota personal, en su idioma", rp4: "En línea – sin cita", revFine: "Los precios son ejemplos para esta demo. Una revisión no sustituye una consulta. Para algo urgente, use los contactos de arriba.",
+      ts1: "Solicitud recibida", ts2: "Médico asignado", ts3: "El médico revisa su explicación", ts4: "Explicación revisada lista", requested: "Revisión médica {tier} solicitada", expected: " – respuesta {time}. ", trackLabel: "Progreso de su revisión médica", sDone: " (hecho)", sNow: " (paso actual)", sNot: " (todavía no)", currentStep: "Paso actual: {s}", inAccount: "Encontrará la explicación revisada en su cuenta. ", refCode: "Su código de referencia es {code}. Guárdelo para abrir la explicación revisada más tarde. ", demoNoDoctor: "En esta demo ningún médico ve su documento y no se cobra dinero.", cancelReq: "Cancelar solicitud",
+      copyFooter: "Redactado por IA (Claude) con Plainly. Puede equivocarse: compruebe los detalles importantes con su equipo médico.",
+      watchT: "Cómo se hace: vídeos y animaciones de confianza", madeBy: "Hechos por organizaciones de salud, no por IA. Término de búsqueda: «{term}».", resFine: "Son sitios web independientes. Muestran el procedimiento en general; el suyo puede ser algo distinto. Muchos están en inglés: su navegador puede traducir las páginas. Plainly no les envía ningún dato suyo.",
+      r_aha: "Animaciones e ilustraciones sobre enfermedades del corazón y el ictus, tratamientos y procedimientos. Elija su tema en el menú «Select a Topic».", r_mlp: "Vídeos animados, tutoriales interactivos y vídeos de cirugía con explicaciones sencillas.", r_nhs: "Guías claras sobre pruebas, tratamientos y operaciones, muchas con vídeos: por qué, qué ocurre y recuperación.", r_ta: "Información de médicos de familia neerlandeses con vídeos cortos.", r_gw: "Información de salud belga basada en pruebas, en neerlandés sencillo.", r_iq: "Información de salud alemana independiente, a menudo con vídeos y gráficos.", r_am: "Guías para pacientes del seguro de salud público francés sobre pruebas y tratamientos.",
+      k_anim: "Animaciones", k_vid: "Vídeos y tutoriales", k_guidevid: "Guías y vídeos", k_guide: "Guías", l_en: "inglés", l_es: "español", l_ensome: "inglés (parte en español)", l_nl: "neerlandés", l_de: "alemán", l_fr: "francés", openX: "Abrir {name}", searchX: "Buscar en {name}",
+      aiWritten: "Redactado por IA – compruébelo con su equipo médico.", more: "Saber más", less: "Mostrar menos", askAbout: "Hacer una pregunta sobre esto"
+    }
+  };
+  let UI = "en";
+  const t = (key, vars) => {
+    let s = (I18N[UI] && I18N[UI][key]) ?? I18N.en[key] ?? key;
+    if (vars) for (const [k, v] of Object.entries(vars)) s = s.split("{" + k + "}").join(String(v));
+    return s;
+  };
+
+  const state = { files: [], sample: null, limits: null, ctl: null, result: null, docText: "", images: [], lang: "", level: "plain", chat: [], account: null, svcFilter: "all" };
+
+  /* ---------- Claude availability ---------- */
+  (async () => {
+    try { state.sample = window.claude ? await window.claude.use("sample") : null; } catch { state.sample = null; }
+    if (!state.sample) { $("#unavailable").classList.remove("hidden"); return; }
+    try { state.limits = await state.sample.limits(); } catch { state.limits = null; }
+    updateGo();
+  })();
+
+  /* ---------- text size ---------- */
+  const sizeBtns = document.querySelectorAll(".sizer .btn");
+  const setSize = px => {
+    document.documentElement.style.fontSize = px + "px";
+    sizeBtns.forEach(b => { if (b.dataset.size) b.setAttribute("aria-pressed", String(b.dataset.size === String(px))); });
+    try { localStorage.setItem("plainly-size", px); } catch {}
+  };
+  sizeBtns.forEach(b => { if (b.dataset.size) b.addEventListener("click", () => setSize(b.dataset.size)); });
+  const spaceBtn = $("#spaceBtn");
+  const setSpacing = on => { document.body.classList.toggle("airy", on); spaceBtn.setAttribute("aria-pressed", String(on)); try { localStorage.setItem("plainly-airy", on ? "1" : ""); } catch {} };
+  spaceBtn.addEventListener("click", () => setSpacing(!document.body.classList.contains("airy")));
+  try { if (localStorage.getItem("plainly-airy")) setSpacing(true); } catch {}
+  try { const s = localStorage.getItem("plainly-size"); if (s) setSize(s); } catch {}
+
+  /* ---------- DEMO account & insurance ---------- */
+  // Everything here is made-up demo data. A real version would use eID login and the patient's own health insurer.
+  const INSURERS = {
+    mutualis: { name: "Mutualis" },
+    noord: { name: "Zorgkas Noord" },
+    santeplus: { name: "Santé Plus" }
+  };
+  // coverage per service category: level + what you pay (standard / with increased reimbursement)
+  const COVER = {
+    gp:            { lvl: "part", pay: [4, 1], unit: "u_visit" },
+    specialist:    { lvl: "part", pay: [15, 4], unit: "u_visit" },
+    emergency:     { lvl: "part", pay: [25, 8], unit: "u_visit" },
+    hospital_stay: { lvl: "part", pay: [45, 10], unit: "u_day", plan: { lvl: "full", pay: [0, 0] } },
+    surgery:       { lvl: "part", pay: [120, 40], unit: "u_estimate", plan: { lvl: "full", pay: [0, 0] } },
+    imaging:       { lvl: "part", pay: [20, 6], unit: "u_scan" },
+    lab_test:      { lvl: "full", pay: [0, 0], unit: "" },
+    physiotherapy: { lvl: "part", pay: [8, 2], unit: "u_session" },
+    home_nursing:  { lvl: "full", pay: [0, 0], unit: "" },
+    mental_health: { lvl: "part", pay: [11, 4], unit: "u_session", note: "n_mh" },
+    medication:    { lvl: "part", pay: [6, 2], unit: "u_pack", note: "n_med" },
+    otc_medicine:  { lvl: "none", pay: null, unit: "" , note: "n_otc" },
+    medical_aids:  { lvl: "none", pay: null, unit: "", plan: { lvl: "part", pay: [10, 5] } },
+    dental:        { lvl: "part", pay: [12, 3], unit: "u_visit" },
+    other:         { lvl: "unk", pay: null, unit: "" }
+  };
+  const CATS = Object.keys(COVER);
+
+  function renderAccount() {
+    const a = state.account;
+    const txt = $("#acctText"), btn = $("#acctBtn"), av = $("#acctAvatar");
+    if (!a) {
+      txt.replaceChildren(el("b", {}, t("acctAnonT")), el("small", {}, t("acctAnonS")));
+      btn.textContent = t("signIn");
+      av.textContent = ""; av.append(svgEl('<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8.5" r="4" stroke="currentColor" stroke-width="2"/><path d="M4 20c1-4 4.2-6 8-6s7 2 8 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'));
+    } else {
+      const ins = INSURERS[a.insurer];
+      txt.replaceChildren(
+        el("b", {}, t("demoPatient"), el("span", { class: "demo-tag" }, t("demo"))),
+        el("small", {}, `${ins.name} · ${t("standardCover")}${a.hospitalPlan ? " + " + t("hospitalPlan") : ""}${a.increased ? " · " + t("increased") : ""}`)
+      );
+      btn.textContent = t("acctBtn");
+      av.textContent = "DP";
+    }
+    $("#goHint").textContent = a ? t("goHintAcct") : t("goHintAnon");
+    if (!$("#goBtn").disabled) $("#goHint").textContent = $("#goHint").textContent;
+    if (state.result) { renderServices(); renderConsult(); renderReview(); }
+  }
+
+  const dlg = $("#acctDlg");
+  let dlgReturn = null;
+  function openDialog(view) {
+    dlgReturn = document.activeElement;
+    showDlgView(view);
+    try { dlg.showModal(); } catch { dlg.setAttribute("open", ""); }
+    const f = dlg.querySelector("h2"); if (f) { f.setAttribute("tabindex", "-1"); f.focus(); }
+  }
+  function closeDialog() { try { dlg.close(); } catch { dlg.removeAttribute("open"); } if (dlgReturn) dlgReturn.focus(); }
+  dlg.addEventListener("close", () => { if (dlgReturn && document.activeElement === document.body) dlgReturn.focus(); });
+
+  function showDlgView(view) {
+    const body = $("#dlgBody");
+    const close = el("button", { class: "btn small", type: "button", onclick: closeDialog }, t("cancel"));
+    if (showReviewViews(view, body)) { const h = body.querySelector("h2"); if (h && dlg.open) { h.setAttribute("tabindex", "-1"); h.focus(); } return; }
+    if (view === "choose") {
+      body.replaceChildren(
+        el("h2", { id: "dlgTitle" }, t("dlgChooseT")),
+        el("p", { class: "hint" }, t("dlgChooseHint")),
+        el("button", { class: "opt", type: "button", onclick: () => { state.account = null; renderAccount(); closeDialog(); } },
+          el("b", {}, t("optAnonT")),
+          el("span", {}, t("optAnonD"))),
+        el("button", { class: "opt", type: "button", onclick: () => showDlgView("eid") },
+          el("b", {}, t("optSignT") + " ", el("span", { class: "demo-tag" }, t("demo"))),
+          el("span", {}, t("optSignD"))),
+        el("div", { class: "row" }, close)
+      );
+    } else if (view === "eid") {
+      body.replaceChildren(
+        el("h2", { id: "dlgTitle" }, t("eidT") + " ", el("span", { class: "demo-tag" }, t("demo"))),
+        el("p", {}, t("eidP")),
+        el("div", { class: "fake-id", "aria-hidden": "true" },
+          svgEl('<svg width="44" height="44" viewBox="0 0 24 24" fill="none"><rect x="2.5" y="5" width="19" height="14" rx="2.5" stroke="#3B4CCA" stroke-width="1.8"/><circle cx="8.5" cy="11" r="2.3" stroke="#3B4CCA" stroke-width="1.6"/><path d="M5.5 16c.6-1.5 1.7-2.3 3-2.3s2.4.8 3 2.3M14 10h4.5M14 13h3" stroke="#3B4CCA" stroke-width="1.6" stroke-linecap="round"/></svg>'),
+          el("div", {}, el("b", {}, t("demoPatient")), el("div", { class: "hint" }, t("idCard")))),
+        el("div", { class: "row" }, el("button", { class: "btn small", type: "button", onclick: () => showDlgView("choose") }, t("back")),
+          el("button", { class: "btn primary", type: "button", onclick: () => showDlgView("insurer") }, t("signInAs")))
+      );
+    } else if (view === "insurer") {
+      const a = state.account || { insurer: "mutualis", increased: false, hospitalPlan: true };
+      const sel = el("select", { id: "insSel" }, Object.entries(INSURERS).map(([k, v]) => el("option", { value: k, selected: k === a.insurer ? true : null }, v.name + " (" + t("demo") + ")")));
+      const inc = el("input", { type: "checkbox", id: "incChk", checked: a.increased ? true : null });
+      const hp = el("input", { type: "checkbox", id: "hpChk", checked: a.hospitalPlan ? true : null });
+      const consent = el("input", { type: "checkbox", id: "consentChk", checked: state.account ? true : null, "aria-describedby": "consentErr" });
+      const err = el("p", { id: "consentErr", class: "hint", style: "color:var(--red-ink)", role: "alert" });
+      body.replaceChildren(
+        el("h2", { id: "dlgTitle" }, t("insT") + " ", el("span", { class: "demo-tag" }, t("demo"))),
+        el("p", { class: "hint" }, t("insHint")),
+        el("label", { class: "f", for: "insSel" }, t("insLabel")), sel,
+        el("label", { class: "check", style: "margin-top:14px" }, inc, el("span", {}, el("b", {}, t("incT")), el("br"), el("span", { class: "hint" }, t("incD")))),
+        el("label", { class: "check", style: "margin-top:10px" }, hp, el("span", {}, el("b", {}, t("hpT")), el("br"), el("span", { class: "hint" }, t("hpD")))),
+        el("label", { class: "check", style: "margin-top:14px" }, consent, el("span", {}, t("insConsent"))),
+        err,
+        el("div", { class: "row" },
+          state.account ? el("button", { class: "btn small", type: "button", onclick: () => { state.account = null; renderAccount(); closeDialog(); } }, t("signOut")) : el("button", { class: "btn small", type: "button", onclick: () => showDlgView("eid") }, t("back")),
+          el("button", { class: "btn primary", type: "button", onclick: () => {
+            if (!consent.checked) { err.textContent = t("consentErr"); consent.focus(); return; }
+            state.account = { name: "demo", insurer: sel.value, increased: inc.checked, hospitalPlan: hp.checked };
+            renderAccount(); closeDialog();
+          } }, state.account ? t("save") : t("linkIns")))
+      );
+    }
+  }
+  function showReviewViews(view, body) {
+    if (view === "review") {
+      const tier = state.pendingTier || "standard";
+      const radios = Object.entries(TIERS).map(([k, tr]) => el("label", { class: "choice" },
+        el("input", { type: "radio", name: "tier", value: k, checked: k === tier ? true : null }),
+        el("span", {}, el("b", {}, `${tierLbl(tr)} · €${tr.price}`), el("small", {}, t("answerIn", { time: t(tr.time) })))));
+      const consent = el("input", { type: "checkbox", id: "revConsent", "aria-describedby": "revErr" });
+      const err = el("p", { id: "revErr", class: "hint", style: "color:var(--red-ink)", role: "alert" });
+      body.replaceChildren(
+        el("h2", { id: "dlgTitle" }, t("revT") + " ", el("span", { class: "demo-tag" }, t("demo"))),
+        el("p", { class: "hint" }, t("revP")),
+        el("fieldset", { style: "margin-top:12px" }, el("legend", {}, t("revSpeed")), el("div", { class: "tiers" }, radios)),
+        el("p", { class: "hint", style: "margin:0 0 10px" }, t("revPay")),
+        el("label", { class: "check" }, consent, el("span", {}, t("revConsent"))),
+        err,
+        el("div", { class: "row" },
+          el("button", { class: "btn small", type: "button", onclick: closeDialog }, t("cancel")),
+          el("button", { class: "btn primary", type: "button", onclick: () => {
+            if (!consent.checked) { err.textContent = t("consentErr"); consent.focus(); return; }
+            state.pendingTier = body.querySelector('input[name="tier"]:checked').value;
+            showDlgView("pay");
+          } }, t("continuePay"))));
+      return true;
+    }
+    if (view === "pay") {
+      const tr = TIERS[state.pendingTier || "standard"];
+      body.replaceChildren(
+        el("h2", { id: "dlgTitle" }, t("payT") + " ", el("span", { class: "demo-tag" }, t("demo"))),
+        el("p", {}, el("b", {}, t("payLine", { tier: tierLbl(tr), price: tr.price }))),
+        el("p", { class: "hint" }, t("payP")),
+        el("div", { class: "row" },
+          el("button", { class: "btn small", type: "button", onclick: () => showDlgView("review") }, t("back")),
+          el("button", { class: "btn primary", type: "button", onclick: () => { startReview(state.pendingTier || "standard"); closeDialog(); setTimeout(() => $("#reviewCard").focus(), 0); } }, t("confirmDemo"))));
+      return true;
+    }
+    return false;
+  }
+  $("#acctBtn").addEventListener("click", () => openDialog(state.account ? "insurer" : "choose"));
+
+  /* ---------- languages ---------- */
+  const LANGS = ["English","Dutch","French","German","Spanish","Portuguese","Italian","Polish","Romanian","Bulgarian","Turkish","Arabic","Moroccan Arabic (Darija)","Tamazight (Berber)","Farsi (Persian)","Dari","Pashto","Kurdish (Sorani)","Ukrainian","Russian","Albanian","Serbian","Croatian","Bosnian","Greek","Hungarian","Czech","Slovak","Lithuanian","Tigrinya","Amharic","Somali","Swahili","Lingala","Kinyarwanda","Hindi","Urdu","Bengali","Punjabi","Tamil","Chinese (Simplified)","Chinese (Traditional)","Vietnamese","Thai","Tagalog","Japanese","Korean","Indonesian","Nepali"];
+  const QUICK = ["en", "nl", "fr", "de", "ar", "tr", "es", "uk"];
+  const langName = (code, inLang) => { try { const n = new Intl.DisplayNames([inLang || UI], { type: "language" }).of(code); return n ? n.charAt(0).toUpperCase() + n.slice(1) : code; } catch { return code; } };
+  let langTouched = false;
+  const dl = $("#langList"); LANGS.forEach(l => dl.append(el("option", { value: l })));
+  const langInput = $("#langInput");
+  const syncChips = () => document.querySelectorAll("#langChips .chip").forEach(c => c.setAttribute("aria-pressed", String(c.textContent === langInput.value.trim())));
+  function renderChips() {
+    $("#langChips").replaceChildren(...QUICK.map(code => el("button", { class: "chip", type: "button", "aria-pressed": "false", lang: code, onclick: e => { langInput.value = e.currentTarget.textContent; langTouched = true; syncChips(); updateGo(); } }, langName(code, UI))));
+    syncChips();
+  }
+  langInput.addEventListener("input", () => { langTouched = true; syncChips(); updateGo(); });
+
+  /* ---------- app language switch ---------- */
+  function applyStatic() {
+    document.documentElement.lang = UI;
+    document.querySelectorAll("[data-i18n]").forEach(n => { n.textContent = t(n.dataset.i18n); });
+    document.querySelectorAll("[data-i18n-ph]").forEach(n => { n.placeholder = t(n.dataset.i18nPh); });
+    document.querySelectorAll("[data-i18n-aria]").forEach(n => { n.setAttribute("aria-label", t(n.dataset.i18nAria)); });
+  }
+  const uiSel = $("#uiLangSel");
+  Object.entries(UI_LANGS).forEach(([code, name]) => uiSel.append(el("option", { value: code, lang: code }, name)));
+  function setUI(code, initial) {
+    UI = I18N[code] ? code : "en";
+    uiSel.value = UI;
+    try { localStorage.setItem("plainly-ui", UI); } catch {}
+    applyStatic();
+    renderChips();
+    if (!langTouched) { langInput.value = langName(UI, UI); syncChips(); }
+    if (!initial) {
+      renderAccount(); renderFiles(); updateGo();
+      if (state.result && !$("#resultView").classList.contains("hidden")) renderResult(state.result, true);
+      if (!$("#errorBox").classList.contains("hidden")) hideError();
+    }
+  }
+  uiSel.addEventListener("change", () => setUI(uiSel.value));
+  (() => {
+    let start = "en";
+    try { start = localStorage.getItem("plainly-ui") || ""; } catch {}
+    if (!I18N[start]) { const nav = (navigator.language || "en").slice(0, 2).toLowerCase(); start = I18N[nav] ? nav : "en"; }
+    try { const l = localStorage.getItem("plainly-lang"); if (l) { langInput.value = l; langTouched = true; } } catch {}
+    setUI(start, true);
+  })();
+
+  /* ---------- files ---------- */
+  const fileInput = $("#fileInput"), drop = $("#drop"), list = $("#fileList"), pasteBox = $("#pasteBox");
+  fileInput.addEventListener("change", () => { addFiles(fileInput.files); fileInput.value = ""; });
+  ["dragenter", "dragover"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add("over"); }));
+  ["dragleave", "drop"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove("over"); }));
+  drop.addEventListener("drop", e => addFiles(e.dataTransfer.files));
+  pasteBox.addEventListener("input", updateGo);
+
+  const IMG_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+  function addFiles(fl) {
+    for (const f of Array.from(fl || [])) {
+      const item = { file: f, name: f.name, status: "reading", text: "", images: [], note: "" };
+      state.files.push(item);
+      processFile(item).then(() => { item.status = "ready"; }).catch(err => { item.status = "error"; item.note = err && err.message ? err.message : t("readErr"); }).finally(() => { renderFiles(); updateGo(); });
+    }
+    renderFiles(); updateGo();
+  }
+  async function processFile(item) {
+    const f = item.file, name = f.name.toLowerCase();
+    if (IMG_TYPES.includes(f.type)) { item.images = [f]; item.note = t("photo"); return; }
+    if (/\.(heic|heif)$/.test(name) || f.type === "image/heic") throw new Error(t("heic"));
+    if (f.type === "application/pdf" || name.endsWith(".pdf")) return readPdf(item);
+    if (name.endsWith(".docx")) {
+      await waitFor(() => window.mammoth, t("wordReader"));
+      const r = await window.mammoth.extractRawText({ arrayBuffer: await f.arrayBuffer() });
+      item.text = r.value || ""; item.note = t("wordDoc");
+      if (!item.text.trim()) throw new Error(t("wordEmpty"));
+      return;
+    }
+    if (f.type.startsWith("text/") || name.endsWith(".txt")) { item.text = await f.text(); item.note = t("textFile"); return; }
+    throw new Error(t("unsupported"));
+  }
+  function waitFor(test, label, ms = 15000) {
+    return new Promise((res, rej) => { const t0 = Date.now(); (function poll() { const v = test(); if (v) return res(v); if (Date.now() - t0 > ms) return rej(new Error(t("loadErr", { what: label }))); setTimeout(poll, 150); })(); });
+  }
+  async function readPdf(item) {
+    const lib = await waitFor(() => window.pdfjsLib, t("pdfReader"));
+    try { lib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"; } catch {}
+    const pdf = await lib.getDocument({ data: new Uint8Array(await item.file.arrayBuffer()) }).promise;
+    let text = "";
+    for (let i = 1; i <= pdf.numPages; i++) { const tc = await (await pdf.getPage(i)).getTextContent(); text += tc.items.map(it => (it.str || "") + (it.hasEOL ? "\n" : " ")).join("") + "\n\n"; }
+    if (text.replace(/\s+/g, "").length >= 60 * Math.min(pdf.numPages, 3)) { item.text = text; item.note = pdf.numPages === 1 ? t("page1") : t("pages", { n: pdf.numPages }); return; }
+    const maxPages = Math.min(pdf.numPages, 8);
+    for (let i = 1; i <= maxPages; i++) {
+      const page = await pdf.getPage(i); const vp = page.getViewport({ scale: 1.7 });
+      const c = document.createElement("canvas"); c.width = Math.floor(vp.width); c.height = Math.floor(vp.height);
+      await page.render({ canvasContext: c.getContext("2d"), viewport: vp }).promise;
+      item.images.push(await new Promise(r => c.toBlob(r, "image/jpeg", 0.85)));
+    }
+    item.note = t("scanned", { pages: maxPages === 1 ? t("page1") : t("pages", { n: maxPages }) });
+  }
+  function renderFiles() {
+    list.replaceChildren(...state.files.map(it => el("li", {},
+      el("span", { "aria-hidden": "true" }, it.images.length && !it.text ? "🖼️" : "📄"),
+      el("span", { class: "fname", title: it.name }, it.name),
+      el("span", { class: "fmeta" + (it.status === "error" ? " err" : "") }, it.status === "reading" ? t("reading") : it.note),
+      el("button", { class: "btn small", type: "button", "aria-label": t("removeX", { name: it.name }), onclick: () => { state.files = state.files.filter(x => x !== it); renderFiles(); updateGo(); fileInput.focus(); } }, t("remove"))
+    )));
+  }
+  function updateGo() {
+    const ready = state.files.some(f => f.status === "ready") || pasteBox.value.trim().length > 20;
+    const busy = state.files.some(f => f.status === "reading");
+    $("#goBtn").disabled = !(ready && !busy && langInput.value.trim() && state.sample);
+  }
+
+  /* ---------- prompts ---------- */
+  const LEVELS = {
+    easy: "VERY SIMPLE (easy-read). Write for someone with low reading skills, about age 9 or CEFR A2: very short sentences (max ~12 words), only everyday words, one idea per sentence, no abbreviations.",
+    plain: "SIMPLE. Write at about age 12 / CEFR B1 / US grade 6: short sentences, everyday words, explain any medical word you must use.",
+    detailed: "PLAIN BUT DETAILED. Plain language around US grade 8 / CEFR B1-B2, but explain more of the medical background and reasons, still avoiding unexplained jargon."
+  };
+  function explainPrompt(lang, level, docText, hasImages) {
+    return `You help patients understand medical documents they received from a doctor, hospital or other healthcare service.
+
+TARGET LANGUAGE: ${lang}. Write EVERYTHING you return in ${lang}, including the labels. If ${lang} is written right-to-left, set "dir" to "rtl".
+READING LEVEL: ${LEVELS[level]}
+
+RULES
+1. Explain only what the document says. Never add diagnoses, doses, results or advice that are not in it. You may explain what medical words mean and what a named procedure usually involves, and say when something is general information.
+2. Copy every number, date, time, dose, unit, result and medicine name exactly as written.
+3. Be calm, kind and honest. Do not make anything sound more or less serious than the document does.
+4. Sort everything the patient needs to know into "items", each with a traffic-light "level":
+   - "red" = needs action right away: something the document says must be done now, today or urgently; and warning signs the document gives for getting help immediately (write these as "Get help right away if …").
+   - "orange" = check or do soon: follow-up appointments, tests, results the document marks as abnormal or to follow up, things to do in the coming days or weeks, and anything unclear, unreadable or contradictory that the patient should confirm with their care team.
+   - "green" = OK: normal results, things that went well, reassuring information.
+   Never raise or lower urgency beyond what the document supports. If you are unsure between green and orange, choose orange. Use 4 to 14 items, each with a short title and 1-2 plain sentences. Put timing in "when" when the document gives it.
+5. "overall": "red" only if the document says something needs action now (warning signs that might happen later do NOT make it red); "orange" if there is follow-up to do or check; "green" if everything is fine.
+6. "procedure": if the document mentions a procedure, operation, test, scan or treatment the patient will have or has had, describe what typically happens from the patient's point of view in 3 to 7 steps. Set "topic" to "heart" if it is a heart or blood-vessel procedure. Otherwise null.
+10. "consult": for the red and orange items only, which kind of health professional the patient should contact to clarify or act on them (e.g. their GP, the surgeon who operated, a cardiologist). Max 4, most urgent first. "who" in ${lang}; "specialty" as a short English search term for a booking site (e.g. "general practitioner", "gastroenterologist"); "category" one of: gp, specialist, emergency, mental_health, physiotherapy, dental, other; "level" red or orange; "why" one sentence naming the item it is for. If the document names the doctor or department, say so in "who". Empty if there are no red or orange items.
+7. "services": the care services the document mentions or clearly implies the patient will use next (follow-up visits, physiotherapy, home nursing, tests, scans, medicines, aids). Max 8. "category" must be one of: ${CATS.join(", ")}. Use "otc_medicine" for medicines bought without prescription.
+8. "translation_caution": if ${lang} is a language where machine translation of medical text is less reliable, one short sentence in ${lang} suggesting a professional interpreter for important conversations; otherwise "".
+9. If the document is not medical or cannot be read, say so in "summary" and leave the lists empty.
+
+Return ONLY one JSON object (example values are placeholders):
+{
+  "lang_code": "BCP-47 code for ${lang}",
+  "dir": "ltr",
+  "labels": {"red":"Act now","red_hint":"Needs attention right away","orange":"Check soon","orange_hint":"Do or check this in the coming days or weeks","green":"All good","green_hint":"Normal or going well","overall_red":"Something needs action now","overall_orange":"Some things to follow up","overall_green":"All looks fine","medicines":"Your medicines","how":"How","why":"Why","procedure":"What happens","step":"Step","services":"Care and costs","consult":"Who to contact","more":"Tell me more","less":"Show less","ask_about":"Ask a question about this","ask":"Ask about your document","terms":"Words explained","questions":"Questions you could ask","when":"When"},
+  "document_type": "e.g. Hospital discharge letter",
+  "title": "short title",
+  "summary": "2 to 3 sentences: the most important message",
+  "overall": "orange",
+  "items": [{"level":"green","title":"short","detail":"1-2 sentences","when":""}],
+  "medicines": [{"name":"as written","how":"as in the document","why":"what it is for"}],
+  "procedure": {"name":"in ${lang}","name_en":"the common English name patients would search for on health websites, e.g. gallbladder removal, coronary angioplasty, colonoscopy","topic":"heart or other","why":"1-2 sentences","steps":[{"title":"short","text":"2-3 sentences"}]},
+  "consult": [{"who":"Your surgeon","specialty":"general surgeon","category":"specialist","level":"orange","why":"1 sentence"}],
+  "services": [{"name":"plain name","category":"specialist","why":"1 sentence","when":""}],
+  "terms": [{"term":"as written","meaning":"plain explanation"}],
+  "questions": ["3 to 5 questions to ask the doctor"],
+  "translation_caution": ""
+}
+
+${hasImages ? "The attached images are photos or scans of the document pages. Read them carefully. " : ""}${docText ? "DOCUMENT TEXT:\n<<<\n" + docText + "\n>>>" : ""}`;
+  }
+  /* ---------- run ---------- */
+  const ERRC = ["not_granted","sampling_disabled","rate_limited","session_expired","prompt_too_large","image_rejected","refused","invalid_json","images_unavailable"];
+  const errText = e => ERRC.includes(e && e.code) ? t("e_" + e.code) : t("e_generic");
+  $("#goBtn").addEventListener("click", run);
+  $("#stopBtn").addEventListener("click", () => state.ctl && state.ctl.abort());
+
+  async function run() {
+    hideError();
+    const lang = langInput.value.trim();
+    const level = document.querySelector('input[name="level"]:checked').value;
+    try { localStorage.setItem("plainly-lang", lang); } catch {}
+    const ready = state.files.filter(f => f.status === "ready");
+    let docText = ready.filter(f => f.text).map(f => (ready.length > 1 ? `--- ${f.name} ---\n` : "") + f.text.trim()).join("\n\n");
+    if (pasteBox.value.trim()) docText += (docText ? "\n\n" : "") + pasteBox.value.trim();
+    if (docText.length > 90000) docText = docText.slice(0, 90000) + "\n[…document shortened…]";
+    let images = ready.flatMap(f => f.images);
+    if (images.length) {
+      const lim = state.limits && state.limits.images;
+      if (!lim) { showError(t("e_images_unavailable")); return; }
+      if (images.length > lim.maxCount) images = images.slice(0, lim.maxCount);
+    }
+    if (state.review) clearTimeout(state.review.timer);
+    Object.assign(state, { lang, level, docText, images, chat: [], svcFilter: "all", review: null });
+    showProgress();
+    state.ctl = new AbortController();
+    let lastLen = 0;
+    try {
+      const r = await state.sample.json(explainPrompt(lang, level, docText, images.length > 0), {
+        modelTier: "complex", images: images.length ? images : undefined, signal: state.ctl.signal,
+        onText: ({ text }) => { if (text.length - lastLen > 200) { lastLen = text.length; $("#progMsg").textContent = t("progWrite"); $("#progSub").textContent = t("progWriteSub"); } }
+      });
+      if (!r || typeof r !== "object") throw { code: "invalid_json" };
+      state.result = r;
+      renderResult(r);
+    } catch (e) {
+      $("#progressView").classList.add("hidden"); $("#inputView").classList.remove("hidden");
+      if (e && e.code === "cancelled") { $("#goBtn").focus(); return; }
+      showError(errText(e));
+    }
+  }
+  function showProgress() {
+    closeChat(false); fab.classList.add("hidden");
+    $("#inputView").classList.add("hidden"); $("#resultView").classList.add("hidden");
+    $("#progMsg").textContent = t("progRead"); $("#progSub").textContent = t("progReadSub");
+    $("#progressView").classList.remove("hidden");
+    $("#stopBtn").focus();
+  }
+  function showError(m) { $("#errorMsg").textContent = m; $("#errorBox").classList.remove("hidden"); }
+  function hideError() { $("#errorBox").classList.add("hidden"); }
+
+  /* ---------- speech ---------- */
+  const synth = window.speechSynthesis;
+  function pickVoice(code) { try { const vs = synth.getVoices(); const c = (code || "").toLowerCase(); const b = c.split("-")[0]; return vs.find(v => v.lang.toLowerCase() === c) || vs.find(v => v.lang.toLowerCase().split(/[-_]/)[0] === b) || null; } catch { return null; } }
+  function speak(text, onend) {
+    if (!synth) return false;
+    try {
+      synth.cancel(); const u = new SpeechSynthesisUtterance(text);
+      const code = str(state.result && state.result.lang_code) || "en"; u.lang = code; const v = pickVoice(code); if (v) u.voice = v; u.rate = 0.92;
+      if (onend) { u.onend = onend; u.onerror = onend; }
+      synth.speak(u); return !!v || !synth.getVoices().length;
+    } catch { return false; }
+  }
+  const stopSpeech = () => { try { synth && synth.cancel(); } catch {} };
+
+  /* ---------- traffic light helpers ---------- */
+  const TL_ICON = {
+    red: '<svg class="tl-ic" width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path d="M10 2h10l8 8v10l-8 8H10l-8-8V10z" fill="#B42318"/><path d="M15 8v9" stroke="#fff" stroke-width="3" stroke-linecap="round"/><circle cx="15" cy="22" r="1.9" fill="#fff"/></svg>',
+    orange: '<svg class="tl-ic" width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path d="M15 3l13 23H2z" fill="#B45309" stroke="#B45309" stroke-width="2" stroke-linejoin="round"/><path d="M15 11v7" stroke="#fff" stroke-width="3" stroke-linecap="round"/><circle cx="15" cy="22" r="1.7" fill="#fff"/></svg>',
+    green: '<svg class="tl-ic" width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="13" fill="#2E7D32"/><path d="M9 15.5l4 4 8-9" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+  };
+  const LVLS = ["red", "orange", "green"];
+  const normLvl = v => (LVLS.includes(String(v).toLowerCase()) ? String(v).toLowerCase() : "orange");
+
+  const ICONS = {
+    medicines: ["#E7F0FA", "#1F5E99", '<rect x="3.5" y="9" width="17" height="7" rx="3.5" transform="rotate(-35 12 12.5)" stroke="currentColor" stroke-width="2"/><path d="M10 8.5l4.5 7" stroke="currentColor" stroke-width="2"/>'],
+    procedure: ["#EEF0FD", "#2C3A9E", '<rect x="3" y="5" width="18" height="13" rx="2.5" stroke="currentColor" stroke-width="2"/><path d="M10 9v5l4.2-2.5z" fill="currentColor"/>'],
+    services: ["#ECEAF8", "#3F3880", '<path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 8.5v7M8.5 12h7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>'],
+    learn: ["#FFF1DC", "#7A3E00", '<path d="M4 6.5C6.5 5 9.5 5 12 6.5v12C9.5 17 6.5 17 4 18.5zM20 6.5C17.5 5 14.5 5 12 6.5v12c2.5-1.5 5.5-1.5 8 0z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>'],
+    consult: ["#FDECEA", "#9B1C13", '<rect x="4" y="5" width="16" height="15" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 3v4M16 3v4M4 10h16M10 14.5h4M12 12.5v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>'],
+    review: ["#EEF0FD", "#2C3A9E", '<circle cx="10" cy="8" r="3.5" stroke="currentColor" stroke-width="2"/><path d="M3.5 19c.8-3.3 3.4-5 6.5-5s5.7 1.7 6.5 5M16 9.5l1.8 1.8 3.2-3.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'],
+    chat: ["#EEF0FD", "#2C3A9E", '<path d="M4 5h16v11H9l-5 4z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>']
+  };
+  const secHead = (key, label, id) => { const [bg, fg, p] = ICONS[key]; return el("h3", { class: "sec", id }, el("span", { class: "ic", style: `background:${bg};color:${fg}`, "aria-hidden": "true" }, svgEl(`<svg width="20" height="20" viewBox="0 0 24 24" fill="none">${p}</svg>`)), label); };
+
+  let L = {};
+  function renderResult(r, rerender) {
+    $("#progressView").classList.add("hidden");
+    L = Object.assign({ red: "Act now", red_hint: "Needs attention right away", orange: "Check soon", orange_hint: "Do or check this in the coming days or weeks", green: "All good", green_hint: "Normal or going well", overall_red: "Something needs action now", overall_orange: "Some things to follow up", overall_green: "All looks fine", medicines: "Your medicines", how: "How", why: "Why", procedure: "What happens", step: "Step", services: "Care and costs", consult: "Who to contact", more: "Tell me more", less: "Show less", ask_about: "Ask a question about this", ask: "Ask about your document", terms: "Words explained", questions: "Questions you could ask", when: "When" }, r.labels || {});
+    const dir = r.dir === "rtl" ? "rtl" : "ltr";
+    const lang = str(r.lang_code) || null;
+    const out = $("#results"); out.replaceChildren();
+    const keepTab = rerender ? state.tab : "overview";
+
+    const items = arr(r.items).filter(i => str(i && i.title)).map(i => ({ ...i, level: normLvl(i.level) }));
+    const by = { red: items.filter(i => i.level === "red"), orange: items.filter(i => i.level === "orange"), green: items.filter(i => i.level === "green") };
+    let overall = normLvl(r.overall);
+    if (!r.overall) overall = by.red.length ? "red" : by.orange.length ? "orange" : "green";
+
+    /* 1. Summary hero: the one thing to read first */
+    const iconBtn = (label, icon, onclick) => el("button", { class: "icon-btn", type: "button", onclick }, svgEl(`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">${icon}</svg>`), el("span", {}, label));
+    const hero = el("section", { class: "hero lvl-" + overall, "aria-labelledby": "resTitle" },
+      el("div", { class: "hero-top" },
+        str(r.document_type) ? el("span", { class: "doc-type" }, str(r.document_type)) : el("span"),
+        el("div", { class: "hero-actions", dir: "ltr", lang: UI },
+          iconBtn(t("readAloud").replace(/^\S+\s/, ""), '<path d="M4 9v6h4l5 4V5L8 9zM16.5 8.5a5 5 0 0 1 0 7" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>', e => speakBtn(e.currentTarget.querySelector("span"), [str(r.title), str(r.summary)].join(". "), true)),
+          iconBtn(t("copyText"), '<rect x="8" y="8" width="12" height="12" rx="2" stroke="currentColor" stroke-width="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3" stroke="currentColor" stroke-width="2"/>', e => copyAll(e.currentTarget.querySelector("span"))),
+          iconBtn(t("newDoc"), '<path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>', startOver))),
+      el("h2", { class: "res-title", id: "resTitle", tabindex: "-1" }, str(r.title) || t("yourDoc")),
+      el("p", { class: "summary" }, str(r.summary)),
+      el("div", { class: "overall lvl-" + overall }, svgEl(TL_ICON[overall]), el("span", {}, L["overall_" + overall])),
+      items.length ? el("ul", { class: "counts", "aria-label": t("overview") }, LVLS.filter(l => by[l].length).map(l => el("li", {},
+        el("a", { href: "#cl-" + l, class: "count lvl-" + l, onclick: e => { e.preventDefault(); goTo("overview", "cl-" + l); } }, svgEl(TL_ICON[l]), el("b", {}, String(by[l].length)), " ", L[l])))) : null,
+      el("p", { class: "ai-note", lang: UI, dir: "ltr" }, svgEl('<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 11v6M12 7.5v.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>'), el("span", {}, t("aiLabel", { lang: state.lang })))
+    );
+    const wrap = el("div", { dir, lang });
+    wrap.append(hero);
+    if (str(r.translation_caution)) wrap.append(el("div", { class: "notice warn" }, el("p", {}, str(r.translation_caution))));
+
+    /* 2. Tabs: one topic at a time instead of one long page */
+    const TABS = [
+      { id: "overview", label: t("overview") },
+      { id: "next", label: t("tabNext") },
+      { id: "costs", label: t("tabCosts") },
+      { id: "learn", label: t("learnMore") }
+    ];
+    const tablist = el("div", { class: "tabs", role: "tablist", "aria-label": t("resultTabs"), lang: UI, dir: "ltr" });
+    const panels = {};
+    TABS.forEach(tb => {
+      tablist.append(el("button", { class: "tab", role: "tab", type: "button", id: "tab-" + tb.id, "aria-controls": "panel-" + tb.id, "aria-selected": "false", tabindex: "-1", onclick: () => selectTab(tb.id, true) }, tb.label));
+      panels[tb.id] = el("div", { class: "panel", role: "tabpanel", id: "panel-" + tb.id, "aria-labelledby": "tab-" + tb.id, tabindex: "0", hidden: true });
+    });
+    tablist.addEventListener("keydown", e => {
+      const ids = TABS.map(x => x.id); let i = ids.indexOf(state.tab);
+      if (e.key === "ArrowRight") i = (i + 1) % ids.length; else if (e.key === "ArrowLeft") i = (i - 1 + ids.length) % ids.length; else if (e.key === "Home") i = 0; else if (e.key === "End") i = ids.length - 1; else return;
+      e.preventDefault(); selectTab(ids[i], true); $("#tab-" + ids[i]).focus();
+    });
+    wrap.append(el("div", { class: "tabs-wrap" }, tablist));
+    Object.values(panels).forEach(p => wrap.append(p));
+
+    /* Overview: the traffic-light list, as calm grouped rows */
+    LVLS.forEach(l => {
+      if (!by[l].length) return;
+      panels.overview.append(el("section", { class: "group lvl-" + l, id: "cl-" + l, "aria-labelledby": "clh-" + l, tabindex: "-1" },
+        el("h3", { id: "clh-" + l }, svgEl(TL_ICON[l]), el("span", {}, L[l]), el("span", { class: "g-hint" }, L[l + "_hint"])),
+        el("ul", { class: "rows" }, by[l].map(i => el("li", {},
+          el("b", {}, str(i.title)),
+          str(i.detail) ? el("span", { class: "det" }, str(i.detail)) : null,
+          str(i.when) ? el("span", { class: "when" }, str(i.when)) : null,
+          moreBtn({ title: str(i.title), detail: str(i.detail) }))))));
+    });
+    if (overall !== "green") panels.overview.append(el("button", { class: "nudge", type: "button", lang: UI, dir: "ltr", onclick: () => goTo("next", "consultCard") },
+      el("span", {}, t("nudgeNext")), el("span", { "aria-hidden": "true" }, "→")));
+
+    /* Next steps: who to contact, medicines, what happens, doctor check */
+    panels.next.append(el("section", { class: "card", id: "consultCard", "aria-labelledby": "h-consult" }));
+    const meds = arr(r.medicines).filter(m => str(m && m.name));
+    if (meds.length) panels.next.append(el("section", { class: "card", "aria-labelledby": "h-meds" }, secHead("medicines", L.medicines, "h-meds"),
+      el("ul", { class: "rows plain" }, meds.map(m => el("li", {}, el("b", {}, str(m.name)),
+        str(m.how) ? el("span", { class: "det" }, el("span", { class: "k" }, L.how), str(m.how)) : null,
+        str(m.why) ? el("span", { class: "det" }, el("span", { class: "k" }, L.why), str(m.why)) : null,
+        moreBtn({ title: str(m.name), detail: [str(m.how), str(m.why)].filter(Boolean).join(". "), kind: "medicine" }))))));
+    const p = r.procedure;
+    if (p && arr(p.steps).length) {
+      const card = el("section", { class: "card", "aria-labelledby": "h-proc" }, secHead("procedure", L.procedure + (str(p.name) ? ": " + str(p.name) : ""), "h-proc"));
+      if (str(p.why)) card.append(el("p", { style: "margin-top:0" }, str(p.why)));
+      card.append(buildProcedure(p));
+      panels.next.append(card);
+    }
+    panels.next.append(el("section", { class: "card review-card", id: "reviewCard", "aria-labelledby": "h-review", tabindex: "-1" }));
+
+    /* Costs */
+    panels.costs.append(el("section", { class: "card", id: "svcCard", "aria-labelledby": "h-svc" }));
+
+    /* Learn more: everything optional, folded */
+    const terms = arr(r.terms).filter(x => str(x && x.term));
+    const qs = arr(r.questions).map(str).filter(Boolean);
+    panels.learn.append(el("section", { class: "card", "aria-label": t("learnMore") },
+      terms.length ? el("details", { class: "more" }, el("summary", {}, L.terms + ` (${terms.length})`), el("div", {}, el("dl", { class: "terms" }, terms.map(x => el("div", {}, el("dt", {}, str(x.term)), el("dd", {}, str(x.meaning), moreBtn({ title: str(x.term), detail: str(x.meaning), kind: "term" }))))))) : null,
+      qs.length ? el("details", { class: "more" }, el("summary", {}, L.questions + ` (${qs.length})`), el("div", {}, el("ol", { class: "qs" }, qs.map(q => el("li", {}, q))))) : null,
+      el("details", { class: "more", lang: UI, dir: "ltr" }, el("summary", {}, t("original")), el("div", {}, state.docText ? el("pre", { class: "origtext" }, state.docText) : el("p", { class: "hint" }, state.images.length === 1 ? t("picsOne") : t("picsMany", { n: state.images.length }))))));
+
+    out.append(wrap);
+    if (rerender) refreshChatTexts(); else resetChat(dir, lang);
+    renderServices(); renderConsult(); renderReview();
+    selectTab(keepTab || "overview", false);
+    $("#resultView").classList.remove("hidden");
+    if (!rerender) $("#resTitle").focus();
+  }
+  function selectTab(id, user) {
+    state.tab = id;
+    document.querySelectorAll("#results .tab").forEach(b => { const on = b.id === "tab-" + id; b.setAttribute("aria-selected", String(on)); b.tabIndex = on ? 0 : -1; });
+    document.querySelectorAll("#results .panel").forEach(pn => { pn.hidden = pn.id !== "panel-" + id; });
+    if (user) { const tw = $("#results .tabs-wrap"); if (tw && tw.getBoundingClientRect().top < 0) tw.scrollIntoView({ block: "start" }); }
+  }
+  function goTo(tab, targetId) {
+    selectTab(tab, false);
+    const tgt = document.getElementById(targetId);
+    if (tgt) { if (!tgt.hasAttribute("tabindex")) tgt.setAttribute("tabindex", "-1"); tgt.scrollIntoView({ block: "start" }); tgt.focus({ preventScroll: true }); }
+  }
+
+  /* ---------- services & coverage ---------- */
+  function coverFor(cat) {
+    const a = state.account; const c = COVER[cat] || COVER.other;
+    let lvl = c.lvl, pay = c.pay;
+    if (a && a.hospitalPlan && c.plan) { lvl = c.plan.lvl; pay = c.plan.pay; }
+    const amount = pay ? pay[a && a.increased ? 1 : 0] : null;
+    return { lvl, amount, unit: c.unit ? t(c.unit) : "", note: c.note ? t(c.note) : "" };
+  }
+  function renderServices() {
+    const card = $("#svcCard"); if (!card || !state.result) return;
+    const svcs = arr(state.result.services).filter(s => str(s && s.name)).map(s => ({ ...s, category: CATS.includes(s.category) ? s.category : "other" }));
+    const dir = state.result.dir === "rtl" ? "rtl" : "ltr";
+    card.replaceChildren(secHead("services", L.services || "Care and costs", "h-svc"));
+    if (!svcs.length) { card.append(el("p", { class: "hint", lang: UI }, t("noCare"))); return; }
+    const a = state.account;
+    if (!a) {
+      card.append(el("div", { class: "signin-cta", lang: UI, dir: "ltr" },
+        el("p", {}, t("signinCta") + " ", el("span", { class: "demo-tag" }, t("demo"))),
+        el("button", { class: "btn small", type: "button", onclick: () => openDialog("choose") }, t("signIn"))));
+      card.append(el("div", { dir }, svcs.map(s => el("div", { class: "svc" },
+        el("span", { class: "nm" }, str(s.name)), el("span", { class: "cov unk", lang: UI }, t("coverUnknown")),
+        str(s.why) || str(s.when) ? el("span", { class: "why" }, [str(s.why), str(s.when)].filter(Boolean).join(" · ")) : null))));
+      return;
+    }
+    const ins = INSURERS[a.insurer];
+    const withCov = svcs.map(s => ({ s, c: coverFor(s.category) }));
+    const counts = { all: withCov.length, full: 0, part: 0, none: 0, unk: 0 }; withCov.forEach(x => counts[x.c.lvl]++);
+    const F = [["all", t("fAll")], ["full", t("fFull")], ["part", t("fPart")], ["none", t("fNone")], ["unk", t("fUnk")]].filter(([k]) => k === "all" || counts[k]);
+    card.append(el("p", { class: "hint", lang: UI, dir: "ltr", style: "margin-top:0" }, t("checkedAgainst", { ins: ins.name, plan: t("standardCover") + (a.hospitalPlan ? " + " + t("hospitalPlan") : "") + (a.increased ? ", " + t("increased") : "") }) + " ", el("span", { class: "demo-tag" }, t("demoFigures"))));
+    card.append(el("div", { class: "svc-filters", role: "group", "aria-label": t("filterBy"), lang: UI, dir: "ltr" }, F.map(([k, lbl]) =>
+      el("button", { class: "chip", type: "button", "aria-pressed": String(state.svcFilter === k), onclick: () => { state.svcFilter = k; renderServices(); $(`#svcCard .chip[data-k="${k}"]`).focus(); }, "data-k": k }, `${lbl} (${counts[k]})`))));
+    const COVLBL = { full: "✓ " + t("fFull"), part: "€ " + t("fPart"), none: "✕ " + t("fNone"), unk: "? " + t("fUnk") };
+    const shown = withCov.filter(x => state.svcFilter === "all" || x.c.lvl === state.svcFilter);
+    if (!shown.length) { state.svcFilter = "all"; return renderServices(); }
+    card.append(el("div", { dir, "aria-live": "polite" }, shown.map(({ s, c }) => {
+      let cost = "";
+      if (c.lvl === "full") cost = t("costFull");
+      else if (c.lvl === "part" && c.amount != null) cost = t("costPart", { amount: c.amount, unit: c.unit }).replace(/\s+;/, ";").replace(/  +/g, " ");
+      else if (c.lvl === "none") cost = t("costNone") + (c.note ? " " + c.note + "." : "");
+      else cost = t("costUnk");
+      if (c.note && c.lvl !== "none") cost += " " + c.note + ".";
+      return el("div", { class: "svc" },
+        el("span", { class: "nm" }, str(s.name)),
+        el("span", { class: "cov " + c.lvl, lang: UI }, COVLBL[c.lvl]),
+        str(s.why) || str(s.when) ? el("span", { class: "why" }, [str(s.why), str(s.when)].filter(Boolean).join(" · ")) : null,
+        el("span", { class: "cost", lang: UI, dir: "ltr" }, cost));
+    })));
+  }
+
+  /* ---------- who to contact ---------- */
+  const BOOKING = [
+    { name: "Doctena", url: "https://www.doctena.com/en-be" },
+    { name: "Doctoranytime", url: "https://www.doctoranytime.be" }
+  ];
+  function renderConsult() {
+    const card = $("#consultCard"); if (!card || !state.result) return;
+    const r = state.result;
+    const hasRed = arr(r.items).some(i => normLvl(i && i.level) === "red");
+    const cs = arr(r.consult).filter(c => str(c && c.who)).map(c => ({ ...c, level: String(c.level).toLowerCase() === "red" ? "red" : "orange" }));
+    if (!hasRed && !cs.length) { card.classList.add("hidden"); return; }
+    card.classList.remove("hidden");
+    const dir = r.dir === "rtl" ? "rtl" : "ltr";
+    card.replaceChildren(secHead("consult", L.consult || "Who to contact", "h-consult"));
+    if (hasRed) card.append(el("div", { class: "urgent", lang: UI, dir: "ltr" }, svgEl(TL_ICON.red),
+      el("div", {}, el("p", {}, el("b", {}, t("urgentT"))),
+        el("p", {}, t("urgentA"), el("a", { href: "tel:112" }, "112"), t("urgentB"), el("a", { href: "tel:1733" }, "1733"), "."))));
+    cs.forEach(c => {
+      let cost = "";
+      if (state.account) {
+        const cv = coverFor(COVER[c.category] ? c.category : "other");
+        cost = cv.lvl === "full" ? t("covered") : cv.lvl === "part" && cv.amount != null ? t("payVisit", { amount: cv.amount }) : cv.lvl === "none" ? t("notCovered") : "";
+      }
+      card.append(el("div", { class: "consult lvl-" + c.level, dir },
+        el("div", { class: "top" }, el("span", { class: "who" }, str(c.who)), el("span", { class: "lvl-tag" }, svgEl(TL_ICON[c.level]), L[c.level])),
+        str(c.why) ? el("p", { class: "why" }, str(c.why)) : null,
+        el("p", { class: "meta", lang: UI, dir: "ltr" }, t("searchFor"), el("b", {}, str(c.specialty) || "general practitioner"),
+          cost ? [" · ", cost, " ", el("span", { class: "demo-tag" }, t("demo"))] : null),
+        el("div", { class: "book", lang: UI, dir: "ltr" },
+          BOOKING.map(b => el("a", { class: "btn small ext", href: b.url, target: "_blank", rel: "noopener noreferrer" }, t("bookOn", { name: b.name }), el("span", { class: "sr-only" }, t("opensOther")))),
+          el("span", { class: "hint", style: "align-self:center;margin:0" }, t("orCall")))));
+    });
+    card.append(el("p", { class: "fine", lang: UI }, t("bookingFine")));
+  }
+
+  /* ---------- doctor check (paid, DEMO) ---------- */
+  const TIERS = { standard: { label: "tierStandard", time: "within48", price: 19 }, express: { label: "tierExpress", time: "within24", price: 29 } };
+  const tierLbl = tr => t(tr.label);
+  function renderReview() {
+    const card = $("#reviewCard"); if (!card || !state.result) return;
+    card.setAttribute("lang", UI); card.setAttribute("dir", "ltr");
+    card.replaceChildren(secHead("review", t("revCardT"), "h-review"));
+    const rv = state.review;
+    if (!rv) {
+      card.append(
+        el("p", { style: "margin-top:0" }, t("revIntro") + " ", el("span", { class: "demo-tag" }, t("demo"))),
+        el("div", { class: "rev-row" },
+          el("button", { class: "btn primary", type: "button", onclick: () => openDialog("review") }, t("revT")),
+          el("span", { class: "hint" }, t("fromPrice", { price: TIERS.standard.price }) + " · " + t("answerIn", { time: t(TIERS.standard.time) }))),
+        el("details", { class: "more", style: "margin-top:12px" }, el("summary", {}, t("howWorks")), el("div", {},
+          el("ul", { class: "review-points" }, el("li", {}, t("rp1")), el("li", {}, t("rp2")), el("li", {}, t("rp3")), el("li", {}, t("rp4"))),
+          el("div", { class: "tiers" }, Object.values(TIERS).map(tr => el("div", { class: "med" }, el("b", {}, `${tierLbl(tr)} · €${tr.price}`), el("div", { class: "hint" }, t("answerIn", { time: t(tr.time) }))))),
+          el("p", { class: "fine" }, t("revFine")))));
+    } else {
+      const tr = TIERS[rv.tier];
+      const steps = [t("ts1"), t("ts2"), t("ts3"), t("ts4")];
+      card.append(
+        el("p", { style: "margin-top:0" }, el("b", {}, t("requested", { tier: tierLbl(tr) })), t("expected", { time: t(tr.time) }), el("span", { class: "demo-tag" }, t("demo"))),
+        el("ol", { class: "tracker", "aria-label": t("trackLabel") }, steps.map((s, i) => el("li", { class: i < rv.step ? "done" : i === rv.step ? "now" : "" },
+          el("span", { class: "dotx", "aria-hidden": "true" }, i < rv.step ? "✓" : String(i + 1)),
+          el("span", {}, s, el("span", { class: "sr-only" }, i < rv.step ? t("sDone") : i === rv.step ? t("sNow") : t("sNot")))))),
+        el("p", { class: "sr-only", role: "status" }, t("currentStep", { s: steps[Math.min(rv.step, steps.length - 1)] })),
+        el("p", { class: "fine" }, state.account ? t("inAccount") : t("refCode", { code: rv.code }),
+          t("demoNoDoctor")),
+        el("button", { class: "btn small", type: "button", onclick: () => { clearTimeout(rv.timer); state.review = null; renderReview(); $("#reviewCard").focus(); } }, t("cancelReq")));
+    }
+  }
+  function startReview(tier) {
+    const rv = { tier, step: 1, code: "PL-" + Math.random().toString(36).slice(2, 7).toUpperCase() };
+    rv.timer = setTimeout(() => { if (state.review === rv) { rv.step = 2; renderReview(); } }, 4000);
+    state.review = rv; renderReview();
+  }
+
+  function speakBtn(btn, text, bare) {
+    const idle = bare ? t("readAloud").replace(/^\S+\s/, "") : t("readAloud");
+    const busy = bare ? t("stopReading").replace(/^\S+\s/, "") : t("stopReading");
+    if (btn.dataset.on === "1") { stopSpeech(); btn.dataset.on = ""; btn.textContent = idle; return; }
+    btn.dataset.on = "1"; btn.textContent = busy;
+    const ok = speak(text, () => { btn.dataset.on = ""; btn.textContent = idle; });
+    if (!ok) { btn.dataset.on = ""; btn.textContent = t("noVoice"); setTimeout(() => btn.textContent = idle, 3000); }
+  }
+  function plainText(r) {
+    const lines = [str(r.title), "", str(r.summary), ""];
+    const add = (h, xs) => { if (xs.length) lines.push(h, ...xs.map(i => "• " + i), ""); };
+    LVLS.forEach(l => add(`[${(L[l] || l).toUpperCase()}]`, arr(r.items).filter(i => normLvl(i.level) === l).map(i => str(i.title) + ": " + str(i.detail) + (str(i.when) ? " (" + str(i.when) + ")" : ""))));
+    add(L.medicines, arr(r.medicines).map(m => [str(m.name), str(m.how), str(m.why)].filter(Boolean).join(" – ")));
+    if (r.procedure && arr(r.procedure.steps).length) add(L.procedure + ": " + str(r.procedure.name), arr(r.procedure.steps).map(s => str(s.title) + ": " + str(s.text)));
+    add(L.terms, arr(r.terms).map(t => str(t.term) + ": " + str(t.meaning)));
+    add(L.questions, arr(r.questions).map(str));
+    lines.push("—", t("copyFooter"));
+    return lines.join("\n");
+  }
+  async function copyAll(btn) {
+    try { await navigator.clipboard.writeText(plainText(state.result)); btn.textContent = t("copied"); } catch { btn.textContent = t("copyFail"); }
+    setTimeout(() => btn.textContent = t("copyText"), 2000);
+  }
+  function startOver() {
+    stopSpeech(); state.ctl && state.ctl.abort();
+    if (state.review) clearTimeout(state.review.timer);
+    state.files = []; state.result = null; state.review = null; renderFiles(); pasteBox.value = "";
+    $("#resultView").classList.add("hidden"); $("#results").replaceChildren();
+    closeChat(false); fab.classList.add("hidden");
+    $("#inputView").classList.remove("hidden"); hideError(); updateGo(); fileInput.focus();
+  }
+
+  /* ---------- procedure: steps + trusted video resources ---------- */
+  // Instead of drawing animations with AI, link to trusted, professionally made resources.
+  const q = s => encodeURIComponent(s);
+  const siteSearch = (domain, term) => "https://www.google.com/search?q=" + q("site:" + domain + " " + term);
+  function procResources(p) {
+    const en = str(p.name_en) || str(p.name);
+    const local = str(p.name);
+    const lang = (str(state.result && state.result.lang_code) || "en").toLowerCase().split("-")[0];
+    const out = [];
+    if (str(p.topic) === "heart") out.push({ org: "American Heart Association", name: "Watch, Learn and Live", desc: t("r_aha"), url: "https://watchlearnlive.heart.org/", langs: t("l_en"), kind: t("k_anim") });
+    out.push({ org: "U.S. National Library of Medicine", name: "MedlinePlus", desc: t("r_mlp"), url: "https://vsearch.nlm.nih.gov/vivisimo/cgi-bin/query-meta?v%3Aproject=" + (lang === "es" ? "medlineplus-spanish" : "medlineplus") + "&query=" + q(lang === "es" ? local : en), langs: lang === "es" ? t("l_es") : t("l_ensome"), kind: t("k_vid") });
+    out.push({ org: "NHS (UK National Health Service)", name: "NHS website", desc: t("r_nhs"), url: "https://www.nhs.uk/search/results?q=" + q(en), langs: t("l_en"), kind: t("k_guidevid") });
+    if (lang === "nl") {
+      out.push({ org: "Nederlands Huisartsen Genootschap", name: "Thuisarts.nl", desc: t("r_ta"), url: siteSearch("thuisarts.nl", local), langs: t("l_nl"), kind: t("k_guidevid") });
+      out.push({ org: "Cebam (Belgium)", name: "Gezondheid en Wetenschap", desc: t("r_gw"), url: siteSearch("gezondheidenwetenschap.be", local), langs: t("l_nl"), kind: t("k_guide") });
+    }
+    if (lang === "de") out.push({ org: "IQWiG (Germany)", name: "gesundheitsinformation.de", desc: t("r_iq"), url: siteSearch("gesundheitsinformation.de", local), langs: t("l_de"), kind: t("k_guidevid") });
+    if (lang === "fr") out.push({ org: "Assurance Maladie (France)", name: "ameli.fr", desc: t("r_am"), url: siteSearch("ameli.fr", local), langs: t("l_fr"), kind: t("k_guide") });
+    return out;
+  }
+  function buildProcedure(p) {
+    const steps = arr(p.steps).filter(s => str(s && s.title));
+    const wrap = el("div", {});
+    if (steps.length) {
+      const text = steps.map((s, i) => `${i + 1}. ${str(s.title)}. ${str(s.text)}`).join(" ");
+      wrap.append(
+        el("div", { class: "toolbar", dir: "ltr", lang: UI, style: "margin-bottom:10px" }, el("button", { class: "btn small", type: "button", onclick: e => speakBtn(e.currentTarget, text) }, t("readAloud"))),
+        el("ol", { class: "steps-list" }, steps.map(s => el("li", {}, el("b", {}, str(s.title)), str(s.text) ? el("span", {}, str(s.text)) : null))));
+    }
+    const res = procResources(p);
+    wrap.append(
+      el("details", { class: "more res-details", lang: UI, dir: "ltr" }, el("summary", {}, t("watchT") + ` (${res.length})`), el("div", {},
+      el("p", { class: "hint", style: "margin-top:0" }, t("madeBy", { term: str(p.name_en) || str(p.name) })),
+      el("ul", { class: "resources", lang: UI, dir: "ltr" }, res.map(r => el("li", {},
+        el("div", { class: "r-top" }, el("span", { class: "r-name" }, r.name), el("span", { class: "r-kind" }, r.kind)),
+        el("span", { class: "r-org" }, r.org + " · " + r.langs),
+        el("p", {}, r.desc),
+        el("a", { class: "btn small ext", href: r.url, target: "_blank", rel: "noopener noreferrer" }, r.url.includes("watchlearnlive") ? t("openX", { name: r.name }) : t("searchX", { name: r.name }), el("span", { class: "sr-only" }, t("opensOther")))))),
+      el("p", { class: "fine" }, t("resFine")))));
+    return wrap;
+  }
+
+  /* ---------- "tell me more" ---------- */
+  let moreSeq = 0;
+  function morePrompt(ctx) {
+    return `A patient is reading a plain-language explanation of their medical document and wants to understand one point better.
+POINT${ctx.kind === "medicine" ? " (a medicine)" : ctx.kind === "term" ? " (a medical word)" : ""}: "${ctx.title}"${ctx.detail ? " – " + ctx.detail : ""}
+
+Explain it in ${state.lang}. Reading level: ${LEVELS[state.level]}
+Cover what is relevant: what it means; what any grade, stage, score, measurement, abbreviation or unit means, what the scale looks like (for example "grade I to III", or the usual normal range) and where the patient's value sits on it; why it matters; what usually happens next or what the patient can do.
+Use the document first. Mark general medical knowledge clearly as general. Do not diagnose beyond the document, do not predict the patient's outcome and do not contradict their care team. If it depends on their situation, say they should ask their doctor.
+At most 150 words. Plain text, no markdown. You may use up to 4 short lines starting with "• ".
+
+${state.docText ? "Original document:\n<<<\n" + state.docText.slice(0, 30000) + "\n>>>" : "(The original was a photo.) Explanation already given (JSON): " + JSON.stringify(state.result).slice(0, 8000)}`;
+  }
+  function moreBtn(ctx) {
+    const id = "more-" + (++moreSeq);
+    const region = el("div", { class: "more-box hidden", id });
+    const btn = el("button", { class: "more-btn", type: "button", "aria-expanded": "false", "aria-controls": id }, t("more"));
+    let loaded = false, busy = false;
+    btn.addEventListener("click", async () => {
+      if (btn.getAttribute("aria-expanded") === "true") { btn.setAttribute("aria-expanded", "false"); region.classList.add("hidden"); btn.textContent = t("more"); return; }
+      btn.setAttribute("aria-expanded", "true"); region.classList.remove("hidden"); btn.textContent = t("less");
+      if (loaded || busy) return;
+      busy = true;
+      const txt = el("div", { class: "more-text", role: "status" }, "…");
+      region.replaceChildren(txt);
+      try {
+        const { text } = await state.sample(morePrompt(ctx), { modelTier: "default", onText: ({ text }) => { txt.textContent = text; } });
+        txt.textContent = text; txt.removeAttribute("role"); loaded = true;
+        region.append(el("div", { class: "more-actions" },
+          el("button", { class: "btn link", type: "button", onclick: () => openChat(`${ctx.title}: `) }, t("askAbout")),
+          el("span", { class: "fine", lang: UI, dir: "ltr" }, t("aiWritten"))));
+      } catch (e) { txt.textContent = (e && e.text) || errText(e); }
+      finally { busy = false; }
+    });
+    return [btn, region];
+  }
+
+  /* ---------- floating questions panel ---------- */
+  const fab = $("#fab"), panel = $("#chatPanel"), chatLog = $("#chatLog"), askInput = $("#askInput"), askSend = $("#askSend");
+  function openChat(prefill) {
+    panel.classList.remove("hidden"); document.body.classList.add("chat-open");
+    fab.setAttribute("aria-expanded", "true");
+    if (typeof prefill === "string") askInput.value = prefill;
+    askInput.focus();
+    try { askInput.setSelectionRange(askInput.value.length, askInput.value.length); } catch {}
+  }
+  function closeChat(returnFocus = true) {
+    panel.classList.add("hidden"); document.body.classList.remove("chat-open");
+    fab.setAttribute("aria-expanded", "false");
+    if (returnFocus && !fab.classList.contains("hidden")) fab.focus();
+  }
+  fab.addEventListener("click", () => panel.classList.contains("hidden") ? openChat() : closeChat());
+  $("#chatClose").addEventListener("click", () => closeChat());
+  panel.addEventListener("keydown", e => { if (e.key === "Escape") { e.stopPropagation(); closeChat(); } });
+  function refreshChatTexts() {
+    const empty = chatLog.querySelector(".chat-empty"); if (empty) { empty.textContent = t("chatEmpty"); empty.setAttribute("lang", UI); }
+    $("#chatHint").textContent = t("chatHint", { lang: state.lang });
+  }
+  function resetChat(dir, lang) {
+    state.chat = [];
+    chatLog.setAttribute("dir", dir); if (lang) chatLog.setAttribute("lang", lang); else chatLog.removeAttribute("lang");
+    chatLog.replaceChildren(el("p", { class: "chat-empty", lang: UI, dir: "ltr" }, t("chatEmpty")));
+    $("#chatHint").textContent = t("chatHint", { lang: state.lang });
+    fab.classList.remove("hidden");
+  }
+  async function submitChat() {
+    const q = askInput.value.trim(); if (!q || askSend.disabled) return;
+    askInput.value = ""; askSend.disabled = true;
+    const empty = chatLog.querySelector(".chat-empty"); if (empty) empty.remove();
+    chatLog.append(el("div", { class: "bubble me" }, q));
+    const bubble = el("div", { class: "bubble ai" }, "…"); chatLog.append(bubble);
+    chatLog.scrollTop = chatLog.scrollHeight;
+    state.chat.push({ role: "user", content: q });
+    const rules = `You answer a patient's follow-up questions about a medical document they received. Answer in ${state.lang}, at this reading level: ${LEVELS[state.level]}
+Answer from the document first. You may give general, well-established health information, and say when you do. Do not diagnose, do not change or invent doses, and do not contradict the care team. If the answer depends on the patient's own situation or isn't in the document, say so kindly and suggest asking their doctor, nurse or pharmacist. If the question describes an emergency or severe symptoms, tell them to call 112 now. Under 120 words. Plain text only.
+
+The explanation already given (JSON):
+${JSON.stringify(state.result).slice(0, 12000)}
+
+${state.docText ? "Original document text:\n<<<\n" + state.docText.slice(0, 40000) + "\n>>>" : "(The original was a photo; rely on the explanation above.)"}`;
+    try {
+      const { text } = await state.sample([{ role: "user", content: rules }, ...state.chat.slice(-10)], { cache: false, modelTier: "default", onText: ({ text }) => { bubble.textContent = text; chatLog.scrollTop = chatLog.scrollHeight; } });
+      state.chat.push({ role: "assistant", content: text });
+    } catch (e) { state.chat.pop(); bubble.textContent = (e && e.text) || errText(e); }
+    finally { askSend.disabled = false; askInput.focus(); }
+  }
+  askSend.addEventListener("click", submitChat);
+  askInput.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); submitChat(); } });
+
+  renderAccount();
+})();
+</script>
+</body>
+</html>
