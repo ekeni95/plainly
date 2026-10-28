@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Address of your Plainly API (Cloudflare Worker). Leave empty when the page runs inside Claude. -->
+<meta name="plainly-api" content="">
 <title>Plainly – your medical papers, explained</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -942,8 +944,69 @@
   const state = { files: [], sample: null, limits: null, ctl: null, result: null, docText: "", images: [], lang: "", level: "plain", chat: [], account: null, svcFilter: "all" };
 
   /* ---------- Claude availability ---------- */
+  /* Outside Claude (e.g. GitHub Pages), talk to your own Plainly API, which holds the Anthropic key. */
+  const API_URL = ((document.querySelector('meta[name="plainly-api"]') || {}).content || "").trim().replace(/\/$/, "");
+  function tolerantJson(t) {
+    try { return JSON.parse(t); } catch {}
+    const f = t.match(/```(?:json)?\s*([\s\S]*?)```/); if (f) { try { return JSON.parse(f[1]); } catch {} }
+    const a = t.search(/[\[{]/), b = Math.max(t.lastIndexOf("}"), t.lastIndexOf("]"));
+    if (a >= 0 && b > a) { try { return JSON.parse(t.slice(a, b + 1)); } catch {} }
+    return undefined;
+  }
+  async function imageToB64(blob) {
+    const bmp = await createImageBitmap(blob);
+    const k = Math.min(1, 1568 / Math.max(bmp.width, bmp.height));
+    const c = document.createElement("canvas"); c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
+    c.getContext("2d").drawImage(bmp, 0, 0, c.width, c.height);
+    const url = c.toDataURL("image/jpeg", 0.85);
+    return { media_type: "image/jpeg", data: url.slice(url.indexOf(",") + 1) };
+  }
+  function makeApiSample(base) {
+    async function call(input, opts = {}, asJson) {
+      const list = opts.images ? (opts.images instanceof Blob ? [opts.images] : Array.from(opts.images)) : [];
+      let imgs = [];
+      try { imgs = await Promise.all(list.map(imageToB64)); } catch { throw { code: "image_rejected", message: "image" }; }
+      let res;
+      try {
+        res = await fetch(base + "/api/sample", { method: "POST", headers: { "Content-Type": "application/json" }, signal: opts.signal,
+          body: JSON.stringify({ input, images: imgs, tier: opts.modelTier || "default", json: !!asJson }) });
+      } catch (e) { throw { code: opts.signal && opts.signal.aborted ? "cancelled" : "upstream_error", message: String(e) }; }
+      if (!res.ok) { let code = "upstream_error"; try { code = (await res.json()).error || code; } catch {} throw { code, message: code }; }
+      const reader = res.body.getReader(), dec = new TextDecoder();
+      let buf = "", text = "", stop = null;
+      try {
+        for (;;) {
+          const { value, done } = await reader.read(); if (done) break;
+          buf += dec.decode(value, { stream: true }).replace(/\r/g, "");
+          let i;
+          while ((i = buf.indexOf("\n\n")) >= 0) {
+            const chunk = buf.slice(0, i); buf = buf.slice(i + 2);
+            const data = chunk.split("\n").filter(l => l.startsWith("data:")).map(l => l.slice(5).trim()).join("");
+            if (!data) continue;
+            let ev; try { ev = JSON.parse(data); } catch { continue; }
+            if (ev.type === "content_block_delta" && ev.delta && ev.delta.type === "text_delta") { text += ev.delta.text; if (opts.onText) opts.onText({ text, delta: ev.delta.text }); }
+            else if (ev.type === "message_delta" && ev.delta) stop = ev.delta.stop_reason;
+            else if (ev.type === "error") throw { code: ev.error && ev.error.type === "overloaded_error" ? "rate_limited" : "upstream_error", message: "stream", text };
+          }
+        }
+      } catch (e) { if (e && e.code) throw e; throw { code: opts.signal && opts.signal.aborted ? "cancelled" : "upstream_error", message: String(e), text }; }
+      if (!text.trim()) throw { code: "empty_completion", message: "empty" };
+      return { text, truncated: stop === "max_tokens" };
+    }
+    const sample = (input, opts) => call(input, opts, false);
+    sample.json = async (input, opts) => {
+      const { text, truncated } = await call(input, opts, true);
+      const v = tolerantJson(text);
+      if (v === undefined || truncated) throw { code: "invalid_json", message: "no json", text };
+      return v;
+    };
+    sample.limits = async () => ({ maxPromptBytes: 262144, images: { maxCount: 6, maxInputBytes: 20000000, mediaTypes: ["image/jpeg", "image/png", "image/webp", "image/gif"] } });
+    return sample;
+  }
+
   (async () => {
     try { state.sample = window.claude ? await window.claude.use("sample") : null; } catch { state.sample = null; }
+    if (!state.sample && API_URL) state.sample = makeApiSample(API_URL);
     if (!state.sample) { $("#unavailable").classList.remove("hidden"); return; }
     try { state.limits = await state.sample.limits(); } catch { state.limits = null; }
     updateGo();

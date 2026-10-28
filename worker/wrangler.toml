@@ -1,0 +1,14 @@
+name = "plainly-api"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+
+[vars]
+# Only these sites may use your API key. Add more, comma-separated.
+ALLOWED_ORIGINS = "https://ekeni95.github.io"
+# Which Claude model to use for each kind of request.
+MODEL_COMPLEX = "claude-sonnet-5-5"   # the main explanation
+MODEL_DEFAULT = "claude-sonnet-5-5"   # "Tell me more" and questions
+MODEL_QUICK   = "claude-haiku-5-5"
+
+# The API key is NOT stored here. Add it as a secret:
+#   npx wrangler secret put ANTHROPIC_API_KEY
