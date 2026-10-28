@@ -547,6 +547,28 @@
   @media (prefers-contrast: more){
     .btn,.chip,.choice span{box-shadow:none;border:2px solid var(--ink)}
   }
+
+  /* ---------- speech ---------- */
+  .mic-btn{min-width:48px;min-height:48px;justify-content:center;padding:.5rem .7rem;color:var(--teal-ink)}
+  .mic-btn.live{background:var(--red-bg);color:var(--red-ink);box-shadow:inset 0 0 0 2px var(--red)}
+  .mic-btn.live svg{animation:pulse 1.2s ease-in-out infinite}
+  @keyframes pulse{50%{transform:scale(1.15)}}
+  @media (prefers-reduced-motion: reduce){.mic-btn.live svg{animation:none}}
+  .dictate-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px}
+  .mic-status:empty{display:none}
+  .chat-panel .mic-status{margin:0 0 6px}
+  .switch{display:flex;align-items:center;gap:10px;cursor:pointer;margin:10px 0 0;font-weight:500;font-size:.95rem}
+  .switch input{position:absolute;opacity:0;width:1px;height:1px}
+  .switch .track{width:44px;height:26px;border-radius:999px;background:#D7D9E3;box-shadow:inset 2px 2px 5px rgba(150,158,190,.45);position:relative;flex:none;border:1.5px solid var(--edge)}
+  .switch .track::after{content:"";position:absolute;top:2px;left:2px;width:19px;height:19px;border-radius:50%;background:#fff;box-shadow:1px 1px 3px rgba(0,0,0,.25);transition:left .15s}
+  .switch input:checked+.track{background:var(--teal);border-color:var(--teal)}
+  .switch input:checked+.track::after{left:20px}
+  .switch input:focus-visible+.track{outline:3px solid var(--focus);outline-offset:2px}
+  .g-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+  .listen-btn{display:inline-flex;align-items:center;gap:6px;flex:none;border:0;border-radius:999px;background:var(--base,#EFEDE8);box-shadow:var(--raise-sm,none);color:var(--teal-ink);font-weight:600;font-size:.88rem;padding:.35rem .75rem;min-height:36px;cursor:pointer}
+  .listen-btn[aria-pressed="true"]{box-shadow:var(--press,none),inset 0 0 0 2px var(--teal)}
+  .group.lvl-red .listen-btn{background:#fff}
+  @media (max-width:600px){ .g-head .lb-txt{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap} .g-head .listen-btn{min-width:40px;min-height:40px;justify-content:center;padding:0} }
 </style>
 </head>
 <body>
@@ -610,6 +632,7 @@
         <summary data-i18n="pasteSummary">Or type or paste the text</summary>
         <label for="pasteBox" class="sr-only" data-i18n="pasteLabel">Document text</label>
         <textarea id="pasteBox" data-i18n-ph="pastePh" placeholder="Paste the text from your letter or report here…"></textarea>
+        <div class="dictate-row"><button class="btn small mic-btn hidden" type="button" id="pasteMic" aria-pressed="false"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" stroke="currentColor" stroke-width="2"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M9 21h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span data-i18n="dictate">Dictate the text</span></button><span class="mic-status hint" id="pasteMicStatus" role="status" aria-live="polite"></span></div>
       </details>
     </div>
 
@@ -674,8 +697,10 @@
     <button class="btn small" type="button" id="chatClose"><span data-i18n="close">Close</span><span class="sr-only" data-i18n="questionsSr"> questions</span></button>
   </div>
   <p class="hint" id="chatHint"></p>
+  <label class="switch"><input type="checkbox" id="voiceReplies"><span class="track" aria-hidden="true"></span><span data-i18n="speakAnswers">Read answers aloud</span></label>
   <div class="chat" id="chatLog" role="log" aria-live="polite"></div>
-  <div class="ask-row"><label for="askInput" class="sr-only" data-i18n="yourQuestion">Your question</label><input id="askInput" type="text" dir="auto" data-i18n-ph="askPh" placeholder="Type your question…"><button class="btn primary" type="button" id="askSend" style="padding:.6rem 1rem;font-size:1rem" data-i18n="askBtn">Ask</button></div>
+  <p class="mic-status hint" id="askMicStatus" role="status" aria-live="polite"></p>
+  <div class="ask-row"><label for="askInput" class="sr-only" data-i18n="yourQuestion">Your question</label><input id="askInput" type="text" dir="auto" data-i18n-ph="askPh" placeholder="Type your question…"><button class="btn mic-btn hidden" type="button" id="askMic" aria-pressed="false"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" stroke="currentColor" stroke-width="2"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M9 21h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span class="sr-only" data-i18n="micStart">Speak your question</span></button><button class="btn primary" type="button" id="askSend" style="padding:.6rem 1rem;font-size:1rem" data-i18n="askBtn">Ask</button></div>
 </div>
 
 <!-- ACCOUNT DIALOG (demo) -->
@@ -707,6 +732,7 @@
   const UI_LANGS = { en: "English", de: "Deutsch", fr: "Français", nl: "Nederlands", es: "Español" };
   const I18N = {
     en: {
+      speakAnswers: "Read answers aloud", micStart: "Speak your question", micStop: "Stop listening", dictate: "Dictate the text", listening: "Listening… speak now.", micDenied: "The microphone isn\u2019t available here. Allow it in your browser, or open Plainly in a normal browser tab. You can also type.", micUnavailable: "Speech input doesn\u2019t work in this browser. Please type instead.", micNoSpeech: "We didn\u2019t hear anything. Try again.", listen: "Listen", listenX: "Listen: {what}", stopShort: "Stop",
       spacing: "Extra spacing",
       howWorks: "How it works", fromPrice: "From €{price}",
       tabNext: "Next steps", tabCosts: "Costs", resultTabs: "Parts of your explanation", nudgeNext: "See who to contact and what to do next",
@@ -746,6 +772,7 @@
       aiWritten: "AI-written – check with your care team.", more: "Tell me more", less: "Show less", askAbout: "Ask a question about this"
     },
     de: {
+      speakAnswers: "Antworten vorlesen", micStart: "Frage sprechen", micStop: "Zuhören beenden", dictate: "Text diktieren", listening: "Ich höre zu … sprechen Sie jetzt.", micDenied: "Das Mikrofon ist hier nicht verfügbar. Erlauben Sie es im Browser oder öffnen Sie Plainly in einem normalen Browser-Tab. Sie können auch tippen.", micUnavailable: "Spracheingabe funktioniert in diesem Browser nicht. Bitte tippen Sie.", micNoSpeech: "Wir haben nichts gehört. Bitte noch einmal.", listen: "Anhören", listenX: "Anhören: {what}", stopShort: "Stopp",
       spacing: "Mehr Abstand",
       howWorks: "So funktioniert es", fromPrice: "Ab {price} €",
       tabNext: "Nächste Schritte", tabCosts: "Kosten", resultTabs: "Teile Ihrer Erklärung", nudgeNext: "Wen Sie kontaktieren sollten und was als Nächstes zu tun ist",
@@ -785,6 +812,7 @@
       aiWritten: "Von KI geschrieben – mit Ihrem Behandlungsteam prüfen.", more: "Mehr dazu", less: "Weniger anzeigen", askAbout: "Eine Frage dazu stellen"
     },
     fr: {
+      speakAnswers: "Lire les réponses à voix haute", micStart: "Dire votre question", micStop: "Arrêter l’écoute", dictate: "Dicter le texte", listening: "J’écoute… parlez maintenant.", micDenied: "Le micro n’est pas disponible ici. Autorisez-le dans votre navigateur ou ouvrez Plainly dans un onglet normal. Vous pouvez aussi taper.", micUnavailable: "La saisie vocale ne fonctionne pas dans ce navigateur. Veuillez taper.", micNoSpeech: "Nous n’avons rien entendu. Réessayez.", listen: "Écouter", listenX: "Écouter : {what}", stopShort: "Arrêter",
       spacing: "Plus d’espace",
       howWorks: "Comment ça marche", fromPrice: "À partir de {price} €",
       tabNext: "Prochaines étapes", tabCosts: "Coûts", resultTabs: "Parties de votre explication", nudgeNext: "Qui contacter et que faire ensuite",
@@ -824,6 +852,7 @@
       aiWritten: "Rédigé par une IA – à vérifier avec votre équipe soignante.", more: "En savoir plus", less: "Afficher moins", askAbout: "Poser une question à ce sujet"
     },
     nl: {
+      speakAnswers: "Antwoorden voorlezen", micStart: "Spreek uw vraag in", micStop: "Stoppen met luisteren", dictate: "Tekst inspreken", listening: "Ik luister… spreek nu.", micDenied: "De microfoon is hier niet beschikbaar. Sta hem toe in uw browser of open Plainly in een gewoon browsertabblad. U kunt ook typen.", micUnavailable: "Spraakinvoer werkt niet in deze browser. Typ alstublieft.", micNoSpeech: "We hoorden niets. Probeer opnieuw.", listen: "Beluisteren", listenX: "Beluisteren: {what}", stopShort: "Stop",
       spacing: "Meer ruimte",
       howWorks: "Zo werkt het", fromPrice: "Vanaf € {price}",
       tabNext: "Volgende stappen", tabCosts: "Kosten", resultTabs: "Onderdelen van uw uitleg", nudgeNext: "Wie u kunt contacteren en wat u nu doet",
@@ -863,6 +892,7 @@
       aiWritten: "Geschreven door AI – controleer bij uw zorgteam.", more: "Meer uitleg", less: "Minder tonen", askAbout: "Hier een vraag over stellen"
     },
     es: {
+      speakAnswers: "Leer las respuestas en voz alta", micStart: "Diga su pregunta", micStop: "Dejar de escuchar", dictate: "Dictar el texto", listening: "Escuchando… hable ahora.", micDenied: "El micrófono no está disponible aquí. Permítalo en su navegador o abra Plainly en una pestaña normal. También puede escribir.", micUnavailable: "La entrada de voz no funciona en este navegador. Escriba, por favor.", micNoSpeech: "No hemos oído nada. Inténtelo de nuevo.", listen: "Escuchar", listenX: "Escuchar: {what}", stopShort: "Parar",
       spacing: "Más espacio",
       howWorks: "Cómo funciona", fromPrice: "Desde {price} €",
       tabNext: "Próximos pasos", tabCosts: "Costes", resultTabs: "Partes de su explicación", nudgeNext: "A quién contactar y qué hacer ahora",
@@ -1298,7 +1328,7 @@ ${hasImages ? "The attached images are photos or scans of the document pages. Re
     if (!synth) return false;
     try {
       synth.cancel(); const u = new SpeechSynthesisUtterance(text);
-      const code = str(state.result && state.result.lang_code) || "en"; u.lang = code; const v = pickVoice(code); if (v) u.voice = v; u.rate = 0.92;
+      const code = str(state.result && state.result.lang_code) || "en"; u.lang = code; const v = pickVoice(code); if (v) u.voice = v; u.rate = 0.9;
       if (onend) { u.onend = onend; u.onerror = onend; }
       synth.speak(u); return !!v || !synth.getVoices().length;
     } catch { return false; }
@@ -1384,7 +1414,9 @@ ${hasImages ? "The attached images are photos or scans of the document pages. Re
     LVLS.forEach(l => {
       if (!by[l].length) return;
       panels.overview.append(el("section", { class: "group lvl-" + l, id: "cl-" + l, "aria-labelledby": "clh-" + l, tabindex: "-1" },
-        el("h3", { id: "clh-" + l }, svgEl(TL_ICON[l]), el("span", {}, L[l]), el("span", { class: "g-hint" }, L[l + "_hint"])),
+        el("div", { class: "g-head" },
+          el("h3", { id: "clh-" + l }, svgEl(TL_ICON[l]), el("span", {}, L[l]), el("span", { class: "g-hint" }, L[l + "_hint"])),
+          listenBtn(() => [L[l]].concat(by[l].map(i => [str(i.title), str(i.detail), str(i.when)].filter(Boolean).join(". "))).join(". "), L[l])),
         el("ul", { class: "rows" }, by[l].map(i => el("li", {},
           el("b", {}, str(i.title)),
           str(i.detail) ? el("span", { class: "det" }, str(i.detail)) : null,
@@ -1637,6 +1669,62 @@ ${hasImages ? "The attached images are photos or scans of the document pages. Re
     return wrap;
   }
 
+  /* ---------- speech: listen buttons + voice input ---------- */
+  const SPK_SVG = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+  function listenBtn(getText, what) {
+    const b = el("button", { class: "listen-btn", type: "button", "aria-pressed": "false", }, svgEl(SPK_SVG), el("span", { class: "lb-txt" }, t("listen")), el("span", { class: "sr-only" }, ": " + what));
+    b.addEventListener("click", () => {
+      if (b.getAttribute("aria-pressed") === "true") { stopSpeech(); return; }
+      document.querySelectorAll('.listen-btn[aria-pressed="true"]').forEach(x => { x.setAttribute("aria-pressed", "false"); x.querySelector(".lb-txt").textContent = t("listen"); });
+      b.setAttribute("aria-pressed", "true"); b.querySelector(".lb-txt").textContent = t("stopShort");
+      const done = () => { b.setAttribute("aria-pressed", "false"); b.querySelector(".lb-txt").textContent = t("listen"); };
+      const ok = speak(getText(), done);
+      if (!ok) { done(); b.querySelector(".lb-txt").textContent = t("noVoice"); setTimeout(done, 2500); }
+    });
+    return b;
+  }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const speechLang = () => {
+    const c = str(state.result && state.result.lang_code);
+    if (c) return c;
+    const typed = (langInput.value || "").trim().toLowerCase();
+    for (const code of ["en", "de", "fr", "nl", "es", "ar", "tr", "uk", "pl", "it", "pt", "ro"]) { try { if (langName(code, UI).toLowerCase() === typed || langName(code, "en").toLowerCase() === typed || langName(code, code).toLowerCase() === typed) return code; } catch {} }
+    return UI;
+  };
+  let activeRec = null;
+  function setupMic(btn, target, statusEl, opts) {
+    if (!SR) return; // browser has no speech recognition: keep the button hidden
+    btn.classList.remove("hidden");
+    const label = btn.querySelector("span");
+    const idleKey = opts.idleKey;
+    btn.addEventListener("click", () => {
+      if (activeRec) { activeRec.stop(); return; }
+      let rec;
+      try { rec = new SR(); } catch { statusEl.textContent = t("micUnavailable"); return; }
+      activeRec = rec;
+      rec.lang = speechLang(); rec.interimResults = true; rec.continuous = !!opts.continuous;
+      const base = target.value && opts.append ? target.value.replace(/\s*$/, " ") : "";
+      let finalText = "";
+      btn.setAttribute("aria-pressed", "true"); btn.classList.add("live"); label.textContent = t("micStop");
+      statusEl.textContent = t("listening");
+      rec.onresult = e => {
+        let interim = "";
+        for (let i = e.resultIndex; i < e.results.length; i++) { const r = e.results[i]; if (r.isFinal) finalText += r[0].transcript + " "; else interim += r[0].transcript; }
+        target.value = (base + finalText + interim).trimStart();
+        target.dispatchEvent(new Event("input"));
+      };
+      rec.onerror = e => {
+        statusEl.textContent = e.error === "not-allowed" || e.error === "service-not-allowed" ? t("micDenied") : e.error === "no-speech" ? t("micNoSpeech") : t("micUnavailable");
+      };
+      rec.onend = () => {
+        activeRec = null; btn.setAttribute("aria-pressed", "false"); btn.classList.remove("live"); label.textContent = t(idleKey);
+        if (statusEl.textContent === t("listening")) statusEl.textContent = "";
+        if (opts.onDone && finalText.trim()) opts.onDone();
+      };
+      try { rec.start(); } catch { activeRec = null; statusEl.textContent = t("micUnavailable"); btn.setAttribute("aria-pressed", "false"); btn.classList.remove("live"); label.textContent = t(idleKey); }
+    });
+  }
+
   /* ---------- "tell me more" ---------- */
   let moreSeq = 0;
   function morePrompt(ctx) {
@@ -1666,6 +1754,7 @@ ${state.docText ? "Original document:\n<<<\n" + state.docText.slice(0, 30000) + 
         const { text } = await state.sample(morePrompt(ctx), { modelTier: "default", onText: ({ text }) => { txt.textContent = text; } });
         txt.textContent = text; txt.removeAttribute("role"); loaded = true;
         region.append(el("div", { class: "more-actions" },
+          listenBtn(() => ctx.title + ". " + text, ctx.title),
           el("button", { class: "btn link", type: "button", onclick: () => openChat(`${ctx.title}: `) }, t("askAbout")),
           el("span", { class: "fine", lang: UI, dir: "ltr" }, t("aiWritten"))));
       } catch (e) { txt.textContent = (e && e.text) || errText(e); }
@@ -1720,10 +1809,15 @@ ${state.docText ? "Original document text:\n<<<\n" + state.docText.slice(0, 4000
     try {
       const { text } = await state.sample([{ role: "user", content: rules }, ...state.chat.slice(-10)], { cache: false, modelTier: "default", onText: ({ text }) => { bubble.textContent = text; chatLog.scrollTop = chatLog.scrollHeight; } });
       state.chat.push({ role: "assistant", content: text });
+      if ($("#voiceReplies").checked) speak(text);
     } catch (e) { state.chat.pop(); bubble.textContent = (e && e.text) || errText(e); }
     finally { askSend.disabled = false; askInput.focus(); }
   }
   askSend.addEventListener("click", submitChat);
+  setupMic($("#askMic"), askInput, $("#askMicStatus"), { idleKey: "micStart", onDone: () => submitChat() });
+  setupMic($("#pasteMic"), pasteBox, $("#pasteMicStatus"), { idleKey: "dictate", continuous: true, append: true });
+  try { $("#voiceReplies").checked = localStorage.getItem("plainly-voice") === "1"; } catch {}
+  $("#voiceReplies").addEventListener("change", e => { try { localStorage.setItem("plainly-voice", e.target.checked ? "1" : ""); } catch {} if (!e.target.checked) stopSpeech(); });
   askInput.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); submitChat(); } });
 
   renderAccount();
