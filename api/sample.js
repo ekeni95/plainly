@@ -80,6 +80,9 @@ export async function POST(request) {
   } catch { return json({ error: "upstream_error" }, 502); }
 
   if (!upstream.ok) {
+    // Log only the provider's own error message, never the request, so no document text reaches the logs.
+    let detail = ""; try { const e = (await upstream.json()).error; detail = (e && (e.message || e.type)) || ""; } catch {}
+    console.error(`[${provider}] ${model} → ${upstream.status} ${String(detail).slice(0, 300)}`);
     const busy = upstream.status === 429 || upstream.status === 529;
     const code = busy ? "rate_limited" : upstream.status === 413 ? "prompt_too_large" : upstream.status === 400 ? "invalid_request" : "upstream_error";
     return json({ error: code }, busy ? 429 : 502);
