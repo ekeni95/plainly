@@ -38,6 +38,9 @@ Optional: add `MODEL_COMPLEX`, `MODEL_DEFAULT`, `MODEL_QUICK` as environment var
 ## Option B – Cloudflare Worker
 See [worker/README.md](worker/README.md).
 
+The functions run in Frankfurt (`fra1`), set in `vercel.json`. This keeps Plainly's own processing in the EU;
+the call to Claude still goes to Anthropic's API (see below).
+
 ## Before going beyond a prototype
 - Add a bot check (e.g. Cloudflare Turnstile or Vercel Firewall rules) and per-visitor rate limits.
 - Ask Anthropic about zero data retention, or run Claude via Amazon Bedrock / Google Vertex AI in an EU region.
