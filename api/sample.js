@@ -20,8 +20,14 @@ const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const JSON_SYSTEM = "Reply with only the JSON value requested, no other text. It will be machine-parsed.";
 
 // Default models per tier. Any of them can be overridden with MODEL_COMPLEX / MODEL_DEFAULT / MODEL_QUICK.
+// For OpenRouter a tier can list up to 3 models (comma-separated in the env variable): if the first is busy,
+// OpenRouter tries the next. Free models are often rate-limited by their provider, so the defaults all read images.
 const DEFAULT_MODELS = {
-  openrouter: { complex: "google/gemma-4-31b-it:free", default: "google/gemma-4-31b-it:free", quick: "google/gemma-4-26b-a4b-it:free" },
+  openrouter: {
+    complex: "google/gemma-4-31b-it:free,nvidia/nemotron-3.5-super-vl:free,google/gemma-4-26b-a4b-it:free",
+    default: "google/gemma-4-31b-it:free,nvidia/nemotron-3.5-super-vl:free,google/gemma-4-26b-a4b-it:free",
+    quick: "google/gemma-4-26b-a4b-it:free,google/gemma-4-31b-it:free,nvidia/nemotron-3.5-super-vl:free"
+  },
   anthropic: { complex: "claude-sonnet-5-5", default: "claude-sonnet-5-5", quick: "claude-haiku-5-5" }
 };
 
@@ -58,7 +64,8 @@ export async function POST(request) {
 
   const tier = ["quick", "default", "complex"].includes(body.tier) ? body.tier : "default";
   const envModel = { complex: env.MODEL_COMPLEX, default: env.MODEL_DEFAULT, quick: env.MODEL_QUICK }[tier];
-  const model = envModel || DEFAULT_MODELS[provider][tier];
+  const models = (envModel || DEFAULT_MODELS[provider][tier]).split(",").map(m => m.trim()).filter(Boolean).slice(0, 3);
+  const model = models[0];
   const system = body.json ? JSON_SYSTEM : undefined;
 
   let upstream;
@@ -68,7 +75,7 @@ export async function POST(request) {
           method: "POST",
           headers: { "content-type": "application/json", authorization: `Bearer ${env.OPENROUTER_API_KEY}`, "x-title": "Plainly" },
           body: JSON.stringify({
-            model, max_tokens: MAX_TOKENS[tier], stream: true,
+            model, models: models.length > 1 ? models : undefined, max_tokens: MAX_TOKENS[tier], stream: true,
             messages: system ? [{ role: "system", content: system }, ...messages] : messages
           })
         })
