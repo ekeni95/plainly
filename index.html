@@ -1399,7 +1399,8 @@
     try { localStorage.setItem("plainly-ui", UI); } catch {}
     applyStatic();
     renderChips();
-    if (!langTouched) { langInput.value = langName(UI, UI); syncChips(); }
+    // The explanation language always follows the app language when the app language is set or changed.
+    langInput.value = langName(UI, UI); langTouched = false; syncChips();
     if (!initial) {
       renderAccount(); renderFiles(); updateGo();
       if (state.result && !$("#resultView").classList.contains("hidden")) renderResult(state.result, true);
@@ -1411,7 +1412,6 @@
     let start = "en";
     try { start = localStorage.getItem("plainly-ui") || ""; } catch {}
     if (!I18N[start]) { const nav = (navigator.language || "en").slice(0, 2).toLowerCase(); start = I18N[nav] ? nav : "en"; }
-    try { const l = localStorage.getItem("plainly-lang"); if (l) { langInput.value = l; langTouched = true; } } catch {}
     setUI(start, true);
   })();
 
@@ -1539,7 +1539,6 @@ ${hasImages ? "The attached images are photos or scans of the document pages. Re
     hideError();
     const lang = langInput.value.trim();
     const level = document.querySelector('input[name="level"]:checked').value;
-    try { localStorage.setItem("plainly-lang", lang); } catch {}
     const ready = state.files.filter(f => f.status === "ready");
     let docText = ready.filter(f => f.text).map(f => (ready.length > 1 ? `--- ${f.name} ---\n` : "") + f.text.trim()).join("\n\n");
     if (pasteBox.value.trim()) docText += (docText ? "\n\n" : "") + pasteBox.value.trim();
