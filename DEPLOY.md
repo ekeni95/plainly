@@ -26,6 +26,7 @@ Either way, you only pay for Anthropic API usage. **Set a monthly spend limit.**
 3. Leave **Framework Preset** on *Other* and the build settings empty.
 4. Open **Environment Variables** and add:
    - Name `ANTHROPIC_API_KEY`, value: your `sk-ant-…` key.
+   - Or, to use OpenRouter instead (see below), name `OPENROUTER_API_KEY`.
 5. Click **Deploy**. After about a minute you get an address like `https://plainly-xyz.vercel.app`.
 6. Check it: open `https://plainly-xyz.vercel.app/api/health` – it should show `{"ok":true,"configured":true}`.
 
@@ -34,6 +35,20 @@ so you don't need to change `index.html`. Every push to `main` updates the site.
 
 Optional: add `MODEL_COMPLEX`, `MODEL_DEFAULT`, `MODEL_QUICK` as environment variables to choose other Claude models
 (defaults: `claude-sonnet-5-5`, `claude-sonnet-5-5`, `claude-haiku-5-5`).
+
+### Using OpenRouter (free models)
+If `OPENROUTER_API_KEY` is set, the Vercel backend uses OpenRouter instead of Anthropic, and
+`/api/health` shows `"provider":"openrouter"`. Create the key at <https://openrouter.ai/keys>.
+Default models: `google/gemma-4-31b-it:free` (explanations and questions) and
+`google/gemma-4-26b-a4b-it:free` (quick calls); both read images. Override them with the same
+`MODEL_*` variables, using OpenRouter model names.
+
+Limits of the free tier, shared by every visitor:
+- 20 requests a minute and 50 a day (1,000 a day once you've bought 10 credits).
+  One explanation, one "Tell me more" and one question already use 3.
+- Free models may log or train on prompts, and EU routing is only on OpenRouter's paid business plans.
+  If free models are refused, allow free-model providers that train on data in your OpenRouter privacy settings.
+  **Use only fake or anonymised documents.**
 
 ## Option B – Cloudflare Worker
 See [worker/README.md](worker/README.md).
