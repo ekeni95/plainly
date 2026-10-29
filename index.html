@@ -1439,7 +1439,6 @@
   function setUI(code, initial) {
     UI = I18N[code] ? code : "en";
     uiSel.value = UI;
-    try { localStorage.setItem("plainly-ui", UI); } catch {}
     applyStatic();
     renderChips();
     // The explanation language always follows the app language when the app language is set or changed.
@@ -1453,8 +1452,9 @@
   uiSel.addEventListener("change", () => setUI(uiSel.value));
   (() => {
     let start = "en";
-    try { start = localStorage.getItem("plainly-ui") || ""; } catch {}
-    if (!I18N[start]) { const nav = (navigator.language || "en").slice(0, 2).toLowerCase(); start = I18N[nav] ? nav : "en"; }
+    // Always start in the device/browser language: first supported entry of the user's language list, else English.
+    const prefs = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || "en"]);
+    start = prefs.map(l => String(l).slice(0, 2).toLowerCase()).find(l => I18N[l]) || "en";
     setUI(start, true);
   })();
 
