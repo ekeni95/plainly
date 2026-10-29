@@ -9,7 +9,7 @@
 <title>Plainly – your medical papers, explained</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Noto+Sans:wght@400;600&family=Noto+Sans+Arabic:wght@400;600&display=swap" rel="stylesheet">
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
@@ -361,7 +361,7 @@
     --teal:#3B4CCA; --teal-ink:#2C3A9E; --teal-soft:#EEF0FD; --peach:#F6E7D8; --peach-ink:#8A5A2B;
     --radius:20px; --shadow:0 1px 2px rgba(34,48,58,.04),0 10px 30px rgba(34,48,58,.06);
   }
-  body{font-family:"Lexend",system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.012em;word-spacing:.08em;line-height:1.7;color:var(--ink);
+  body{font-family:"Lexend","Noto Sans","Noto Sans Arabic",system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.012em;word-spacing:.08em;line-height:1.7;color:var(--ink);
     background:radial-gradient(1200px 420px at 50% -120px,#EFE6D8 0%,rgba(239,230,216,0) 70%),var(--paper);background-attachment:scroll;text-align:left;hyphens:none;font-weight:400}
   body.airy{letter-spacing:.05em;word-spacing:.18em;line-height:1.9}
   body.airy p,body.airy li{margin-bottom:.4em}
@@ -572,6 +572,40 @@
   .listen-btn[aria-pressed="true"]{box-shadow:var(--press,none),inset 0 0 0 2px var(--teal)}
   .group.lvl-red .listen-btn{background:#fff}
   @media (max-width:600px){ .g-head .lb-txt{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap} .g-head .listen-btn{min-width:40px;min-height:40px;justify-content:center;padding:0} }
+
+  .rows li{max-width:none}
+  .rows li > b,.rows li > .det{max-width:64ch}
+  /* ---------- right-to-left (Arabic) & non-Latin scripts ---------- */
+  body{text-align:start}
+  :lang(ar){font-family:"Noto Sans Arabic","Lexend","Noto Sans",system-ui,sans-serif;letter-spacing:0!important}
+  body.airy:lang(ar){letter-spacing:0!important}
+  :lang(uk){font-family:"Lexend","Noto Sans",system-ui,sans-serif}
+  .skip{left:auto;inset-inline-start:12px}
+  .demo-tag{margin-left:0;margin-inline-start:.35rem}
+  .med .k,.rows .k{margin-right:0;margin-inline-end:6px}
+  dl.terms div{border-left:0;border-inline-start:4px solid var(--violet-ink);padding:2px 0;padding-inline-start:12px}
+  ol.qs,ol.steps-list,.review-points,ul.pts{padding-left:0;padding-inline-start:1.4rem}
+  .bubble.me{border-bottom-right-radius:18px;border-end-end-radius:4px}
+  .bubble.ai{border-bottom-left-radius:18px;border-end-start-radius:4px}
+  .dlg .opt,.nudge{text-align:start}
+  .consult{border-left-width:1px;border-inline-start:6px solid var(--acc)}
+  .cta-review{margin-left:0;margin-inline-start:10px}
+  .fab{right:auto;inset-inline-end:20px}
+  .chat-panel{right:auto;inset-inline-end:20px}
+  .chat-panel .chat{padding-right:0;padding-inline-end:2px}
+  .hero-actions{margin-left:0;margin-inline-start:auto}
+  .rows li{padding-right:0;padding-inline-end:44px}
+  .rows .more-btn{right:auto;inset-inline-end:0}
+  .rows .more-box{margin-right:0;margin-inline-end:-44px}
+  .switch .track::after{left:auto;inset-inline-start:2px;transition:inset-inline-start .15s}
+  .switch input:checked+.track::after{left:auto;inset-inline-start:20px}
+  [dir="rtl"] .nudge span[aria-hidden],[dir="rtl"] .icon-btn svg,[dir="rtl"] .ext::after{display:inline-block}
+  [dir="rtl"] .nudge span[aria-hidden]{transform:scaleX(-1)}
+  .open-claude{margin-top:10px;text-decoration:none;color:#fff}
+  @media (max-width:600px){
+    .fab{inset-inline-end:12px}
+    .chat-panel{inset-inline:0;right:0;left:0}
+  }
 </style>
 </head>
 <body>
@@ -617,7 +651,8 @@
   <main id="main" tabindex="-1">
   <div id="unavailable" class="notice warn hidden" role="status">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 7v6M12 16.5v.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
-    <p data-i18n="unavailable">To explain documents, this prototype needs Claude. Open this page in Claude while you're signed in, then allow it to use Claude when asked.</p>
+    <div><p data-i18n="unavailable">To explain documents, this prototype needs Claude. Open this page in Claude while you're signed in, then allow it to use Claude when asked.</p>
+    <a class="btn primary small open-claude" href="https://claude.ai/artifact/J3JLHJbU8XxB3JD62BCffb" target="_blank" rel="noopener"><span data-i18n="openInClaude">Open Plainly in Claude</span> <span aria-hidden="true">↗</span></a></div>
   </div>
 
   <!-- INPUT -->
@@ -732,15 +767,18 @@
   const arr = v => Array.isArray(v) ? v : [];
   const reduceMotion = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
   /* ---------- interface languages ---------- */
-  const UI_LANGS = { en: "English", de: "Deutsch", fr: "Français", nl: "Nederlands", es: "Español" };
+  const UI_LANGS = { en: "English", de: "Deutsch", fr: "Français", nl: "Nederlands", es: "Español", uk: "Українська", ar: "العربية", tr: "Türkçe" };
+  const RTL_UI = ["ar"];
+  const UIDIR = () => RTL_UI.includes(UI) ? "rtl" : "ltr";
   const I18N = {
     en: {
+      openInClaude: "Open Plainly in Claude",
       speakAnswers: "Read answers aloud", micStart: "Speak your question", micStop: "Stop listening", dictate: "Dictate the text", listening: "Listening… speak now.", micDenied: "The microphone isn\u2019t available here. Allow it in your browser, or open Plainly in a normal browser tab. You can also type.", micUnavailable: "Speech input doesn\u2019t work in this browser. Please type instead.", micNoSpeech: "We didn\u2019t hear anything. Try again.", listen: "Listen", listenX: "Listen: {what}", stopShort: "Stop",
       spacing: "Extra spacing",
       howWorks: "How it works", fromPrice: "From €{price}",
       tabNext: "Next steps", tabCosts: "Costs", resultTabs: "Parts of your explanation", nudgeNext: "See who to contact and what to do next",
       skip: "Skip to main content", tagline: "Your medical papers, explained in plain words", textSize: "Text size", sizeN: "Normal text size", sizeL: "Large text size", sizeXL: "Extra large text size", uiLang: "App language",
-      acctRegion: "Your account", unavailable: "To explain documents, this prototype needs Claude. Open this page in Claude while you're signed in, then allow it to use Claude when asked.",
+      acctRegion: "Your account", unavailable: "To explain documents, this version needs Claude. Open Plainly in Claude – you'll need a Claude account.",
       inputRegion: "Explain a document", step1: "Add your document", dropTitle: "Choose a file or drop it here", dropHint: "A letter, test result, scan report or leaflet: PDF, Word, text, or a photo of each page", filesLabel: "Added files",
       pasteSummary: "Or type or paste the text", pasteLabel: "Document text", pastePh: "Paste the text from your letter or report here…",
       step2: "How should we explain it?", langLabel: "Language of the explanation", langPh: "Type any language, e.g. Dutch, Arabic, Polish", langHint: "Type any language, or pick one below.", commonLangs: "Common languages", howSimple: "How simple?",
@@ -750,7 +788,7 @@
       resultsRegion: "Your explanation", footer: "Plainly is a prototype. It explains documents; it does not diagnose or give medical advice. Account and insurance features are a demo with made-up data.",
       ask: "Ask about your document", close: "Close", questionsSr: " questions", yourQuestion: "Your question", askPh: "Type your question…", askBtn: "Ask",
       chatEmpty: "For example: “What does this result mean for me?” or “Can I shower after the operation?”", chatHint: "Answers come in {lang}. For anything about your own treatment, your care team has the final word.",
-      acctAnonT: "Using Plainly without an account", acctAnonS: "Nothing is saved. Sign in to see what your health insurance covers.", signIn: "Sign in", demo: "Demo", hospitalPlan: "Hospital plan", increased: "Increased reimbursement", acctBtn: "Account & insurance", standardCover: "Standard cover", demoPatient: "Demo patient",
+      acctAnonT: "You are currently using Plainly without an account", acctAnonS: "Nothing is saved. Sign in to see what your health insurance covers.", signIn: "Sign in", demo: "Demo", hospitalPlan: "Hospital plan", increased: "Increased reimbursement", acctBtn: "Account & insurance", standardCover: "Standard cover", demoPatient: "Demo patient",
       cancel: "Cancel", back: "Back", dlgChooseT: "How do you want to use Plainly?", dlgChooseHint: "You can always explain documents without an account.", optAnonT: "Continue without an account", optAnonD: "Anonymous. Nothing is saved, and we don't know who you are. You won't see your insurance cover.", optSignT: "Sign in and link my health insurance", optSignD: "See which care is covered by your insurance and what you may have to pay yourself.",
       eidT: "Sign in", eidP: "In the real service you would sign in with your Belgian eID or a digital identity app. In this demo, nothing is checked.", idCard: "Identity card ending ••• 042", signInAs: "Sign in as Demo patient",
       insT: "Link your health insurance", insHint: "These insurers and figures are made up for this demo.", insLabel: "Your health insurer", incT: "I have increased reimbursement", incD: "A status that lowers what you pay yourself, e.g. with a low income.", hpT: "I have a hospital plan", hpD: "Extra insurance for hospital stays and some aids.", insConsent: "I agree that Plainly checks my insurance cover for the care in my documents. I can unlink it at any time.", consentErr: "Please tick the box to agree, or choose Cancel.", signOut: "Sign out", save: "Save", linkIns: "Link insurance",
@@ -775,12 +813,13 @@
       aiWritten: "AI-written – check with your care team.", more: "Tell me more", less: "Show less", askAbout: "Ask a question about this"
     },
     de: {
+      openInClaude: "Plainly in Claude öffnen",
       speakAnswers: "Antworten vorlesen", micStart: "Frage sprechen", micStop: "Zuhören beenden", dictate: "Text diktieren", listening: "Ich höre zu … sprechen Sie jetzt.", micDenied: "Das Mikrofon ist hier nicht verfügbar. Erlauben Sie es im Browser oder öffnen Sie Plainly in einem normalen Browser-Tab. Sie können auch tippen.", micUnavailable: "Spracheingabe funktioniert in diesem Browser nicht. Bitte tippen Sie.", micNoSpeech: "Wir haben nichts gehört. Bitte noch einmal.", listen: "Anhören", listenX: "Anhören: {what}", stopShort: "Stopp",
       spacing: "Mehr Abstand",
       howWorks: "So funktioniert es", fromPrice: "Ab {price} €",
       tabNext: "Nächste Schritte", tabCosts: "Kosten", resultTabs: "Teile Ihrer Erklärung", nudgeNext: "Wen Sie kontaktieren sollten und was als Nächstes zu tun ist",
       skip: "Zum Hauptinhalt springen", tagline: "Ihre medizinischen Unterlagen, einfach erklärt", textSize: "Textgröße", sizeN: "Normale Textgröße", sizeL: "Große Textgröße", sizeXL: "Sehr große Textgröße", uiLang: "Sprache der App",
-      acctRegion: "Ihr Konto", unavailable: "Um Dokumente zu erklären, braucht dieser Prototyp Claude. Öffnen Sie diese Seite in Claude, während Sie angemeldet sind, und erlauben Sie die Nutzung von Claude, wenn Sie gefragt werden.",
+      acctRegion: "Ihr Konto", unavailable: "Um Dokumente zu erklären, braucht diese Version Claude. Öffnen Sie Plainly in Claude – dafür brauchen Sie ein Claude-Konto.",
       inputRegion: "Ein Dokument erklären lassen", step1: "Dokument hinzufügen", dropTitle: "Datei auswählen oder hierher ziehen", dropHint: "Ein Arztbrief, Laborbefund, Bildgebungsbericht oder Merkblatt: PDF, Word, Text oder ein Foto jeder Seite", filesLabel: "Hinzugefügte Dateien",
       pasteSummary: "Oder Text eingeben oder einfügen", pasteLabel: "Text des Dokuments", pastePh: "Fügen Sie hier den Text Ihres Briefes oder Befundes ein…",
       step2: "Wie sollen wir es erklären?", langLabel: "Sprache der Erklärung", langPh: "Beliebige Sprache eingeben, z. B. Niederländisch, Arabisch, Polnisch", langHint: "Geben Sie eine beliebige Sprache ein oder wählen Sie unten eine aus.", commonLangs: "Häufige Sprachen", howSimple: "Wie einfach?",
@@ -790,7 +829,7 @@
       resultsRegion: "Ihre Erklärung", footer: "Plainly ist ein Prototyp. Es erklärt Dokumente; es stellt keine Diagnosen und gibt keinen medizinischen Rat. Konto- und Versicherungsfunktionen sind eine Demo mit erfundenen Daten.",
       ask: "Fragen zu Ihrem Dokument", close: "Schließen", questionsSr: " (Fragen)", yourQuestion: "Ihre Frage", askPh: "Ihre Frage eingeben…", askBtn: "Fragen",
       chatEmpty: "Zum Beispiel: „Was bedeutet dieser Wert für mich?“ oder „Darf ich nach der Operation duschen?“", chatHint: "Antworten kommen auf {lang}. Bei allem, was Ihre eigene Behandlung betrifft, hat Ihr Behandlungsteam das letzte Wort.",
-      acctAnonT: "Sie nutzen Plainly ohne Konto", acctAnonS: "Nichts wird gespeichert. Melden Sie sich an, um zu sehen, was Ihre Krankenkasse übernimmt.", signIn: "Anmelden", demo: "Demo", hospitalPlan: "Krankenhauszusatz", increased: "Erhöhte Kostenerstattung", acctBtn: "Konto & Versicherung", standardCover: "Grundversicherung", demoPatient: "Demo-Patient",
+      acctAnonT: "Sie nutzen Plainly derzeit ohne Konto", acctAnonS: "Nichts wird gespeichert. Melden Sie sich an, um zu sehen, was Ihre Krankenkasse übernimmt.", signIn: "Anmelden", demo: "Demo", hospitalPlan: "Krankenhauszusatz", increased: "Erhöhte Kostenerstattung", acctBtn: "Konto & Versicherung", standardCover: "Grundversicherung", demoPatient: "Demo-Patient",
       cancel: "Abbrechen", back: "Zurück", dlgChooseT: "Wie möchten Sie Plainly nutzen?", dlgChooseHint: "Dokumente erklären lassen können Sie immer auch ohne Konto.", optAnonT: "Ohne Konto weiter", optAnonD: "Anonym. Nichts wird gespeichert und wir wissen nicht, wer Sie sind. Ihren Versicherungsschutz sehen Sie nicht.", optSignT: "Anmelden und Krankenkasse verknüpfen", optSignD: "Sehen Sie, welche Versorgung Ihre Kasse übernimmt und was Sie eventuell selbst zahlen.",
       eidT: "Anmelden", eidP: "Im echten Dienst würden Sie sich mit Ihrem belgischen eID oder einer digitalen Identitäts-App anmelden. In dieser Demo wird nichts geprüft.", idCard: "Personalausweis endet auf ••• 042", signInAs: "Als Demo-Patient anmelden",
       insT: "Krankenkasse verknüpfen", insHint: "Diese Kassen und Beträge sind für die Demo erfunden.", insLabel: "Ihre Krankenkasse", incT: "Ich habe Anspruch auf erhöhte Kostenerstattung", incD: "Ein Status, der Ihren Eigenanteil senkt, z. B. bei geringem Einkommen.", hpT: "Ich habe eine Krankenhauszusatzversicherung", hpD: "Zusätzliche Versicherung für Krankenhausaufenthalte und manche Hilfsmittel.", insConsent: "Ich bin einverstanden, dass Plainly meinen Versicherungsschutz für die Versorgung in meinen Dokumenten prüft. Ich kann die Verknüpfung jederzeit aufheben.", consentErr: "Bitte setzen Sie das Häkchen, um zuzustimmen, oder wählen Sie Abbrechen.", signOut: "Abmelden", save: "Speichern", linkIns: "Kasse verknüpfen",
@@ -815,12 +854,13 @@
       aiWritten: "Von KI geschrieben – mit Ihrem Behandlungsteam prüfen.", more: "Mehr dazu", less: "Weniger anzeigen", askAbout: "Eine Frage dazu stellen"
     },
     fr: {
+      openInClaude: "Ouvrir Plainly dans Claude",
       speakAnswers: "Lire les réponses à voix haute", micStart: "Dire votre question", micStop: "Arrêter l’écoute", dictate: "Dicter le texte", listening: "J’écoute… parlez maintenant.", micDenied: "Le micro n’est pas disponible ici. Autorisez-le dans votre navigateur ou ouvrez Plainly dans un onglet normal. Vous pouvez aussi taper.", micUnavailable: "La saisie vocale ne fonctionne pas dans ce navigateur. Veuillez taper.", micNoSpeech: "Nous n’avons rien entendu. Réessayez.", listen: "Écouter", listenX: "Écouter : {what}", stopShort: "Arrêter",
       spacing: "Plus d’espace",
       howWorks: "Comment ça marche", fromPrice: "À partir de {price} €",
       tabNext: "Prochaines étapes", tabCosts: "Coûts", resultTabs: "Parties de votre explication", nudgeNext: "Qui contacter et que faire ensuite",
       skip: "Aller au contenu principal", tagline: "Vos documents médicaux, expliqués simplement", textSize: "Taille du texte", sizeN: "Taille de texte normale", sizeL: "Grand texte", sizeXL: "Très grand texte", uiLang: "Langue de l’application",
-      acctRegion: "Votre compte", unavailable: "Pour expliquer des documents, ce prototype a besoin de Claude. Ouvrez cette page dans Claude en étant connecté, puis autorisez l’utilisation de Claude lorsque cela vous est demandé.",
+      acctRegion: "Votre compte", unavailable: "Pour expliquer des documents, cette version a besoin de Claude. Ouvrez Plainly dans Claude – il vous faut un compte Claude.",
       inputRegion: "Faire expliquer un document", step1: "Ajoutez votre document", dropTitle: "Choisissez un fichier ou déposez-le ici", dropHint: "Une lettre, un résultat d’analyse, un compte rendu d’imagerie ou une notice : PDF, Word, texte ou une photo de chaque page", filesLabel: "Fichiers ajoutés",
       pasteSummary: "Ou tapez ou collez le texte", pasteLabel: "Texte du document", pastePh: "Collez ici le texte de votre lettre ou de votre compte rendu…",
       step2: "Comment voulez-vous l’explication ?", langLabel: "Langue de l’explication", langPh: "Tapez une langue, p. ex. néerlandais, arabe, polonais", langHint: "Tapez n’importe quelle langue ou choisissez-en une ci-dessous.", commonLangs: "Langues courantes", howSimple: "Quel niveau de simplicité ?",
@@ -830,7 +870,7 @@
       resultsRegion: "Votre explication", footer: "Plainly est un prototype. Il explique des documents ; il ne pose pas de diagnostic et ne donne pas d’avis médical. Les fonctions de compte et d’assurance sont une démonstration avec des données fictives.",
       ask: "Questions sur votre document", close: "Fermer", questionsSr: " (questions)", yourQuestion: "Votre question", askPh: "Tapez votre question…", askBtn: "Demander",
       chatEmpty: "Par exemple : « Que signifie ce résultat pour moi ? » ou « Puis-je me doucher après l’opération ? »", chatHint: "Les réponses sont en {lang}. Pour tout ce qui concerne votre traitement, votre équipe soignante a le dernier mot.",
-      acctAnonT: "Vous utilisez Plainly sans compte", acctAnonS: "Rien n’est enregistré. Connectez-vous pour voir ce que couvre votre mutualité.", signIn: "Se connecter", demo: "Démo", hospitalPlan: "Assurance hospitalisation", increased: "Intervention majorée", acctBtn: "Compte et assurance", standardCover: "Couverture de base", demoPatient: "Patient de démo",
+      acctAnonT: "Vous utilisez actuellement Plainly sans compte", acctAnonS: "Rien n’est enregistré. Connectez-vous pour voir ce que couvre votre mutualité.", signIn: "Se connecter", demo: "Démo", hospitalPlan: "Assurance hospitalisation", increased: "Intervention majorée", acctBtn: "Compte et assurance", standardCover: "Couverture de base", demoPatient: "Patient de démo",
       cancel: "Annuler", back: "Retour", dlgChooseT: "Comment voulez-vous utiliser Plainly ?", dlgChooseHint: "Vous pouvez toujours faire expliquer des documents sans compte.", optAnonT: "Continuer sans compte", optAnonD: "Anonyme. Rien n’est enregistré et nous ne savons pas qui vous êtes. Vous ne verrez pas votre couverture.", optSignT: "Me connecter et lier ma mutualité", optSignD: "Voyez quels soins sont couverts par votre mutualité et ce que vous pourriez payer vous-même.",
       eidT: "Se connecter", eidP: "Dans le vrai service, vous vous connecteriez avec votre eID belge ou une application d’identité numérique. Dans cette démo, rien n’est vérifié.", idCard: "Carte d’identité se terminant par ••• 042", signInAs: "Se connecter comme patient de démo",
       insT: "Lier votre mutualité", insHint: "Ces mutualités et montants sont inventés pour cette démo.", insLabel: "Votre mutualité", incT: "J’ai droit à l’intervention majorée", incD: "Un statut qui réduit ce que vous payez vous-même, p. ex. avec un faible revenu.", hpT: "J’ai une assurance hospitalisation", hpD: "Assurance complémentaire pour les séjours à l’hôpital et certaines aides.", insConsent: "J’accepte que Plainly vérifie ma couverture pour les soins mentionnés dans mes documents. Je peux supprimer ce lien à tout moment.", consentErr: "Veuillez cocher la case pour accepter, ou choisissez Annuler.", signOut: "Se déconnecter", save: "Enregistrer", linkIns: "Lier la mutualité",
@@ -855,12 +895,13 @@
       aiWritten: "Rédigé par une IA – à vérifier avec votre équipe soignante.", more: "En savoir plus", less: "Afficher moins", askAbout: "Poser une question à ce sujet"
     },
     nl: {
+      openInClaude: "Plainly openen in Claude",
       speakAnswers: "Antwoorden voorlezen", micStart: "Spreek uw vraag in", micStop: "Stoppen met luisteren", dictate: "Tekst inspreken", listening: "Ik luister… spreek nu.", micDenied: "De microfoon is hier niet beschikbaar. Sta hem toe in uw browser of open Plainly in een gewoon browsertabblad. U kunt ook typen.", micUnavailable: "Spraakinvoer werkt niet in deze browser. Typ alstublieft.", micNoSpeech: "We hoorden niets. Probeer opnieuw.", listen: "Beluisteren", listenX: "Beluisteren: {what}", stopShort: "Stop",
       spacing: "Meer ruimte",
       howWorks: "Zo werkt het", fromPrice: "Vanaf € {price}",
       tabNext: "Volgende stappen", tabCosts: "Kosten", resultTabs: "Onderdelen van uw uitleg", nudgeNext: "Wie u kunt contacteren en wat u nu doet",
       skip: "Naar de hoofdinhoud", tagline: "Uw medische documenten, eenvoudig uitgelegd", textSize: "Tekstgrootte", sizeN: "Normale tekstgrootte", sizeL: "Grote tekst", sizeXL: "Extra grote tekst", uiLang: "Taal van de app",
-      acctRegion: "Uw account", unavailable: "Om documenten uit te leggen heeft dit prototype Claude nodig. Open deze pagina in Claude terwijl u aangemeld bent, en sta het gebruik van Claude toe als daarom gevraagd wordt.",
+      acctRegion: "Uw account", unavailable: "Om documenten uit te leggen heeft deze versie Claude nodig. Open Plainly in Claude – daarvoor heeft u een Claude-account nodig.",
       inputRegion: "Een document laten uitleggen", step1: "Voeg uw document toe", dropTitle: "Kies een bestand of sleep het hierheen", dropHint: "Een brief, labo-uitslag, verslag van een scan of folder: pdf, Word, tekst of een foto van elke pagina", filesLabel: "Toegevoegde bestanden",
       pasteSummary: "Of typ of plak de tekst", pasteLabel: "Tekst van het document", pastePh: "Plak hier de tekst van uw brief of verslag…",
       step2: "Hoe moeten we het uitleggen?", langLabel: "Taal van de uitleg", langPh: "Typ een taal, bv. Nederlands, Arabisch, Pools", langHint: "Typ een taal of kies er hieronder een.", commonLangs: "Veelgebruikte talen", howSimple: "Hoe eenvoudig?",
@@ -870,7 +911,7 @@
       resultsRegion: "Uw uitleg", footer: "Plainly is een prototype. Het legt documenten uit; het stelt geen diagnose en geeft geen medisch advies. Account- en verzekeringsfuncties zijn een demo met verzonnen gegevens.",
       ask: "Vragen over uw document", close: "Sluiten", questionsSr: " (vragen)", yourQuestion: "Uw vraag", askPh: "Typ uw vraag…", askBtn: "Vragen",
       chatEmpty: "Bijvoorbeeld: ‘Wat betekent deze uitslag voor mij?’ of ‘Mag ik douchen na de operatie?’", chatHint: "Antwoorden komen in het {lang}. Voor alles over uw eigen behandeling heeft uw zorgteam het laatste woord.",
-      acctAnonT: "U gebruikt Plainly zonder account", acctAnonS: "Er wordt niets bewaard. Meld u aan om te zien wat uw ziekenfonds terugbetaalt.", signIn: "Aanmelden", demo: "Demo", hospitalPlan: "Hospitalisatieverzekering", increased: "Verhoogde tegemoetkoming", acctBtn: "Account en verzekering", standardCover: "Basisdekking", demoPatient: "Demopatiënt",
+      acctAnonT: "U gebruikt Plainly momenteel zonder account", acctAnonS: "Er wordt niets bewaard. Meld u aan om te zien wat uw ziekenfonds terugbetaalt.", signIn: "Aanmelden", demo: "Demo", hospitalPlan: "Hospitalisatieverzekering", increased: "Verhoogde tegemoetkoming", acctBtn: "Account en verzekering", standardCover: "Basisdekking", demoPatient: "Demopatiënt",
       cancel: "Annuleren", back: "Terug", dlgChooseT: "Hoe wilt u Plainly gebruiken?", dlgChooseHint: "U kunt documenten altijd zonder account laten uitleggen.", optAnonT: "Verder zonder account", optAnonD: "Anoniem. Er wordt niets bewaard en we weten niet wie u bent. U ziet uw terugbetaling niet.", optSignT: "Aanmelden en mijn ziekenfonds koppelen", optSignD: "Zie welke zorg uw ziekenfonds terugbetaalt en wat u mogelijk zelf betaalt.",
       eidT: "Aanmelden", eidP: "In de echte dienst meldt u zich aan met uw Belgische eID of een app voor digitale identiteit. In deze demo wordt niets gecontroleerd.", idCard: "Identiteitskaart eindigend op ••• 042", signInAs: "Aanmelden als demopatiënt",
       insT: "Uw ziekenfonds koppelen", insHint: "Deze ziekenfondsen en bedragen zijn verzonnen voor deze demo.", insLabel: "Uw ziekenfonds", incT: "Ik heb recht op verhoogde tegemoetkoming", incD: "Een statuut dat uw eigen bijdrage verlaagt, bv. bij een laag inkomen.", hpT: "Ik heb een hospitalisatieverzekering", hpD: "Extra verzekering voor ziekenhuisopnames en sommige hulpmiddelen.", insConsent: "Ik ga ermee akkoord dat Plainly mijn terugbetaling controleert voor de zorg in mijn documenten. Ik kan de koppeling altijd verwijderen.", consentErr: "Vink het vakje aan om akkoord te gaan, of kies Annuleren.", signOut: "Afmelden", save: "Opslaan", linkIns: "Ziekenfonds koppelen",
@@ -895,12 +936,13 @@
       aiWritten: "Geschreven door AI – controleer bij uw zorgteam.", more: "Meer uitleg", less: "Minder tonen", askAbout: "Hier een vraag over stellen"
     },
     es: {
+      openInClaude: "Abrir Plainly en Claude",
       speakAnswers: "Leer las respuestas en voz alta", micStart: "Diga su pregunta", micStop: "Dejar de escuchar", dictate: "Dictar el texto", listening: "Escuchando… hable ahora.", micDenied: "El micrófono no está disponible aquí. Permítalo en su navegador o abra Plainly en una pestaña normal. También puede escribir.", micUnavailable: "La entrada de voz no funciona en este navegador. Escriba, por favor.", micNoSpeech: "No hemos oído nada. Inténtelo de nuevo.", listen: "Escuchar", listenX: "Escuchar: {what}", stopShort: "Parar",
       spacing: "Más espacio",
       howWorks: "Cómo funciona", fromPrice: "Desde {price} €",
       tabNext: "Próximos pasos", tabCosts: "Costes", resultTabs: "Partes de su explicación", nudgeNext: "A quién contactar y qué hacer ahora",
       skip: "Ir al contenido principal", tagline: "Sus documentos médicos, explicados con palabras sencillas", textSize: "Tamaño del texto", sizeN: "Texto normal", sizeL: "Texto grande", sizeXL: "Texto muy grande", uiLang: "Idioma de la aplicación",
-      acctRegion: "Su cuenta", unavailable: "Para explicar documentos, este prototipo necesita Claude. Abra esta página en Claude con su sesión iniciada y permita el uso de Claude cuando se le pida.",
+      acctRegion: "Su cuenta", unavailable: "Para explicar documentos, esta versión necesita Claude. Abra Plainly en Claude – necesitará una cuenta de Claude.",
       inputRegion: "Explicar un documento", step1: "Añada su documento", dropTitle: "Elija un archivo o arrástrelo aquí", dropHint: "Una carta, un resultado de análisis, un informe de imagen o un folleto: PDF, Word, texto o una foto de cada página", filesLabel: "Archivos añadidos",
       pasteSummary: "O escriba o pegue el texto", pasteLabel: "Texto del documento", pastePh: "Pegue aquí el texto de su carta o informe…",
       step2: "¿Cómo quiere la explicación?", langLabel: "Idioma de la explicación", langPh: "Escriba cualquier idioma, p. ej. neerlandés, árabe, polaco", langHint: "Escriba cualquier idioma o elija uno abajo.", commonLangs: "Idiomas frecuentes", howSimple: "¿Qué tan sencillo?",
@@ -910,7 +952,7 @@
       resultsRegion: "Su explicación", footer: "Plainly es un prototipo. Explica documentos; no hace diagnósticos ni da consejos médicos. Las funciones de cuenta y seguro son una demostración con datos inventados.",
       ask: "Preguntas sobre su documento", close: "Cerrar", questionsSr: " (preguntas)", yourQuestion: "Su pregunta", askPh: "Escriba su pregunta…", askBtn: "Preguntar",
       chatEmpty: "Por ejemplo: «¿Qué significa este resultado para mí?» o «¿Puedo ducharme después de la operación?»", chatHint: "Las respuestas llegan en {lang}. Para todo lo que afecte a su propio tratamiento, su equipo médico tiene la última palabra.",
-      acctAnonT: "Usa Plainly sin cuenta", acctAnonS: "No se guarda nada. Inicie sesión para ver qué cubre su seguro de salud.", signIn: "Iniciar sesión", demo: "Demo", hospitalPlan: "Seguro de hospitalización", increased: "Reembolso aumentado", acctBtn: "Cuenta y seguro", standardCover: "Cobertura básica", demoPatient: "Paciente de demo",
+      acctAnonT: "Actualmente usa Plainly sin cuenta", acctAnonS: "No se guarda nada. Inicie sesión para ver qué cubre su seguro de salud.", signIn: "Iniciar sesión", demo: "Demo", hospitalPlan: "Seguro de hospitalización", increased: "Reembolso aumentado", acctBtn: "Cuenta y seguro", standardCover: "Cobertura básica", demoPatient: "Paciente de demo",
       cancel: "Cancelar", back: "Atrás", dlgChooseT: "¿Cómo quiere usar Plainly?", dlgChooseHint: "Siempre puede explicar documentos sin cuenta.", optAnonT: "Seguir sin cuenta", optAnonD: "Anónimo. No se guarda nada y no sabemos quién es. No verá su cobertura.", optSignT: "Iniciar sesión y vincular mi seguro de salud", optSignD: "Vea qué atención cubre su seguro y qué podría pagar usted.",
       eidT: "Iniciar sesión", eidP: "En el servicio real iniciaría sesión con su eID belga o una aplicación de identidad digital. En esta demo no se comprueba nada.", idCard: "Documento de identidad terminado en ••• 042", signInAs: "Entrar como paciente de demo",
       insT: "Vincular su seguro de salud", insHint: "Estas aseguradoras y cifras son inventadas para esta demo.", insLabel: "Su seguro de salud", incT: "Tengo reembolso aumentado", incD: "Un estatus que reduce lo que paga usted, p. ej. con ingresos bajos.", hpT: "Tengo seguro de hospitalización", hpD: "Seguro adicional para estancias en el hospital y algunas ayudas.", insConsent: "Acepto que Plainly compruebe mi cobertura para la atención que aparece en mis documentos. Puedo desvincularlo en cualquier momento.", consentErr: "Marque la casilla para aceptar o elija Cancelar.", signOut: "Cerrar sesión", save: "Guardar", linkIns: "Vincular seguro",
@@ -933,6 +975,129 @@
       r_aha: "Animaciones e ilustraciones sobre enfermedades del corazón y el ictus, tratamientos y procedimientos. Elija su tema en el menú «Select a Topic».", r_mlp: "Vídeos animados, tutoriales interactivos y vídeos de cirugía con explicaciones sencillas.", r_nhs: "Guías claras sobre pruebas, tratamientos y operaciones, muchas con vídeos: por qué, qué ocurre y recuperación.", r_ta: "Información de médicos de familia neerlandeses con vídeos cortos.", r_gw: "Información de salud belga basada en pruebas, en neerlandés sencillo.", r_iq: "Información de salud alemana independiente, a menudo con vídeos y gráficos.", r_am: "Guías para pacientes del seguro de salud público francés sobre pruebas y tratamientos.",
       k_anim: "Animaciones", k_vid: "Vídeos y tutoriales", k_guidevid: "Guías y vídeos", k_guide: "Guías", l_en: "inglés", l_es: "español", l_ensome: "inglés (parte en español)", l_nl: "neerlandés", l_de: "alemán", l_fr: "francés", openX: "Abrir {name}", searchX: "Buscar en {name}",
       aiWritten: "Redactado por IA – compruébelo con su equipo médico.", more: "Saber más", less: "Mostrar menos", askAbout: "Hacer una pregunta sobre esto"
+    },
+    uk: {
+      openInClaude: "Відкрити Plainly у Claude",
+      speakAnswers: "Читати відповіді вголос", micStart: "Скажіть своє запитання", micStop: "Зупинити прослуховування", dictate: "Надиктувати текст", listening: "Слухаю… говоріть.", micDenied: "Мікрофон тут недоступний. Дозвольте його в браузері або відкрийте Plainly у звичайній вкладці браузера. Ви також можете ввести текст.", micUnavailable: "Голосове введення не працює в цьому браузері. Будь ласка, введіть текст.", micNoSpeech: "Ми нічого не почули. Спробуйте ще раз.", listen: "Слухати", listenX: "Слухати: {what}", stopShort: "Стоп",
+      spacing: "Більші інтервали",
+      howWorks: "Як це працює", fromPrice: "Від {price} €",
+      tabNext: "Наступні кроки", tabCosts: "Вартість", resultTabs: "Частини вашого пояснення", nudgeNext: "До кого звернутися і що робити далі",
+      skip: "Перейти до основного вмісту", tagline: "Ваші медичні документи простими словами", textSize: "Розмір тексту", sizeN: "Звичайний розмір тексту", sizeL: "Великий текст", sizeXL: "Дуже великий текст", uiLang: "Мова застосунку",
+      acctRegion: "Ваш обліковий запис", unavailable: "Щоб пояснювати документи, цій версії потрібен Claude. Відкрийте Plainly у Claude – для цього потрібен обліковий запис Claude.",
+      inputRegion: "Пояснити документ", step1: "Додайте свій документ", dropTitle: "Виберіть файл або перетягніть його сюди", dropHint: "Лист, результат аналізу, висновок обстеження чи інформаційний листок: PDF, Word, текст або фото кожної сторінки", filesLabel: "Додані файли",
+      pasteSummary: "Або введіть чи вставте текст", pasteLabel: "Текст документа", pastePh: "Вставте сюди текст вашого листа чи висновку…",
+      step2: "Як нам це пояснити?", langLabel: "Мова пояснення", langPh: "Введіть будь-яку мову, напр. нідерландська, арабська, польська", langHint: "Введіть будь-яку мову або виберіть одну нижче.", commonLangs: "Поширені мови", howSimple: "Наскільки просто?",
+      lvlEasy: "Дуже просто", lvlEasyD: "Короткі речення, звичайні слова. Як текст для легкого читання.", lvlPlain: "Просто", lvlPlainD: "Зрозуміла повсякденна мова з головними подробицями.", lvlDet: "Детальніше", lvlDetD: "Проста мова, але більше медичного пояснення.",
+      go: "Поясніть мені", goHintAnon: "Ваш документ читається на цій сторінці й надсилається Claude лише для того, щоб написати пояснення. Він не зберігається.", goHintAcct: "Ваш документ надсилається Claude лише для того, щоб написати пояснення. З вашим демо-обліковим записом ми також перевіряємо покриття страховки.",
+      progress: "Хід виконання", progRead: "Читаємо ваш документ…", progReadSub: "Claude уважно його читає. Зазвичай це займає менше хвилини.", progWrite: "Пишемо ваше пояснення…", progWriteSub: "Майже готово.", stop: "Зупинити",
+      resultsRegion: "Ваше пояснення", footer: "Plainly – це прототип. Він пояснює документи, але не ставить діагнозів і не дає медичних порад. Функції облікового запису та страхування – це демо з вигаданими даними.",
+      ask: "Запитання про ваш документ", close: "Закрити", questionsSr: " (запитання)", yourQuestion: "Ваше запитання", askPh: "Введіть своє запитання…", askBtn: "Запитати",
+      chatEmpty: "Наприклад: «Що цей результат означає для мене?» або «Чи можна мені приймати душ після операції?»", chatHint: "Відповіді надходять мовою: {lang}. В усьому, що стосується вашого лікування, останнє слово за вашою медичною командою.",
+      acctAnonT: "Зараз ви користуєтеся Plainly без облікового запису", acctAnonS: "Нічого не зберігається. Увійдіть, щоб побачити, що покриває ваша медична страховка.", signIn: "Увійти", demo: "Демо", hospitalPlan: "Страховка на госпіталізацію", increased: "Підвищене відшкодування", acctBtn: "Обліковий запис і страховка", standardCover: "Базове покриття", demoPatient: "Демо-пацієнт",
+      cancel: "Скасувати", back: "Назад", dlgChooseT: "Як ви хочете користуватися Plainly?", dlgChooseHint: "Пояснювати документи завжди можна й без облікового запису.", optAnonT: "Продовжити без облікового запису", optAnonD: "Анонімно. Нічого не зберігається, і ми не знаємо, хто ви. Покриття страховки ви не побачите.", optSignT: "Увійти й підключити мою медичну страховку", optSignD: "Дізнайтеся, яку допомогу покриває страховка і скільки, можливо, доведеться платити самостійно.",
+      eidT: "Увійти", eidP: "У справжньому сервісі ви входили б за допомогою бельгійської eID або застосунку цифрової ідентифікації. У цьому демо нічого не перевіряється.", idCard: "Посвідчення особи, що закінчується на ••• 042", signInAs: "Увійти як демо-пацієнт",
+      insT: "Підключіть свою медичну страховку", insHint: "Ці страхові каси й суми вигадані для демо.", insLabel: "Ваша страхова каса", incT: "Я маю право на підвищене відшкодування", incD: "Статус, що зменшує вашу власну частку оплати, напр. при низькому доході.", hpT: "Я маю страховку на госпіталізацію", hpD: "Додаткова страховка на перебування в лікарні та деякі допоміжні засоби.", insConsent: "Я погоджуюся, щоб Plainly перевіряв покриття страховки для допомоги з моїх документів. Я можу будь-коли скасувати підключення.", consentErr: "Позначте прапорець, щоб погодитися, або виберіть «Скасувати».", signOut: "Вийти", save: "Зберегти", linkIns: "Підключити страховку",
+      revT: "Замовити перевірку лікарем", revP: "Лікар, зареєстрований у Бельгії, порівнює це пояснення з вашим оригінальним документом і надсилає вам перевірену версію.", revSpeed: "Як швидко вам це потрібно?", revPay: "Ви оплачуєте це самостійно. Деякі додаткові страховки відшкодовують частину.", revConsent: "Я погоджуюся, щоб лікар побачив мій документ і це пояснення лише для перевірки.", continuePay: "Перейти до оплати",
+      payT: "Оплата", payLine: "Перевірка лікарем ({tier}): {price} €", payP: "У справжньому сервісі ви б безпечно платили через платіжного провайдера, наприклад Bancontact чи банківською карткою. Це демо не запитує платіжних даних і не списує гроші.", confirmDemo: "Підтвердити (демо, безкоштовно)",
+      tierStandard: "Стандарт", tierExpress: "Експрес", within48: "протягом 48 годин", within24: "протягом 24 годин", answerIn: "Відповідь {time}",
+      readErr: "Не вдалося прочитати цей файл.", photo: "Фото", heic: "Фото HEIC з iPhone не підтримуються. Надішліть його у форматі JPG або зробіть знімок екрана.", wordDoc: "Документ Word", wordEmpty: "Схоже, цей файл Word порожній.", textFile: "Текст", unsupported: "Цей тип файлу не підтримується. Спробуйте PDF, Word, текстовий файл або фото.", loadErr: "{what} не завантажився. Перевірте з'єднання і спробуйте ще раз.", pdfReader: "Засіб читання PDF", wordReader: "Засіб читання Word", pages: "{n} стор.", page1: "1 сторінка", scanned: "Скановано, {pages}", reading: "Читаємо…", remove: "Видалити", removeX: "Видалити {name}",
+      e_not_granted: "Plainly не отримав дозволу використовувати Claude. Перезавантажте сторінку і виберіть «Дозволити».", e_sampling_disabled: "Claude зараз недоступний для цього облікового запису.", e_rate_limited: "Ви досягли ліміту використання. Зачекайте трохи й спробуйте ще раз.", e_session_expired: "Ваш сеанс завершився. Увійдіть у Claude ще раз.", e_prompt_too_large: "Цей документ задовгий, щоб пояснити його за один раз. Надішліть менше сторінок.", e_image_rejected: "Одне із зображень не вдалося прочитати. Спробуйте чіткіше фото JPG або PNG.", e_refused: "Claude не зміг пояснити цей документ. Перевірте, чи це медичний документ, і спробуйте ще раз.", e_invalid_json: "Під час написання пояснення сталася помилка. Спробуйте ще раз.", e_images_unavailable: "У цьому вікні не можна надсилати фото. Вставте текст або використайте PDF з текстом, який можна виділити.", e_generic: "Щось пішло не так. Спробуйте ще раз.",
+      aiLabel: "Написано штучним інтелектом (Claude) на основі вашого документа, мовою: {lang}. Він може помилятися. Завжди перевіряйте важливі подробиці з лікарем, медсестрою чи фармацевтом. У надзвичайній ситуації телефонуйте 112.",
+      yourDoc: "Ваш документ", readAloud: "🔊 Прочитати вголос", stopReading: "■ Зупинити читання", noVoice: "Немає голосу для цієї мови", copyText: "Копіювати текст", copied: "Скопійовано ✓", copyFail: "Не вдалося скопіювати", newDoc: "Новий документ", unsure: "Сумніваєтеся? Попросіть лікаря перевірити →", overview: "Огляд",
+      learnMore: "Докладніше", original: "Оригінальний документ", picsOne: "Ваш документ надіслано як 1 зображення.", picsMany: "Ваш документ надіслано як {n} зображень.",
+      noCare: "У цьому документі не знайдено подальшої допомоги.", signinCta: "Увійдіть і підключіть медичну страховку, щоб побачити, що покривається і скільки, можливо, доведеться платити самостійно.", coverUnknown: "Покриття невідоме", checkedAgainst: "Перевірено за {ins} ({plan}).", demoFigures: "Демо-суми", filterBy: "Фільтр за покриттям",
+      fAll: "Усі", fFull: "Повністю покрито", fPart: "Часткова оплата", fNone: "Не покрито", fUnk: "Запитайте страхову касу", costFull: "Ви нічого не доплачуєте.", costPart: "Ви платите приблизно {amount} € {unit}; решту оплачує страхова каса.", costNone: "Не відшкодовується: ви платите повну ціну.", costUnk: "Не вдалося зіставити це з вашим покриттям. Запитайте страхову касу.",
+      u_visit: "за візит", u_day: "за день", u_estimate: "(орієнтовно)", u_scan: "за обстеження", u_session: "за сеанс", u_pack: "за упаковку", n_mh: "Перші 8 сеансів на рік", n_med: "Залежить від ліків", n_otc: "Ви платите аптечну ціну",
+      urgentT: "Якщо у вас зараз є червона ознака небезпеки, не чекайте на прийом.", urgentA: "Надзвичайна ситуація: телефонуйте ", urgentB: ". Увечері, вночі та у вихідні – черговий лікар загальної практики: ", covered: "Покривається вашою страховкою", payVisit: "Ви платите приблизно {amount} € за візит", notCovered: "Не покривається вашою страховкою", searchFor: "Шукати: ", bookOn: "Записатися на {name}", opensOther: " (відкриває інший сайт)", orCall: "або зателефонуйте до кабінету лікаря", bookingFine: "Doctena і Doctoranytime – незалежні сайти для запису. Plainly не надсилає їм ваш документ чи будь-які дані. Візьміть це пояснення й оригінальний документ на прийом.",
+      revCardT: "Попросіть лікаря перевірити", revIntro: "ШІ може помилятися. Для більшої впевненості ліцензований лікар може порівняти це пояснення з вашим оригінальним документом.", rp1: "Виправляє те, що ШІ зрозумів неправильно чи пропустив", rp2: "Підтверджує, які пункти червоні, помаранчеві чи зелені", rp3: "Додає коротку особисту примітку вашою мовою", rp4: "Онлайн – без запису на прийом", revFine: "Ціни – приклади для цього демо. Перевірка лікарем не замінює консультацію. У термінових випадках використовуйте контакти вище.",
+      ts1: "Запит отримано", ts2: "Лікаря призначено", ts3: "Лікар перевіряє ваше пояснення", ts4: "Перевірене пояснення готове", requested: "Перевірку лікарем ({tier}) замовлено", expected: " – відповідь {time}. ", trackLabel: "Хід перевірки лікарем", sDone: " (виконано)", sNow: " (поточний крок)", sNot: " (ще ні)", currentStep: "Поточний крок: {s}", inAccount: "Перевірене пояснення буде у вашому обліковому записі. ", refCode: "Ваш код: {code}. Збережіть його, щоб пізніше відкрити перевірене пояснення. ", demoNoDoctor: "У цьому демо жоден лікар не бачить ваш документ і гроші не списуються.", cancelReq: "Скасувати запит",
+      copyFooter: "Написано штучним інтелектом (Claude) у Plainly. Він може помилятися: перевіряйте важливі подробиці з вашою медичною командою.",
+      watchT: "Як це відбувається: перевірені відео й анімації", madeBy: "Створено медичними організаціями, а не ШІ. Пошуковий запит: «{term}».", resFine: "Це незалежні сайти. Вони показують процедуру загалом; ваша може дещо відрізнятися. Багато з них англійською: ваш браузер може перекласти сторінки. Plainly не надсилає їм жодних ваших даних.",
+      r_aha: "Анімації та ілюстрації про хвороби серця й інсульт, лікування та процедури. Виберіть тему в меню «Select a Topic».", r_mlp: "Анімовані відео, інтерактивні уроки й відео операцій із простими поясненнями.", r_nhs: "Зрозумілі посібники про обстеження, лікування й операції, часто з відео: навіщо, що відбувається і відновлення.", r_ta: "Інформація від нідерландських сімейних лікарів з короткими відео.", r_gw: "Бельгійська науково обґрунтована інформація про здоров'я простою нідерландською.", r_iq: "Незалежна німецька інформація про здоров'я, часто з відео й графікою.", r_am: "Посібники для пацієнтів від французького державного медичного страхування про обстеження й лікування.",
+      k_anim: "Анімації", k_vid: "Відео й уроки", k_guidevid: "Посібники й відео", k_guide: "Посібники", l_en: "англійська", l_es: "іспанська", l_ensome: "англійська (частково іспанська)", l_nl: "нідерландська", l_de: "німецька", l_fr: "французька", openX: "Відкрити {name}", searchX: "Шукати на {name}",
+      aiWritten: "Написано ШІ – перевірте з вашою медичною командою.", more: "Докладніше", less: "Згорнути", askAbout: "Поставити запитання про це"
+    },
+    ar: {
+      openInClaude: "افتح Plainly في Claude",
+      speakAnswers: "قراءة الإجابات بصوت عالٍ", micStart: "قل سؤالك", micStop: "إيقاف الاستماع", dictate: "إملاء النص", listening: "أستمع… تحدّث الآن.", micDenied: "الميكروفون غير متاح هنا. اسمح به في متصفحك، أو افتح Plainly في علامة تبويب عادية. يمكنك أيضًا الكتابة.", micUnavailable: "الإدخال الصوتي لا يعمل في هذا المتصفح. يُرجى الكتابة بدلًا من ذلك.", micNoSpeech: "لم نسمع شيئًا. حاول مرة أخرى.", listen: "استمع", listenX: "استمع: {what}", stopShort: "إيقاف",
+      spacing: "مسافات أكبر",
+      howWorks: "كيف يعمل", fromPrice: "ابتداءً من {price} €",
+      tabNext: "الخطوات التالية", tabCosts: "التكاليف", resultTabs: "أجزاء شرحك", nudgeNext: "من تتواصل معه وماذا تفعل بعد ذلك",
+      skip: "انتقل إلى المحتوى الرئيسي", tagline: "أوراقك الطبية مشروحة بكلمات بسيطة", textSize: "حجم النص", sizeN: "حجم نص عادي", sizeL: "نص كبير", sizeXL: "نص كبير جدًا", uiLang: "لغة التطبيق",
+      acctRegion: "حسابك", unavailable: "لشرح المستندات، تحتاج هذه النسخة إلى Claude. افتح Plainly في Claude – ستحتاج إلى حساب Claude.",
+      inputRegion: "شرح مستند", step1: "أضف مستندك", dropTitle: "اختر ملفًا أو اسحبه إلى هنا", dropHint: "رسالة أو نتيجة تحليل أو تقرير تصوير أو نشرة: PDF أو Word أو نص أو صورة لكل صفحة", filesLabel: "الملفات المضافة",
+      pasteSummary: "أو اكتب النص أو الصقه", pasteLabel: "نص المستند", pastePh: "الصق هنا نص رسالتك أو تقريرك…",
+      step2: "كيف نشرح لك؟", langLabel: "لغة الشرح", langPh: "اكتب أي لغة، مثل الهولندية أو العربية أو البولندية", langHint: "اكتب أي لغة أو اختر واحدة من الأسفل.", commonLangs: "لغات شائعة", howSimple: "ما مدى البساطة؟",
+      lvlEasy: "بسيط جدًا", lvlEasyD: "جمل قصيرة وكلمات يومية، مثل نشرة سهلة القراءة.", lvlPlain: "بسيط", lvlPlainD: "لغة يومية واضحة مع أهم التفاصيل.", lvlDet: "تفاصيل أكثر", lvlDetD: "لغة بسيطة، لكن مع شرح أكثر للخلفية الطبية.",
+      go: "اشرح لي", goHintAnon: "يُقرأ مستندك على هذه الصفحة ويُرسَل إلى Claude فقط لكتابة الشرح. لا يتم حفظه.", goHintAcct: "يُرسَل مستندك إلى Claude فقط لكتابة الشرح. مع حسابك التجريبي نتحقق أيضًا من تغطية تأمينك.",
+      progress: "التقدّم", progRead: "نقرأ مستندك…", progReadSub: "يقرؤه Claude بعناية. يستغرق ذلك عادةً أقل من دقيقة.", progWrite: "نكتب شرحك…", progWriteSub: "أوشكنا على الانتهاء.", stop: "إيقاف",
+      resultsRegion: "شرحك", footer: "Plainly نموذج أولي. يشرح المستندات، ولا يشخّص ولا يقدّم نصيحة طبية. ميزات الحساب والتأمين تجريبية ببيانات مختلَقة.",
+      ask: "أسئلة عن مستندك", close: "إغلاق", questionsSr: " (الأسئلة)", yourQuestion: "سؤالك", askPh: "اكتب سؤالك…", askBtn: "اسأل",
+      chatEmpty: "مثلًا: «ماذا تعني هذه النتيجة بالنسبة لي؟» أو «هل يمكنني الاستحمام بعد العملية؟»", chatHint: "تأتي الإجابات باللغة: {lang}. في كل ما يخص علاجك، الكلمة الأخيرة لفريق رعايتك.",
+      acctAnonT: "أنت تستخدم Plainly حاليًا بدون حساب", acctAnonS: "لا يُحفَظ أي شيء. سجّل الدخول لترى ما يغطيه تأمينك الصحي.", signIn: "تسجيل الدخول", demo: "تجريبي", hospitalPlan: "تأمين الاستشفاء", increased: "تعويض مرتفع", acctBtn: "الحساب والتأمين", standardCover: "تغطية أساسية", demoPatient: "مريض تجريبي",
+      cancel: "إلغاء", back: "رجوع", dlgChooseT: "كيف تريد استخدام Plainly؟", dlgChooseHint: "يمكنك دائمًا شرح المستندات بدون حساب.", optAnonT: "المتابعة بدون حساب", optAnonD: "مجهول الهوية. لا يُحفَظ أي شيء ولا نعرف من أنت. لن ترى تغطية تأمينك.", optSignT: "تسجيل الدخول وربط تأميني الصحي", optSignD: "اعرف ما يغطيه تأمينك من رعاية وما قد تدفعه بنفسك.",
+      eidT: "تسجيل الدخول", eidP: "في الخدمة الحقيقية ستسجّل الدخول ببطاقة الهوية الإلكترونية البلجيكية أو بتطبيق هوية رقمية. في هذا العرض التجريبي لا يتم التحقق من شيء.", idCard: "بطاقة هوية تنتهي بـ ••• 042", signInAs: "الدخول كمريض تجريبي",
+      insT: "اربط تأمينك الصحي", insHint: "هذه الصناديق والمبالغ مختلَقة لهذا العرض التجريبي.", insLabel: "صندوق تأمينك الصحي", incT: "لديّ حق التعويض المرتفع", incD: "وضع يخفّض ما تدفعه بنفسك، مثلًا عند انخفاض الدخل.", hpT: "لديّ تأمين استشفاء", hpD: "تأمين إضافي للإقامة في المستشفى وبعض الوسائل المساعدة.", insConsent: "أوافق على أن يتحقق Plainly من تغطية تأميني للرعاية الواردة في مستنداتي. يمكنني إلغاء الربط في أي وقت.", consentErr: "يُرجى وضع علامة في المربع للموافقة، أو اختيار «إلغاء».", signOut: "تسجيل الخروج", save: "حفظ", linkIns: "ربط التأمين",
+      revT: "طلب مراجعة من طبيب", revP: "يقارن طبيب مسجّل في بلجيكا هذا الشرح بمستندك الأصلي ويرسل إليك نسخة مُراجَعة.", revSpeed: "متى تحتاجها؟", revPay: "تدفع ذلك بنفسك. بعض التأمينات التكميلية تعوّض جزءًا منه.", revConsent: "أوافق على أن يطّلع طبيب على مستندي وهذا الشرح لغرض المراجعة فقط.", continuePay: "المتابعة إلى الدفع",
+      payT: "الدفع", payLine: "مراجعة الطبيب ({tier}): {price} €", payP: "في الخدمة الحقيقية ستدفع بأمان عبر مزوّد دفع، مثل Bancontact أو بطاقة مصرفية. هذا العرض التجريبي لا يطلب بيانات دفع ولا يخصم أي مال.", confirmDemo: "تأكيد (تجريبي، مجانًا)",
+      tierStandard: "عادي", tierExpress: "سريع", within48: "خلال 48 ساعة", within24: "خلال 24 ساعة", answerIn: "الرد {time}",
+      readErr: "تعذّرت قراءة هذا الملف.", photo: "صورة", heic: "صور HEIC من الآيفون غير مدعومة. يُرجى إرسالها بصيغة JPG أو التقاط لقطة شاشة.", wordDoc: "مستند Word", wordEmpty: "يبدو أن ملف Word هذا فارغ.", textFile: "نص", unsupported: "نوع الملف هذا غير مدعوم. جرّب PDF أو Word أو ملفًا نصيًا أو صورة.", loadErr: "لم يتم تحميل {what}. تحقّق من اتصالك وحاول مرة أخرى.", pdfReader: "قارئ PDF", wordReader: "قارئ Word", pages: "{n} صفحات", page1: "صفحة واحدة", scanned: "ممسوح ضوئيًا، {pages}", reading: "جارٍ القراءة…", remove: "إزالة", removeX: "إزالة {name}",
+      e_not_granted: "لم يُسمح لـ Plainly باستخدام Claude. أعد تحميل الصفحة واختر «السماح».", e_sampling_disabled: "Claude غير متاح لهذا الحساب حاليًا.", e_rate_limited: "وصلت إلى حد الاستخدام حاليًا. انتظر قليلًا ثم حاول مرة أخرى.", e_session_expired: "انتهت جلستك. سجّل الدخول إلى Claude مرة أخرى.", e_prompt_too_large: "هذا المستند أطول من أن يُشرح دفعة واحدة. أرسل صفحات أقل.", e_image_rejected: "تعذّرت قراءة إحدى الصور. جرّب صورة JPG أو PNG أوضح.", e_refused: "لم يتمكن Claude من شرح هذا المستند. تأكد أنه مستند طبي وحاول مرة أخرى.", e_invalid_json: "حدث خطأ أثناء كتابة الشرح. يُرجى المحاولة مرة أخرى.", e_images_unavailable: "لا يمكن إرسال الصور من هذه الواجهة. الصق النص بدلًا من ذلك أو استخدم ملف PDF بنص قابل للتحديد.", e_generic: "حدث خطأ ما. يُرجى المحاولة مرة أخرى.",
+      aiLabel: "كتبه الذكاء الاصطناعي (Claude) من مستندك، باللغة: {lang}. قد يخطئ. تحقّق دائمًا من التفاصيل المهمة مع طبيبك أو الممرض أو الصيدلي. في حالة الطوارئ اتصل بـ 112.",
+      yourDoc: "مستندك", readAloud: "🔊 اقرأ بصوت عالٍ", stopReading: "■ إيقاف القراءة", noVoice: "لا يوجد صوت لهذه اللغة", copyText: "نسخ النص", copied: "تم النسخ ✓", copyFail: "تعذّر النسخ", newDoc: "مستند جديد", unsure: "غير متأكد؟ اطلب مراجعة من طبيب ←", overview: "نظرة عامة",
+      learnMore: "اعرف المزيد", original: "المستند الأصلي", picsOne: "أُرسل مستندك كصورة واحدة.", picsMany: "أُرسل مستندك كـ {n} صور.",
+      noCare: "لم نجد رعاية متابعة في هذا المستند.", signinCta: "سجّل الدخول واربط تأمينك الصحي لترى ما هو مغطّى وما قد تدفعه بنفسك.", coverUnknown: "التغطية غير معروفة", checkedAgainst: "تم التحقق مع {ins} ({plan}).", demoFigures: "مبالغ تجريبية", filterBy: "تصفية حسب التغطية",
+      fAll: "الكل", fFull: "مغطّى بالكامل", fPart: "تدفع جزءًا", fNone: "غير مغطّى", fUnk: "اسأل صندوق تأمينك", costFull: "لا تدفع أي مبلغ إضافي.", costPart: "تدفع نحو {amount} € {unit}؛ ويدفع صندوق تأمينك الباقي.", costNone: "غير مُعوَّض: تدفع السعر كاملًا.", costUnk: "لم نتمكن من مطابقة ذلك مع تغطيتك. اسأل صندوق تأمينك.",
+      u_visit: "لكل زيارة", u_day: "لكل يوم", u_estimate: "(تقديري)", u_scan: "لكل فحص", u_session: "لكل جلسة", u_pack: "لكل علبة", n_mh: "أول 8 جلسات في السنة", n_med: "يعتمد على الدواء", n_otc: "تدفع سعر الصيدلية",
+      urgentT: "إذا كانت لديك الآن علامة تحذير حمراء، فلا تنتظر موعدًا.", urgentA: "في الطوارئ اتصل بـ ", urgentB: ". مساءً وليلًا وفي عطلة نهاية الأسبوع، طبيب المناوبة العام: ", covered: "مغطّى من تأمينك", payVisit: "تدفع نحو {amount} € لكل زيارة", notCovered: "غير مغطّى من تأمينك", searchFor: "ابحث عن: ", bookOn: "احجز عبر {name}", opensOther: " (يفتح موقعًا آخر)", orCall: "أو اتصل بعيادة طبيبك", bookingFine: "Doctena و Doctoranytime موقعا حجز مستقلّان. لا يرسل Plainly إليهما مستندك ولا أي بيانات. خذ هذا الشرح ومستندك الأصلي معك إلى الموعد.",
+      revCardT: "اطلب مراجعة من طبيب", revIntro: "قد يخطئ الذكاء الاصطناعي. لمزيد من الاطمئنان، يمكن لطبيب مرخّص مقارنة هذا الشرح بمستندك الأصلي.", rp1: "يصحّح ما فهمه الذكاء الاصطناعي خطأً أو أغفله", rp2: "يؤكّد أي النقاط حمراء أو برتقالية أو خضراء", rp3: "يضيف ملاحظة شخصية قصيرة بلغتك", rp4: "عبر الإنترنت – دون موعد", revFine: "الأسعار أمثلة لهذا العرض التجريبي. المراجعة لا تحلّ محل الاستشارة. في الحالات العاجلة استخدم جهات الاتصال أعلاه.",
+      ts1: "تم استلام الطلب", ts2: "تم تعيين طبيب", ts3: "الطبيب يراجع شرحك", ts4: "الشرح المُراجَع جاهز", requested: "تم طلب مراجعة الطبيب ({tier})", expected: " – الرد متوقع {time}. ", trackLabel: "تقدّم مراجعة الطبيب", sDone: " (تم)", sNow: " (الخطوة الحالية)", sNot: " (لم يتم بعد)", currentStep: "الخطوة الحالية: {s}", inAccount: "ستجد الشرح المُراجَع في حسابك. ", refCode: "رمزك المرجعي هو {code}. احتفظ به لفتح الشرح المُراجَع لاحقًا. ", demoNoDoctor: "في هذا العرض التجريبي لا يرى أي طبيب مستندك ولا يُخصم أي مال.", cancelReq: "إلغاء الطلب",
+      copyFooter: "كتبه الذكاء الاصطناعي (Claude) عبر Plainly. قد يخطئ: تحقّق من التفاصيل المهمة مع فريق رعايتك.",
+      watchT: "كيف يتم الإجراء: فيديوهات ورسوم متحركة موثوقة", madeBy: "من إعداد مؤسسات صحية، لا الذكاء الاصطناعي. مصطلح البحث: «{term}».", resFine: "هذه مواقع مستقلة. تعرض الإجراء بشكل عام، وقد يختلف إجراؤك قليلًا. كثير منها بالإنجليزية: يمكن لمتصفحك ترجمة الصفحات. لا يرسل Plainly إليها أي بيانات تخصّك.",
+      r_aha: "رسوم متحركة وصور توضيحية عن أمراض القلب والسكتة الدماغية وعلاجاتها وإجراءاتها. اختر موضوعك من قائمة «Select a Topic».", r_mlp: "فيديوهات متحركة ودروس تفاعلية وفيديوهات عمليات مع شروح بسيطة.", r_nhs: "أدلة واضحة عن الفحوص والعلاجات والعمليات، كثير منها بالفيديو: السبب وما يحدث والتعافي.", r_ta: "معلومات من أطباء الأسرة الهولنديين مع فيديوهات قصيرة.", r_gw: "معلومات صحية بلجيكية قائمة على الأدلة بهولندية بسيطة.", r_iq: "معلومات صحية ألمانية مستقلة، كثير منها بالفيديو والرسوم.", r_am: "أدلة للمرضى من التأمين الصحي العام الفرنسي عن الفحوص والعلاجات.",
+      k_anim: "رسوم متحركة", k_vid: "فيديوهات ودروس", k_guidevid: "أدلة وفيديوهات", k_guide: "أدلة", l_en: "الإنجليزية", l_es: "الإسبانية", l_ensome: "الإنجليزية (بعضها بالإسبانية)", l_nl: "الهولندية", l_de: "الألمانية", l_fr: "الفرنسية", openX: "افتح {name}", searchX: "ابحث في {name}",
+      aiWritten: "كتبه الذكاء الاصطناعي – تحقّق منه مع فريق رعايتك.", more: "المزيد", less: "عرض أقل", askAbout: "اطرح سؤالًا عن هذا"
+    },
+    tr: {
+      openInClaude: "Plainly'yi Claude'da aç",
+      speakAnswers: "Yanıtları sesli oku", micStart: "Sorunuzu söyleyin", micStop: "Dinlemeyi durdur", dictate: "Metni dikte edin", listening: "Dinliyorum… şimdi konuşun.", micDenied: "Mikrofon burada kullanılamıyor. Tarayıcınızda izin verin veya Plainly'yi normal bir tarayıcı sekmesinde açın. Yazabilirsiniz de.", micUnavailable: "Sesli giriş bu tarayıcıda çalışmıyor. Lütfen yazın.", micNoSpeech: "Hiçbir şey duyamadık. Tekrar deneyin.", listen: "Dinle", listenX: "Dinle: {what}", stopShort: "Durdur",
+      spacing: "Daha fazla boşluk",
+      howWorks: "Nasıl çalışır", fromPrice: "{price} €'dan başlayan",
+      tabNext: "Sonraki adımlar", tabCosts: "Maliyetler", resultTabs: "Açıklamanızın bölümleri", nudgeNext: "Kime başvurmalı ve sırada ne var",
+      skip: "Ana içeriğe geç", tagline: "Tıbbi belgeleriniz, sade bir dille", textSize: "Metin boyutu", sizeN: "Normal metin boyutu", sizeL: "Büyük metin", sizeXL: "Çok büyük metin", uiLang: "Uygulama dili",
+      acctRegion: "Hesabınız", unavailable: "Belgeleri açıklamak için bu sürümün Claude'a ihtiyacı var. Plainly'yi Claude'da açın – bunun için bir Claude hesabı gerekir.",
+      inputRegion: "Bir belgeyi açıklat", step1: "Belgenizi ekleyin", dropTitle: "Bir dosya seçin veya buraya bırakın", dropHint: "Bir mektup, tahlil sonucu, görüntüleme raporu veya broşür: PDF, Word, metin ya da her sayfanın fotoğrafı", filesLabel: "Eklenen dosyalar",
+      pasteSummary: "Ya da metni yazın veya yapıştırın", pasteLabel: "Belge metni", pastePh: "Mektubunuzun veya raporunuzun metnini buraya yapıştırın…",
+      step2: "Nasıl açıklayalım?", langLabel: "Açıklamanın dili", langPh: "Herhangi bir dil yazın, ör. Felemenkçe, Arapça, Lehçe", langHint: "Herhangi bir dil yazın veya aşağıdan seçin.", commonLangs: "Sık kullanılan diller", howSimple: "Ne kadar sade?",
+      lvlEasy: "Çok sade", lvlEasyD: "Kısa cümleler, günlük kelimeler. Kolay okunur bir broşür gibi.", lvlPlain: "Sade", lvlPlainD: "Önemli ayrıntılarla açık, günlük bir dil.", lvlDet: "Daha ayrıntılı", lvlDetD: "Sade dil, ama tıbbi arka planı daha çok açıklar.",
+      go: "Bana açıklayın", goHintAnon: "Belgeniz bu sayfada okunur ve yalnızca açıklamanızı yazmak için Claude'a gönderilir. Kaydedilmez.", goHintAcct: "Belgeniz yalnızca açıklamanızı yazmak için Claude'a gönderilir. Demo hesabınızla sigorta kapsamınızı da kontrol ederiz.",
+      progress: "İlerleme", progRead: "Belgeniz okunuyor…", progReadSub: "Claude dikkatle okuyor. Bu genellikle bir dakikadan kısa sürer.", progWrite: "Açıklamanız yazılıyor…", progWriteSub: "Neredeyse hazır.", stop: "Durdur",
+      resultsRegion: "Açıklamanız", footer: "Plainly bir prototiptir. Belgeleri açıklar; teşhis koymaz ve tıbbi tavsiye vermez. Hesap ve sigorta özellikleri uydurma verilerle bir demodur.",
+      ask: "Belgeniz hakkında sorular", close: "Kapat", questionsSr: " (sorular)", yourQuestion: "Sorunuz", askPh: "Sorunuzu yazın…", askBtn: "Sor",
+      chatEmpty: "Örneğin: “Bu sonuç benim için ne anlama geliyor?” veya “Ameliyattan sonra duş alabilir miyim?”", chatHint: "Yanıtlar şu dilde gelir: {lang}. Kendi tedavinizle ilgili her konuda son söz sağlık ekibinizindir.",
+      acctAnonT: "Plainly'yi şu anda hesap olmadan kullanıyorsunuz", acctAnonS: "Hiçbir şey kaydedilmez. Sağlık sigortanızın neleri karşıladığını görmek için giriş yapın.", signIn: "Giriş yap", demo: "Demo", hospitalPlan: "Hastane sigortası", increased: "Artırılmış geri ödeme", acctBtn: "Hesap ve sigorta", standardCover: "Temel kapsam", demoPatient: "Demo hasta",
+      cancel: "İptal", back: "Geri", dlgChooseT: "Plainly'yi nasıl kullanmak istersiniz?", dlgChooseHint: "Belgeleri her zaman hesap olmadan da açıklatabilirsiniz.", optAnonT: "Hesap olmadan devam et", optAnonD: "Anonim. Hiçbir şey kaydedilmez ve kim olduğunuzu bilmeyiz. Sigorta kapsamınızı göremezsiniz.", optSignT: "Giriş yap ve sağlık sigortamı bağla", optSignD: "Sigortanızın hangi bakımı karşıladığını ve sizin ne ödeyebileceğinizi görün.",
+      eidT: "Giriş yap", eidP: "Gerçek hizmette Belçika eID'niz veya bir dijital kimlik uygulamasıyla giriş yaparsınız. Bu demoda hiçbir şey kontrol edilmez.", idCard: "••• 042 ile biten kimlik kartı", signInAs: "Demo hasta olarak giriş yap",
+      insT: "Sağlık sigortanızı bağlayın", insHint: "Bu sigorta kurumları ve tutarlar demo için uydurulmuştur.", insLabel: "Sağlık sigortanız", incT: "Artırılmış geri ödeme hakkım var", incD: "Kendi ödediğiniz payı düşüren bir statü, ör. düşük gelirde.", hpT: "Hastane sigortam var", hpD: "Hastanede yatış ve bazı yardımcı araçlar için ek sigorta.", insConsent: "Plainly'nin belgelerimdeki bakım için sigorta kapsamımı kontrol etmesini kabul ediyorum. Bağlantıyı istediğim zaman kaldırabilirim.", consentErr: "Kabul etmek için kutuyu işaretleyin veya İptal'i seçin.", signOut: "Çıkış yap", save: "Kaydet", linkIns: "Sigortayı bağla",
+      revT: "Doktor kontrolü iste", revP: "Belçika'da kayıtlı bir doktor bu açıklamayı orijinal belgenizle karşılaştırır ve size kontrol edilmiş bir sürüm gönderir.", revSpeed: "Ne kadar hızlı gerekiyor?", revPay: "Bunu kendiniz ödersiniz. Bazı tamamlayıcı sigortalar bir kısmını geri öder.", revConsent: "Bir doktorun belgemi ve bu açıklamayı yalnızca kontrol amacıyla görmesini kabul ediyorum.", continuePay: "Ödemeye devam et",
+      payT: "Ödeme", payLine: "Doktor kontrolü ({tier}): {price} €", payP: "Gerçek hizmette bir ödeme sağlayıcısı aracılığıyla güvenle ödersiniz, örneğin Bancontact veya banka kartıyla. Bu demo ödeme bilgisi istemez ve para çekmez.", confirmDemo: "Onayla (demo, ücretsiz)",
+      tierStandard: "Standart", tierExpress: "Ekspres", within48: "48 saat içinde", within24: "24 saat içinde", answerIn: "Yanıt {time}",
+      readErr: "Bu dosya okunamadı.", photo: "Fotoğraf", heic: "iPhone HEIC fotoğrafları desteklenmez. Lütfen JPG olarak gönderin veya ekran görüntüsü alın.", wordDoc: "Word belgesi", wordEmpty: "Bu Word dosyası boş görünüyor.", textFile: "Metin", unsupported: "Bu dosya türü desteklenmiyor. PDF, Word, metin dosyası veya fotoğraf deneyin.", loadErr: "{what} yüklenemedi. Bağlantınızı kontrol edip tekrar deneyin.", pdfReader: "PDF okuyucu", wordReader: "Word okuyucu", pages: "{n} sayfa", page1: "1 sayfa", scanned: "Taranmış, {pages}", reading: "Okunuyor…", remove: "Kaldır", removeX: "{name} kaldır",
+      e_not_granted: "Plainly'nin Claude'u kullanmasına izin verilmedi. Sayfayı yenileyip İzin ver'i seçin.", e_sampling_disabled: "Claude şu anda bu hesap için kullanılamıyor.", e_rate_limited: "Şimdilik kullanım sınırına ulaştınız. Biraz bekleyip tekrar deneyin.", e_session_expired: "Oturumunuz sona erdi. Lütfen Claude'a tekrar giriş yapın.", e_prompt_too_large: "Bu belge tek seferde açıklanamayacak kadar uzun. Daha az sayfa gönderin.", e_image_rejected: "Resimlerden biri okunamadı. Daha net bir JPG veya PNG fotoğraf deneyin.", e_refused: "Claude bu belgeyi açıklayamadı. Tıbbi bir belge olduğunu kontrol edip tekrar deneyin.", e_invalid_json: "Açıklama yazılırken bir sorun oluştu. Lütfen tekrar deneyin.", e_images_unavailable: "Bu görünümden fotoğraf gönderilemez. Bunun yerine metni yapıştırın veya seçilebilir metinli bir PDF kullanın.", e_generic: "Bir sorun oluştu. Lütfen tekrar deneyin.",
+      aiLabel: "Belgenizden yapay zekâ (Claude) tarafından şu dilde yazıldı: {lang}. Hata yapabilir. Önemli ayrıntıları her zaman doktorunuz, hemşireniz veya eczacınızla kontrol edin. Acil durumda 112'yi arayın.",
+      yourDoc: "Belgeniz", readAloud: "🔊 Sesli oku", stopReading: "■ Okumayı durdur", noVoice: "Bu dil için ses yok", copyText: "Metni kopyala", copied: "Kopyalandı ✓", copyFail: "Kopyalanamadı", newDoc: "Yeni belge", unsure: "Emin değil misiniz? Bir doktora kontrol ettirin →", overview: "Genel bakış",
+      learnMore: "Daha fazla bilgi", original: "Orijinal belge", picsOne: "Belgeniz 1 resim olarak gönderildi.", picsMany: "Belgeniz {n} resim olarak gönderildi.",
+      noCare: "Bu belgede takip bakımı bulunamadı.", signinCta: "Neyin karşılandığını ve sizin ne ödeyebileceğinizi görmek için giriş yapıp sağlık sigortanızı bağlayın.", coverUnknown: "Kapsam bilinmiyor", checkedAgainst: "{ins} ({plan}) ile kontrol edildi.", demoFigures: "Demo tutarlar", filterBy: "Kapsama göre filtrele",
+      fAll: "Tümü", fFull: "Tamamen karşılanır", fPart: "Bir kısmını ödersiniz", fNone: "Karşılanmaz", fUnk: "Sigortanıza sorun", costFull: "Ek bir şey ödemezsiniz.", costPart: "Yaklaşık {amount} € {unit} ödersiniz; kalanını sigortanız öder.", costNone: "Geri ödenmez: tam fiyatı ödersiniz.", costUnk: "Bunu kapsamınızla eşleştiremedik. Sigortanıza sorun.",
+      u_visit: "ziyaret başına", u_day: "gün başına", u_estimate: "(tahmini)", u_scan: "tetkik başına", u_session: "seans başına", u_pack: "kutu başına", n_mh: "Yılda ilk 8 seans", n_med: "İlaca bağlıdır", n_otc: "Eczane fiyatını ödersiniz",
+      urgentT: "Şu anda kırmızı bir uyarı işaretiniz varsa randevu beklemeyin.", urgentA: "Acil durum: ", urgentB: " numarasını arayın. Akşam, gece ve hafta sonu nöbetçi aile hekimi: ", covered: "Sigortanız karşılar", payVisit: "Ziyaret başına yaklaşık {amount} € ödersiniz", notCovered: "Sigortanız karşılamaz", searchFor: "Arama: ", bookOn: "{name} üzerinden randevu al", opensOther: " (başka bir web sitesi açar)", orCall: "veya muayenehaneyi arayın", bookingFine: "Doctena ve Doctoranytime bağımsız randevu siteleridir. Plainly onlara belgenizi veya herhangi bir veri göndermez. Bu açıklamayı ve orijinal belgenizi randevuya götürün.",
+      revCardT: "Bir doktora kontrol ettirin", revIntro: "Yapay zekâ hata yapabilir. Daha fazla güvence için lisanslı bir doktor bu açıklamayı orijinal belgenizle karşılaştırabilir.", rp1: "Yapay zekânın yanlış anladığı veya atladığı şeyleri düzeltir", rp2: "Hangi maddelerin kırmızı, turuncu veya yeşil olduğunu doğrular", rp3: "Kendi dilinizde kısa, kişisel bir not ekler", rp4: "Çevrimiçi – randevu gerekmez", revFine: "Fiyatlar bu demo için örnektir. Doktor kontrolü muayenenin yerini tutmaz. Acil durumlarda yukarıdaki iletişim bilgilerini kullanın.",
+      ts1: "Talep alındı", ts2: "Doktor atandı", ts3: "Doktor açıklamanızı kontrol ediyor", ts4: "Kontrol edilmiş açıklama hazır", requested: "Doktor kontrolü ({tier}) istendi", expected: " – beklenen yanıt {time}. ", trackLabel: "Doktor kontrolünüzün ilerlemesi", sDone: " (tamamlandı)", sNow: " (şu anki adım)", sNot: " (henüz değil)", currentStep: "Şu anki adım: {s}", inAccount: "Kontrol edilmiş açıklamayı hesabınızda bulacaksınız. ", refCode: "Referans kodunuz {code}. Kontrol edilmiş açıklamayı daha sonra açmak için saklayın. ", demoNoDoctor: "Bu demoda hiçbir doktor belgenizi görmez ve para çekilmez.", cancelReq: "Talebi iptal et",
+      copyFooter: "Plainly ile yapay zekâ (Claude) tarafından yazıldı. Hata yapabilir: önemli ayrıntıları sağlık ekibinizle kontrol edin.",
+      watchT: "Nasıl yapılır: güvenilir videolar ve animasyonlar", madeBy: "Yapay zekâ değil, sağlık kuruluşları tarafından hazırlandı. Arama terimi: “{term}”.", resFine: "Bunlar bağımsız web siteleridir. İşlemi genel olarak gösterirler; sizinki biraz farklı olabilir. Çoğu İngilizcedir: tarayıcınız sayfaları çevirebilir. Plainly onlara hiçbir verinizi göndermez.",
+      r_aha: "Kalp hastalıkları ve inme, tedavileri ve işlemleri hakkında animasyonlar ve çizimler. Konunuzu “Select a Topic” menüsünden seçin.", r_mlp: "Sade açıklamalı animasyonlu videolar, etkileşimli dersler ve ameliyat videoları.", r_nhs: "Tetkikler, tedaviler ve ameliyatlar hakkında, çoğu videolu net rehberler: neden yapılır, ne olur ve iyileşme.", r_ta: "Hollandalı aile hekimlerinden kısa videolu bilgiler.", r_gw: "Sade Felemenkçe ile Belçika'dan kanıta dayalı sağlık bilgileri.", r_iq: "Bağımsız Alman sağlık bilgileri, çoğu video ve grafikli.", r_am: "Fransız kamu sağlık sigortasının tetkik ve tedaviler hakkındaki hasta rehberleri.",
+      k_anim: "Animasyonlar", k_vid: "Videolar ve dersler", k_guidevid: "Rehberler ve videolar", k_guide: "Rehberler", l_en: "İngilizce", l_es: "İspanyolca", l_ensome: "İngilizce (kısmen İspanyolca)", l_nl: "Felemenkçe", l_de: "Almanca", l_fr: "Fransızca", openX: "{name} aç", searchX: "{name} içinde ara",
+      aiWritten: "Yapay zekâ tarafından yazıldı – sağlık ekibinizle kontrol edin.", more: "Daha fazla", less: "Daha az göster", askAbout: "Bununla ilgili soru sor"
     }
   };
   let UI = "en";
@@ -1197,6 +1362,7 @@
   /* ---------- app language switch ---------- */
   function applyStatic() {
     document.documentElement.lang = UI;
+    document.documentElement.dir = UIDIR();
     document.querySelectorAll("[data-i18n]").forEach(n => { n.textContent = t(n.dataset.i18n); });
     document.querySelectorAll("[data-i18n-ph]").forEach(n => { n.placeholder = t(n.dataset.i18nPh); });
     document.querySelectorAll("[data-i18n-aria]").forEach(n => { n.setAttribute("aria-label", t(n.dataset.i18nAria)); });
@@ -1442,7 +1608,7 @@ ${hasImages ? "The attached images are photos or scans of the document pages. Re
     const hero = el("section", { class: "hero lvl-" + overall, "aria-labelledby": "resTitle" },
       el("div", { class: "hero-top" },
         str(r.document_type) ? el("span", { class: "doc-type" }, str(r.document_type)) : el("span"),
-        el("div", { class: "hero-actions", dir: "ltr", lang: UI },
+        el("div", { class: "hero-actions", dir: UIDIR(), lang: UI },
           iconBtn(t("readAloud").replace(/^\S+\s/, ""), '<path d="M4 9v6h4l5 4V5L8 9zM16.5 8.5a5 5 0 0 1 0 7" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>', e => speakBtn(e.currentTarget.querySelector("span"), [str(r.title), str(r.summary)].join(". "), true)),
           iconBtn(t("copyText"), '<rect x="8" y="8" width="12" height="12" rx="2" stroke="currentColor" stroke-width="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3" stroke="currentColor" stroke-width="2"/>', e => copyAll(e.currentTarget.querySelector("span"))),
           iconBtn(t("newDoc"), '<path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>', startOver))),
@@ -1451,7 +1617,7 @@ ${hasImages ? "The attached images are photos or scans of the document pages. Re
       el("div", { class: "overall lvl-" + overall }, svgEl(TL_ICON[overall]), el("span", {}, L["overall_" + overall])),
       items.length ? el("ul", { class: "counts", "aria-label": t("overview") }, LVLS.filter(l => by[l].length).map(l => el("li", {},
         el("a", { href: "#cl-" + l, class: "count lvl-" + l, onclick: e => { e.preventDefault(); goTo("overview", "cl-" + l); } }, svgEl(TL_ICON[l]), el("b", {}, String(by[l].length)), " ", L[l])))) : null,
-      el("p", { class: "ai-note", lang: UI, dir: "ltr" }, svgEl('<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 11v6M12 7.5v.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>'), el("span", {}, t("aiLabel", { lang: state.lang })))
+      el("p", { class: "ai-note", lang: UI, dir: UIDIR() }, svgEl('<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 11v6M12 7.5v.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>'), el("span", {}, t("aiLabel", { lang: state.lang })))
     );
     const wrap = el("div", { dir, lang });
     wrap.append(hero);
@@ -1464,7 +1630,7 @@ ${hasImages ? "The attached images are photos or scans of the document pages. Re
       { id: "costs", label: t("tabCosts") },
       { id: "learn", label: t("learnMore") }
     ];
-    const tablist = el("div", { class: "tabs", role: "tablist", "aria-label": t("resultTabs"), lang: UI, dir: "ltr" });
+    const tablist = el("div", { class: "tabs", role: "tablist", "aria-label": t("resultTabs"), lang: UI, dir: UIDIR() });
     const panels = {};
     TABS.forEach(tb => {
       tablist.append(el("button", { class: "tab", role: "tab", type: "button", id: "tab-" + tb.id, "aria-controls": "panel-" + tb.id, "aria-selected": "false", tabindex: "-1", onclick: () => selectTab(tb.id, true) }, tb.label));
@@ -1491,7 +1657,7 @@ ${hasImages ? "The attached images are photos or scans of the document pages. Re
           str(i.when) ? el("span", { class: "when" }, str(i.when)) : null,
           moreBtn({ title: str(i.title), detail: str(i.detail) }))))));
     });
-    if (overall !== "green") panels.overview.append(el("button", { class: "nudge", type: "button", lang: UI, dir: "ltr", onclick: () => goTo("next", "consultCard") },
+    if (overall !== "green") panels.overview.append(el("button", { class: "nudge", type: "button", lang: UI, dir: UIDIR(), onclick: () => goTo("next", "consultCard") },
       el("span", {}, t("nudgeNext")), el("span", { "aria-hidden": "true" }, "→")));
 
     /* Next steps: who to contact, medicines, what happens, doctor check */
@@ -1520,7 +1686,7 @@ ${hasImages ? "The attached images are photos or scans of the document pages. Re
     panels.learn.append(el("section", { class: "card", "aria-label": t("learnMore") },
       terms.length ? el("details", { class: "more" }, el("summary", {}, L.terms + ` (${terms.length})`), el("div", {}, el("dl", { class: "terms" }, terms.map(x => el("div", {}, el("dt", {}, str(x.term)), el("dd", {}, str(x.meaning), moreBtn({ title: str(x.term), detail: str(x.meaning), kind: "term" }))))))) : null,
       qs.length ? el("details", { class: "more" }, el("summary", {}, L.questions + ` (${qs.length})`), el("div", {}, el("ol", { class: "qs" }, qs.map(q => el("li", {}, q))))) : null,
-      el("details", { class: "more", lang: UI, dir: "ltr" }, el("summary", {}, t("original")), el("div", {}, state.docText ? el("pre", { class: "origtext" }, state.docText) : el("p", { class: "hint" }, state.images.length === 1 ? t("picsOne") : t("picsMany", { n: state.images.length }))))));
+      el("details", { class: "more", lang: UI, dir: UIDIR() }, el("summary", {}, t("original")), el("div", {}, state.docText ? el("pre", { class: "origtext" }, state.docText) : el("p", { class: "hint" }, state.images.length === 1 ? t("picsOne") : t("picsMany", { n: state.images.length }))))));
 
     out.append(wrap);
     if (rerender) refreshChatTexts(); else resetChat(dir, lang);
@@ -1557,7 +1723,7 @@ ${hasImages ? "The attached images are photos or scans of the document pages. Re
     if (!svcs.length) { card.append(el("p", { class: "hint", lang: UI }, t("noCare"))); return; }
     const a = state.account;
     if (!a) {
-      card.append(el("div", { class: "signin-cta", lang: UI, dir: "ltr" },
+      card.append(el("div", { class: "signin-cta", lang: UI, dir: UIDIR() },
         el("p", {}, t("signinCta") + " ", el("span", { class: "demo-tag" }, t("demo"))),
         el("button", { class: "btn small", type: "button", onclick: () => openDialog("choose") }, t("signIn"))));
       card.append(el("div", { dir }, svcs.map(s => el("div", { class: "svc" },
@@ -1569,8 +1735,8 @@ ${hasImages ? "The attached images are photos or scans of the document pages. Re
     const withCov = svcs.map(s => ({ s, c: coverFor(s.category) }));
     const counts = { all: withCov.length, full: 0, part: 0, none: 0, unk: 0 }; withCov.forEach(x => counts[x.c.lvl]++);
     const F = [["all", t("fAll")], ["full", t("fFull")], ["part", t("fPart")], ["none", t("fNone")], ["unk", t("fUnk")]].filter(([k]) => k === "all" || counts[k]);
-    card.append(el("p", { class: "hint", lang: UI, dir: "ltr", style: "margin-top:0" }, t("checkedAgainst", { ins: ins.name, plan: t("standardCover") + (a.hospitalPlan ? " + " + t("hospitalPlan") : "") + (a.increased ? ", " + t("increased") : "") }) + " ", el("span", { class: "demo-tag" }, t("demoFigures"))));
-    card.append(el("div", { class: "svc-filters", role: "group", "aria-label": t("filterBy"), lang: UI, dir: "ltr" }, F.map(([k, lbl]) =>
+    card.append(el("p", { class: "hint", lang: UI, dir: UIDIR(), style: "margin-top:0" }, t("checkedAgainst", { ins: ins.name, plan: t("standardCover") + (a.hospitalPlan ? " + " + t("hospitalPlan") : "") + (a.increased ? ", " + t("increased") : "") }) + " ", el("span", { class: "demo-tag" }, t("demoFigures"))));
+    card.append(el("div", { class: "svc-filters", role: "group", "aria-label": t("filterBy"), lang: UI, dir: UIDIR() }, F.map(([k, lbl]) =>
       el("button", { class: "chip", type: "button", "aria-pressed": String(state.svcFilter === k), onclick: () => { state.svcFilter = k; renderServices(); $(`#svcCard .chip[data-k="${k}"]`).focus(); }, "data-k": k }, `${lbl} (${counts[k]})`))));
     const COVLBL = { full: "✓ " + t("fFull"), part: "€ " + t("fPart"), none: "✕ " + t("fNone"), unk: "? " + t("fUnk") };
     const shown = withCov.filter(x => state.svcFilter === "all" || x.c.lvl === state.svcFilter);
@@ -1586,7 +1752,7 @@ ${hasImages ? "The attached images are photos or scans of the document pages. Re
         el("span", { class: "nm" }, str(s.name)),
         el("span", { class: "cov " + c.lvl, lang: UI }, COVLBL[c.lvl]),
         str(s.why) || str(s.when) ? el("span", { class: "why" }, [str(s.why), str(s.when)].filter(Boolean).join(" · ")) : null,
-        el("span", { class: "cost", lang: UI, dir: "ltr" }, cost));
+        el("span", { class: "cost", lang: UI, dir: UIDIR() }, cost));
     })));
   }
 
@@ -1604,7 +1770,7 @@ ${hasImages ? "The attached images are photos or scans of the document pages. Re
     card.classList.remove("hidden");
     const dir = r.dir === "rtl" ? "rtl" : "ltr";
     card.replaceChildren(secHead("consult", L.consult || "Who to contact", "h-consult"));
-    if (hasRed) card.append(el("div", { class: "urgent", lang: UI, dir: "ltr" }, svgEl(TL_ICON.red),
+    if (hasRed) card.append(el("div", { class: "urgent", lang: UI, dir: UIDIR() }, svgEl(TL_ICON.red),
       el("div", {}, el("p", {}, el("b", {}, t("urgentT"))),
         el("p", {}, t("urgentA"), el("a", { href: "tel:112" }, "112"), t("urgentB"), el("a", { href: "tel:1733" }, "1733"), "."))));
     cs.forEach(c => {
@@ -1616,9 +1782,9 @@ ${hasImages ? "The attached images are photos or scans of the document pages. Re
       card.append(el("div", { class: "consult lvl-" + c.level, dir },
         el("div", { class: "top" }, el("span", { class: "who" }, str(c.who)), el("span", { class: "lvl-tag" }, svgEl(TL_ICON[c.level]), L[c.level])),
         str(c.why) ? el("p", { class: "why" }, str(c.why)) : null,
-        el("p", { class: "meta", lang: UI, dir: "ltr" }, t("searchFor"), el("b", {}, str(c.specialty) || "general practitioner"),
+        el("p", { class: "meta", lang: UI, dir: UIDIR() }, t("searchFor"), el("b", {}, str(c.specialty) || "general practitioner"),
           cost ? [" · ", cost, " ", el("span", { class: "demo-tag" }, t("demo"))] : null),
-        el("div", { class: "book", lang: UI, dir: "ltr" },
+        el("div", { class: "book", lang: UI, dir: UIDIR() },
           BOOKING.map(b => el("a", { class: "btn small ext", href: b.url, target: "_blank", rel: "noopener noreferrer" }, t("bookOn", { name: b.name }), el("span", { class: "sr-only" }, t("opensOther")))),
           el("span", { class: "hint", style: "align-self:center;margin:0" }, t("orCall")))));
     });
@@ -1630,7 +1796,7 @@ ${hasImages ? "The attached images are photos or scans of the document pages. Re
   const tierLbl = tr => t(tr.label);
   function renderReview() {
     const card = $("#reviewCard"); if (!card || !state.result) return;
-    card.setAttribute("lang", UI); card.setAttribute("dir", "ltr");
+    card.setAttribute("lang", UI); card.setAttribute("dir", UIDIR());
     card.replaceChildren(secHead("review", t("revCardT"), "h-review"));
     const rv = state.review;
     if (!rv) {
@@ -1721,14 +1887,14 @@ ${hasImages ? "The attached images are photos or scans of the document pages. Re
     if (steps.length) {
       const text = steps.map((s, i) => `${i + 1}. ${str(s.title)}. ${str(s.text)}`).join(" ");
       wrap.append(
-        el("div", { class: "toolbar", dir: "ltr", lang: UI, style: "margin-bottom:10px" }, el("button", { class: "btn small", type: "button", onclick: e => speakBtn(e.currentTarget, text) }, t("readAloud"))),
+        el("div", { class: "toolbar", dir: UIDIR(), lang: UI, style: "margin-bottom:10px" }, el("button", { class: "btn small", type: "button", onclick: e => speakBtn(e.currentTarget, text) }, t("readAloud"))),
         el("ol", { class: "steps-list" }, steps.map(s => el("li", {}, el("b", {}, str(s.title)), str(s.text) ? el("span", {}, str(s.text)) : null))));
     }
     const res = procResources(p);
     wrap.append(
-      el("details", { class: "more res-details", lang: UI, dir: "ltr" }, el("summary", {}, t("watchT") + ` (${res.length})`), el("div", {},
+      el("details", { class: "more res-details", lang: UI, dir: UIDIR() }, el("summary", {}, t("watchT") + ` (${res.length})`), el("div", {},
       el("p", { class: "hint", style: "margin-top:0" }, t("madeBy", { term: str(p.name_en) || str(p.name) })),
-      el("ul", { class: "resources", lang: UI, dir: "ltr" }, res.map(r => el("li", {},
+      el("ul", { class: "resources", lang: UI, dir: UIDIR() }, res.map(r => el("li", {},
         el("div", { class: "r-top" }, el("span", { class: "r-name" }, r.name), el("span", { class: "r-kind" }, r.kind)),
         el("span", { class: "r-org" }, r.org + " · " + r.langs),
         el("p", {}, r.desc),
@@ -1824,7 +1990,7 @@ ${state.docText ? "Original document:\n<<<\n" + state.docText.slice(0, 30000) + 
         region.append(el("div", { class: "more-actions" },
           listenBtn(() => ctx.title + ". " + text, ctx.title),
           el("button", { class: "btn link", type: "button", onclick: () => openChat(`${ctx.title}: `) }, t("askAbout")),
-          el("span", { class: "fine", lang: UI, dir: "ltr" }, t("aiWritten"))));
+          el("span", { class: "fine", lang: UI, dir: UIDIR() }, t("aiWritten"))));
       } catch (e) { txt.textContent = (e && e.text) || errText(e); }
       finally { busy = false; }
     });
@@ -1855,7 +2021,7 @@ ${state.docText ? "Original document:\n<<<\n" + state.docText.slice(0, 30000) + 
   function resetChat(dir, lang) {
     state.chat = [];
     chatLog.setAttribute("dir", dir); if (lang) chatLog.setAttribute("lang", lang); else chatLog.removeAttribute("lang");
-    chatLog.replaceChildren(el("p", { class: "chat-empty", lang: UI, dir: "ltr" }, t("chatEmpty")));
+    chatLog.replaceChildren(el("p", { class: "chat-empty", lang: UI, dir: UIDIR() }, t("chatEmpty")));
     $("#chatHint").textContent = t("chatHint", { lang: state.lang });
     fab.classList.remove("hidden");
   }
