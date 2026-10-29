@@ -309,6 +309,18 @@
   .rows .when::before{content:"⏱ "}
   .rows .k{color:var(--muted);font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em;margin-right:6px}
   .group.lvl-red .rows .det{color:#1E2A2E}
+  .grp-switch{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0 0 12px}
+  .grp-switch .grp-lbl{font-size:.9rem;color:var(--muted);margin-inline-end:4px}
+  .grp-switch button{appearance:none;border:1.5px solid var(--edge);background:rgba(255,255,255,.7);color:var(--ink);border-radius:999px;padding:.35rem .95rem;min-height:40px;font:inherit;font-size:.92rem;font-weight:600;cursor:pointer}
+  .grp-switch button[aria-pressed="true"]{background:var(--teal);border-color:var(--teal);color:#fff}
+  #grpSw button[aria-pressed="true"]{background:var(--teal);border-color:var(--teal);color:#fff;box-shadow:0 4px 12px rgba(59,76,202,.3)}
+  #grpSw button[aria-pressed="false"]{background:rgba(255,255,255,.7);color:var(--ink)}
+  .grp-switch button:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+  .group.body-group{border-inline-start:6px solid var(--acc)}
+  .group.body-group.lvl-red{background:var(--card);border:0;border-inline-start:6px solid var(--acc);box-shadow:var(--shadow)}
+  .g-count{display:inline-grid;place-items:center;min-width:24px;height:24px;padding:0 6px;border-radius:999px;background:rgba(59,76,202,.1);color:var(--teal-ink);font-size:.82rem;font-weight:700}
+  .rows .row-tag{margin:0 0 4px;font-size:.8rem}
+  .rows .row-tag .tl-ic{width:18px;height:18px}
   .nudge{display:flex;justify-content:space-between;align-items:center;width:100%;background:var(--teal);color:#fff;border:0;border-radius:14px;padding:14px 18px;font-weight:700;min-height:52px;cursor:pointer;text-align:left;gap:10px;margin:4px 0 14px;font-size:1rem}
   .nudge:hover{background:var(--teal-ink)}
   @media (max-width:600px){
@@ -815,7 +827,7 @@
       speakAnswers: "Read answers aloud", micStart: "Speak your question", micStop: "Stop listening", dictate: "Dictate the text", listening: "Listening… speak now.", micDenied: "The microphone isn\u2019t available here. Allow it in your browser, or open Plainly in a normal browser tab. You can also type.", micUnavailable: "Speech input doesn\u2019t work in this browser. Please type instead.", micNoSpeech: "We didn\u2019t hear anything. Try again.", listen: "Listen", listenX: "Listen: {what}", stopShort: "Stop",
       spacing: "Extra spacing",
       howWorks: "How it works", fromPrice: "From €{price}",
-      tabNext: "Next steps", tabCosts: "Costs", resultTabs: "Parts of your explanation", nudgeNext: "See who to contact and what to do next",
+      tabNext: "Next steps", tabCosts: "Costs", resultTabs: "Parts of your explanation", groupBy: "Group by", byBody: "Body part", byUrgency: "Urgency", areaGeneral: "General", nudgeNext: "See who to contact and what to do next",
       skip: "Skip to main content", tagline: "Your medical papers, explained in plain words", textSize: "Text size", sizeN: "Normal text size", sizeL: "Large text size", sizeXL: "Extra large text size", uiLang: "App language",
       acctRegion: "Your account", unavailable: "To explain documents, this version needs Claude. Open Plainly in Claude – you'll need a Claude account.",
       inputRegion: "Explain a document", step1: "Add your document", dropTitle: "Choose a file or drop it here", dropHint: "A letter, test result, scan report or leaflet: PDF, Word, text, or a photo of each page", filesLabel: "Added files",
@@ -857,7 +869,7 @@
       speakAnswers: "Antworten vorlesen", micStart: "Frage sprechen", micStop: "Zuhören beenden", dictate: "Text diktieren", listening: "Ich höre zu … sprechen Sie jetzt.", micDenied: "Das Mikrofon ist hier nicht verfügbar. Erlauben Sie es im Browser oder öffnen Sie Plainly in einem normalen Browser-Tab. Sie können auch tippen.", micUnavailable: "Spracheingabe funktioniert in diesem Browser nicht. Bitte tippen Sie.", micNoSpeech: "Wir haben nichts gehört. Bitte noch einmal.", listen: "Anhören", listenX: "Anhören: {what}", stopShort: "Stopp",
       spacing: "Mehr Abstand",
       howWorks: "So funktioniert es", fromPrice: "Ab {price} €",
-      tabNext: "Nächste Schritte", tabCosts: "Kosten", resultTabs: "Teile Ihrer Erklärung", nudgeNext: "Wen Sie kontaktieren sollten und was als Nächstes zu tun ist",
+      tabNext: "Nächste Schritte", tabCosts: "Kosten", resultTabs: "Teile Ihrer Erklärung", groupBy: "Gruppieren nach", byBody: "Körperteil", byUrgency: "Dringlichkeit", areaGeneral: "Allgemein", nudgeNext: "Wen Sie kontaktieren sollten und was als Nächstes zu tun ist",
       skip: "Zum Hauptinhalt springen", tagline: "Ihre medizinischen Unterlagen, einfach erklärt", textSize: "Textgröße", sizeN: "Normale Textgröße", sizeL: "Große Textgröße", sizeXL: "Sehr große Textgröße", uiLang: "Sprache der App",
       acctRegion: "Ihr Konto", unavailable: "Um Dokumente zu erklären, braucht diese Version Claude. Öffnen Sie Plainly in Claude – dafür brauchen Sie ein Claude-Konto.",
       inputRegion: "Ein Dokument erklären lassen", step1: "Dokument hinzufügen", dropTitle: "Datei auswählen oder hierher ziehen", dropHint: "Ein Arztbrief, Laborbefund, Bildgebungsbericht oder Merkblatt: PDF, Word, Text oder ein Foto jeder Seite", filesLabel: "Hinzugefügte Dateien",
@@ -899,7 +911,7 @@
       speakAnswers: "Lire les réponses à voix haute", micStart: "Dire votre question", micStop: "Arrêter l’écoute", dictate: "Dicter le texte", listening: "J’écoute… parlez maintenant.", micDenied: "Le micro n’est pas disponible ici. Autorisez-le dans votre navigateur ou ouvrez Plainly dans un onglet normal. Vous pouvez aussi taper.", micUnavailable: "La saisie vocale ne fonctionne pas dans ce navigateur. Veuillez taper.", micNoSpeech: "Nous n’avons rien entendu. Réessayez.", listen: "Écouter", listenX: "Écouter : {what}", stopShort: "Arrêter",
       spacing: "Plus d’espace",
       howWorks: "Comment ça marche", fromPrice: "À partir de {price} €",
-      tabNext: "Prochaines étapes", tabCosts: "Coûts", resultTabs: "Parties de votre explication", nudgeNext: "Qui contacter et que faire ensuite",
+      tabNext: "Prochaines étapes", tabCosts: "Coûts", resultTabs: "Parties de votre explication", groupBy: "Regrouper par", byBody: "Partie du corps", byUrgency: "Urgence", areaGeneral: "Général", nudgeNext: "Qui contacter et que faire ensuite",
       skip: "Aller au contenu principal", tagline: "Vos documents médicaux, expliqués simplement", textSize: "Taille du texte", sizeN: "Taille de texte normale", sizeL: "Grand texte", sizeXL: "Très grand texte", uiLang: "Langue de l’application",
       acctRegion: "Votre compte", unavailable: "Pour expliquer des documents, cette version a besoin de Claude. Ouvrez Plainly dans Claude – il vous faut un compte Claude.",
       inputRegion: "Faire expliquer un document", step1: "Ajoutez votre document", dropTitle: "Choisissez un fichier ou déposez-le ici", dropHint: "Une lettre, un résultat d’analyse, un compte rendu d’imagerie ou une notice : PDF, Word, texte ou une photo de chaque page", filesLabel: "Fichiers ajoutés",
@@ -941,7 +953,7 @@
       speakAnswers: "Antwoorden voorlezen", micStart: "Spreek uw vraag in", micStop: "Stoppen met luisteren", dictate: "Tekst inspreken", listening: "Ik luister… spreek nu.", micDenied: "De microfoon is hier niet beschikbaar. Sta hem toe in uw browser of open Plainly in een gewoon browsertabblad. U kunt ook typen.", micUnavailable: "Spraakinvoer werkt niet in deze browser. Typ alstublieft.", micNoSpeech: "We hoorden niets. Probeer opnieuw.", listen: "Beluisteren", listenX: "Beluisteren: {what}", stopShort: "Stop",
       spacing: "Meer ruimte",
       howWorks: "Zo werkt het", fromPrice: "Vanaf € {price}",
-      tabNext: "Volgende stappen", tabCosts: "Kosten", resultTabs: "Onderdelen van uw uitleg", nudgeNext: "Wie u kunt contacteren en wat u nu doet",
+      tabNext: "Volgende stappen", tabCosts: "Kosten", resultTabs: "Onderdelen van uw uitleg", groupBy: "Groeperen op", byBody: "Lichaamsdeel", byUrgency: "Urgentie", areaGeneral: "Algemeen", nudgeNext: "Wie u kunt contacteren en wat u nu doet",
       skip: "Naar de hoofdinhoud", tagline: "Uw medische documenten, eenvoudig uitgelegd", textSize: "Tekstgrootte", sizeN: "Normale tekstgrootte", sizeL: "Grote tekst", sizeXL: "Extra grote tekst", uiLang: "Taal van de app",
       acctRegion: "Uw account", unavailable: "Om documenten uit te leggen heeft deze versie Claude nodig. Open Plainly in Claude – daarvoor heeft u een Claude-account nodig.",
       inputRegion: "Een document laten uitleggen", step1: "Voeg uw document toe", dropTitle: "Kies een bestand of sleep het hierheen", dropHint: "Een brief, labo-uitslag, verslag van een scan of folder: pdf, Word, tekst of een foto van elke pagina", filesLabel: "Toegevoegde bestanden",
@@ -983,7 +995,7 @@
       speakAnswers: "Leer las respuestas en voz alta", micStart: "Diga su pregunta", micStop: "Dejar de escuchar", dictate: "Dictar el texto", listening: "Escuchando… hable ahora.", micDenied: "El micrófono no está disponible aquí. Permítalo en su navegador o abra Plainly en una pestaña normal. También puede escribir.", micUnavailable: "La entrada de voz no funciona en este navegador. Escriba, por favor.", micNoSpeech: "No hemos oído nada. Inténtelo de nuevo.", listen: "Escuchar", listenX: "Escuchar: {what}", stopShort: "Parar",
       spacing: "Más espacio",
       howWorks: "Cómo funciona", fromPrice: "Desde {price} €",
-      tabNext: "Próximos pasos", tabCosts: "Costes", resultTabs: "Partes de su explicación", nudgeNext: "A quién contactar y qué hacer ahora",
+      tabNext: "Próximos pasos", tabCosts: "Costes", resultTabs: "Partes de su explicación", groupBy: "Agrupar por", byBody: "Parte del cuerpo", byUrgency: "Urgencia", areaGeneral: "General", nudgeNext: "A quién contactar y qué hacer ahora",
       skip: "Ir al contenido principal", tagline: "Sus documentos médicos, explicados con palabras sencillas", textSize: "Tamaño del texto", sizeN: "Texto normal", sizeL: "Texto grande", sizeXL: "Texto muy grande", uiLang: "Idioma de la aplicación",
       acctRegion: "Su cuenta", unavailable: "Para explicar documentos, esta versión necesita Claude. Abra Plainly en Claude – necesitará una cuenta de Claude.",
       inputRegion: "Explicar un documento", step1: "Añada su documento", dropTitle: "Elija un archivo o arrástrelo aquí", dropHint: "Una carta, un resultado de análisis, un informe de imagen o un folleto: PDF, Word, texto o una foto de cada página", filesLabel: "Archivos añadidos",
@@ -1025,7 +1037,7 @@
       speakAnswers: "Читати відповіді вголос", micStart: "Скажіть своє запитання", micStop: "Зупинити прослуховування", dictate: "Надиктувати текст", listening: "Слухаю… говоріть.", micDenied: "Мікрофон тут недоступний. Дозвольте його в браузері або відкрийте Plainly у звичайній вкладці браузера. Ви також можете ввести текст.", micUnavailable: "Голосове введення не працює в цьому браузері. Будь ласка, введіть текст.", micNoSpeech: "Ми нічого не почули. Спробуйте ще раз.", listen: "Слухати", listenX: "Слухати: {what}", stopShort: "Стоп",
       spacing: "Більші інтервали",
       howWorks: "Як це працює", fromPrice: "Від {price} €",
-      tabNext: "Наступні кроки", tabCosts: "Вартість", resultTabs: "Частини вашого пояснення", nudgeNext: "До кого звернутися і що робити далі",
+      tabNext: "Наступні кроки", tabCosts: "Вартість", resultTabs: "Частини вашого пояснення", groupBy: "Групувати за", byBody: "Частиною тіла", byUrgency: "Терміновістю", areaGeneral: "Загальне", nudgeNext: "До кого звернутися і що робити далі",
       skip: "Перейти до основного вмісту", tagline: "Ваші медичні документи простими словами", textSize: "Розмір тексту", sizeN: "Звичайний розмір тексту", sizeL: "Великий текст", sizeXL: "Дуже великий текст", uiLang: "Мова застосунку",
       acctRegion: "Ваш обліковий запис", unavailable: "Щоб пояснювати документи, цій версії потрібен Claude. Відкрийте Plainly у Claude – для цього потрібен обліковий запис Claude.",
       inputRegion: "Пояснити документ", step1: "Додайте свій документ", dropTitle: "Виберіть файл або перетягніть його сюди", dropHint: "Лист, результат аналізу, висновок обстеження чи інформаційний листок: PDF, Word, текст або фото кожної сторінки", filesLabel: "Додані файли",
@@ -1067,7 +1079,7 @@
       speakAnswers: "قراءة الإجابات بصوت عالٍ", micStart: "قل سؤالك", micStop: "إيقاف الاستماع", dictate: "إملاء النص", listening: "أستمع… تحدّث الآن.", micDenied: "الميكروفون غير متاح هنا. اسمح به في متصفحك، أو افتح Plainly في علامة تبويب عادية. يمكنك أيضًا الكتابة.", micUnavailable: "الإدخال الصوتي لا يعمل في هذا المتصفح. يُرجى الكتابة بدلًا من ذلك.", micNoSpeech: "لم نسمع شيئًا. حاول مرة أخرى.", listen: "استمع", listenX: "استمع: {what}", stopShort: "إيقاف",
       spacing: "مسافات أكبر",
       howWorks: "كيف يعمل", fromPrice: "ابتداءً من {price} €",
-      tabNext: "الخطوات التالية", tabCosts: "التكاليف", resultTabs: "أجزاء شرحك", nudgeNext: "من تتواصل معه وماذا تفعل بعد ذلك",
+      tabNext: "الخطوات التالية", tabCosts: "التكاليف", resultTabs: "أجزاء شرحك", groupBy: "التجميع حسب", byBody: "جزء الجسم", byUrgency: "الأولوية", areaGeneral: "عام", nudgeNext: "من تتواصل معه وماذا تفعل بعد ذلك",
       skip: "انتقل إلى المحتوى الرئيسي", tagline: "أوراقك الطبية مشروحة بكلمات بسيطة", textSize: "حجم النص", sizeN: "حجم نص عادي", sizeL: "نص كبير", sizeXL: "نص كبير جدًا", uiLang: "لغة التطبيق",
       acctRegion: "حسابك", unavailable: "لشرح المستندات، تحتاج هذه النسخة إلى Claude. افتح Plainly في Claude – ستحتاج إلى حساب Claude.",
       inputRegion: "شرح مستند", step1: "أضف مستندك", dropTitle: "اختر ملفًا أو اسحبه إلى هنا", dropHint: "رسالة أو نتيجة تحليل أو تقرير تصوير أو نشرة: PDF أو Word أو نص أو صورة لكل صفحة", filesLabel: "الملفات المضافة",
@@ -1109,7 +1121,7 @@
       speakAnswers: "Yanıtları sesli oku", micStart: "Sorunuzu söyleyin", micStop: "Dinlemeyi durdur", dictate: "Metni dikte edin", listening: "Dinliyorum… şimdi konuşun.", micDenied: "Mikrofon burada kullanılamıyor. Tarayıcınızda izin verin veya Plainly'yi normal bir tarayıcı sekmesinde açın. Yazabilirsiniz de.", micUnavailable: "Sesli giriş bu tarayıcıda çalışmıyor. Lütfen yazın.", micNoSpeech: "Hiçbir şey duyamadık. Tekrar deneyin.", listen: "Dinle", listenX: "Dinle: {what}", stopShort: "Durdur",
       spacing: "Daha fazla boşluk",
       howWorks: "Nasıl çalışır", fromPrice: "{price} €'dan başlayan",
-      tabNext: "Sonraki adımlar", tabCosts: "Maliyetler", resultTabs: "Açıklamanızın bölümleri", nudgeNext: "Kime başvurmalı ve sırada ne var",
+      tabNext: "Sonraki adımlar", tabCosts: "Maliyetler", resultTabs: "Açıklamanızın bölümleri", groupBy: "Grupla", byBody: "Vücut bölgesi", byUrgency: "Aciliyet", areaGeneral: "Genel", nudgeNext: "Kime başvurmalı ve sırada ne var",
       skip: "Ana içeriğe geç", tagline: "Tıbbi belgeleriniz, sade bir dille", textSize: "Metin boyutu", sizeN: "Normal metin boyutu", sizeL: "Büyük metin", sizeXL: "Çok büyük metin", uiLang: "Uygulama dili",
       acctRegion: "Hesabınız", unavailable: "Belgeleri açıklamak için bu sürümün Claude'a ihtiyacı var. Plainly'yi Claude'da açın – bunun için bir Claude hesabı gerekir.",
       inputRegion: "Bir belgeyi açıklat", step1: "Belgenizi ekleyin", dropTitle: "Bir dosya seçin veya buraya bırakın", dropHint: "Bir mektup, tahlil sonucu, görüntüleme raporu veya broşür: PDF, Word, metin ya da her sayfanın fotoğrafı", filesLabel: "Eklenen dosyalar",
@@ -1153,7 +1165,7 @@
     return s;
   };
 
-  const state = { files: [], sample: null, limits: null, ctl: null, result: null, docText: "", images: [], lang: "", level: "plain", chat: [], account: null, svcFilter: "all" };
+  const state = { files: [], sample: null, limits: null, ctl: null, result: null, docText: "", images: [], lang: "", level: "plain", chat: [], account: null, svcFilter: "all", group: "body" };
 
   /* ---------- Claude availability ---------- */
   /* Outside Claude (e.g. GitHub Pages), talk to your own Plainly API, which holds the Anthropic key. */
@@ -1523,6 +1535,7 @@ RULES
    - "orange" = check or do soon: follow-up appointments, tests, results the document marks as abnormal or to follow up, things to do in the coming days or weeks, and anything unclear, unreadable or contradictory that the patient should confirm with their care team.
    - "green" = OK: normal results, things that went well, reassuring information.
    Never raise or lower urgency beyond what the document supports. If you are unsure between green and orange, choose orange. Use 4 to 14 items, each with a short title and 1-2 plain sentences. Put timing in "when" when the document gives it.
+   Give every item an "area": the body part or organ it is about, as a short plain word in ${lang} (e.g. "Liver", "Bladder", "Heart", "Kidneys", "Blood", "Wound"). Use exactly the same word for every item about the same body part, so they can be grouped. Use "General" (in ${lang}) for items not about one body part, such as appointments, medicines in general or lifestyle.
 5. "overall": "red" only if the document says something needs action now (warning signs that might happen later do NOT make it red); "orange" if there is follow-up to do or check; "green" if everything is fine.
 6. "procedure": if the document mentions a procedure, operation, test, scan or treatment the patient will have or has had, describe what typically happens from the patient's point of view in 3 to 7 steps. Set "topic" to "heart" if it is a heart or blood-vessel procedure. Otherwise null.
 10. "consult": for the red and orange items only, which kind of health professional the patient should contact to clarify or act on them (e.g. their GP, the surgeon who operated, a cardiologist). Max 4, most urgent first. "who" in ${lang}; "specialty" as a short English search term for a booking site (e.g. "general practitioner", "gastroenterologist"); "category" one of: gp, specialist, emergency, mental_health, physiotherapy, dental, other; "level" red or orange; "why" one sentence naming the item it is for. If the document names the doctor or department, say so in "who". Empty if there are no red or orange items.
@@ -1534,12 +1547,12 @@ Return ONLY one JSON object (example values are placeholders):
 {
   "lang_code": "BCP-47 code for ${lang}",
   "dir": "ltr",
-  "labels": {"red":"Act now","red_hint":"Needs attention right away","orange":"Check soon","orange_hint":"Do or check this in the coming days or weeks","green":"All good","green_hint":"Normal or going well","overall_red":"Something needs action now","overall_orange":"Some things to follow up","overall_green":"All looks fine","medicines":"Your medicines","how":"How","why":"Why","procedure":"What happens","step":"Step","services":"Care and costs","consult":"Who to contact","more":"Tell me more","less":"Show less","ask_about":"Ask a question about this","ask":"Ask about your document","terms":"Words explained","questions":"Questions you could ask","when":"When"},
+  "labels": {"red":"Act now","red_hint":"Needs attention right away","orange":"Check soon","orange_hint":"Do or check this in the coming days or weeks","green":"All good","green_hint":"Normal or going well","overall_red":"Something needs action now","overall_orange":"Some things to follow up","overall_green":"All looks fine","medicines":"Your medicines","how":"How","why":"Why","procedure":"What happens","step":"Step","services":"Care and costs","consult":"Who to contact","more":"Tell me more","less":"Show less","ask_about":"Ask a question about this","ask":"Ask about your document","terms":"Words explained","questions":"Questions you could ask","when":"When","general":"General"},
   "document_type": "e.g. Hospital discharge letter",
   "title": "short title",
   "summary": "2 to 3 sentences: the most important message",
   "overall": "orange",
-  "items": [{"level":"green","title":"short","detail":"1-2 sentences","when":""}],
+  "items": [{"level":"green","area":"Liver","title":"short","detail":"1-2 sentences","when":""}],
   "medicines": [{"name":"as written","how":"as in the document","why":"what it is for"}],
   "procedure": {"name":"in ${lang}","name_en":"the common English name patients would search for on health websites, e.g. gallbladder removal, coronary angioplasty, colonoscopy","topic":"heart or other","why":"1-2 sentences","steps":[{"title":"short","text":"2-3 sentences"}]},
   "consult": [{"who":"Your surgeon","specialty":"general surgeon","category":"specialist","level":"orange","why":"1 sentence"}],
@@ -1661,7 +1674,7 @@ ${hasImages ? "The attached images are photos or scans of the document pages. Re
       el("p", { class: "summary" }, str(r.summary)),
       el("div", { class: "overall lvl-" + overall }, svgEl(TL_ICON[overall]), el("span", {}, L["overall_" + overall])),
       items.length ? el("ul", { class: "counts", "aria-label": t("overview") }, LVLS.filter(l => by[l].length).map(l => el("li", {},
-        el("a", { href: "#cl-" + l, class: "count lvl-" + l, onclick: e => { e.preventDefault(); goTo("overview", "cl-" + l); } }, svgEl(TL_ICON[l]), el("b", {}, String(by[l].length)), " ", L[l])))) : null,
+        el("a", { href: "#cl-" + l, class: "count lvl-" + l, onclick: e => { e.preventDefault(); if (state.group !== "urgency" && grpSw) { state.group = "urgency"; drawOverview(); } goTo("overview", "cl-" + l); } }, svgEl(TL_ICON[l]), el("b", {}, String(by[l].length)), " ", L[l])))) : null,
       el("p", { class: "ai-note", lang: UI, dir: UIDIR() }, svgEl('<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 11v6M12 7.5v.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>'), el("span", {}, t("aiLabel", { lang: state.lang })))
     );
     const restartBtn = cls => el("button", { class: "btn restart-btn " + (cls || ""), type: "button", onclick: startOver }, svgEl('<svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 3.5h7l4.5 4.5V19a1.5 1.5 0 0 1-1.5 1.5H7A1.5 1.5 0 0 1 5.5 19V5A1.5 1.5 0 0 1 7 3.5z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="M14 3.5V8h4.5" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="M12 17v-6m0 0-2.5 2.5M12 11l2.5 2.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>'), el("span", {}, t("newDocBig")));
@@ -1690,19 +1703,56 @@ ${hasImages ? "The attached images are photos or scans of the document pages. Re
     wrap.append(el("div", { class: "tabs-wrap" }, tablist));
     Object.values(panels).forEach(p => wrap.append(p));
 
-    /* Overview: the traffic-light list, as calm grouped rows */
-    LVLS.forEach(l => {
-      if (!by[l].length) return;
-      panels.overview.append(el("section", { class: "group lvl-" + l, id: "cl-" + l, "aria-labelledby": "clh-" + l, tabindex: "-1" },
-        el("div", { class: "g-head" },
-          el("h3", { id: "clh-" + l }, svgEl(TL_ICON[l]), el("span", {}, L[l]), el("span", { class: "g-hint" }, L[l + "_hint"])),
-          listenBtn(() => [L[l]].concat(by[l].map(i => [str(i.title), str(i.detail), str(i.when)].filter(Boolean).join(". "))).join(". "), L[l])),
-        el("ul", { class: "rows" }, by[l].map(i => el("li", {},
-          el("b", {}, str(i.title)),
-          str(i.detail) ? el("span", { class: "det" }, str(i.detail)) : null,
-          str(i.when) ? el("span", { class: "when" }, str(i.when)) : null,
-          moreBtn({ title: str(i.title), detail: str(i.detail) }))))));
+    /* Overview: grouped by body part (default) or by urgency */
+    const rank = { red: 0, orange: 1, green: 2 };
+    const generalLbl = str(L.general) || t("areaGeneral");
+    const areaKey = a => str(a).trim().toLowerCase();
+    const areas = []; const amap = {};
+    items.forEach(i => {
+      let k = areaKey(i.area); let name = str(i.area).trim();
+      if (!k || k === areaKey(generalLbl) || k === "general") { k = "__general"; name = generalLbl; }
+      if (!amap[k]) { amap[k] = { key: k, name, items: [] }; areas.push(amap[k]); }
+      amap[k].items.push(i);
     });
+    areas.forEach(a => { a.items.sort((x, y) => rank[x.level] - rank[y.level]); a.worst = a.items[0].level; });
+    areas.sort((a, b) => (a.key === "__general") - (b.key === "__general") || rank[a.worst] - rank[b.worst] || b.items.length - a.items.length);
+    const canBody = areas.filter(a => a.key !== "__general").length >= 1 && areas.length >= 2;
+    const ovBody = el("div", { id: "ovBody" });
+    const rowOf = (i, withTag) => el("li", {},
+      withTag ? el("span", { class: "lvl-tag row-tag lvl-" + i.level }, svgEl(TL_ICON[i.level]), L[i.level]) : null,
+      el("b", {}, str(i.title)),
+      str(i.detail) ? el("span", { class: "det" }, str(i.detail)) : null,
+      str(i.when) ? el("span", { class: "when" }, str(i.when)) : null,
+      moreBtn({ title: str(i.title), detail: str(i.detail) }));
+    const drawOverview = () => {
+      ovBody.replaceChildren();
+      const sw = grpSw; if (sw) sw.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.g === state.group)));
+      if (canBody && state.group === "body") {
+        areas.forEach((a, n) => {
+          const id = "ar-" + n;
+          ovBody.append(el("section", { class: "group body-group lvl-" + a.worst, id, "aria-labelledby": id + "h", tabindex: "-1" },
+            el("div", { class: "g-head" },
+              el("h3", { id: id + "h" }, el("span", {}, a.name), el("span", { class: "g-count" }, String(a.items.length))),
+              listenBtn(() => [a.name].concat(a.items.map(i => [L[i.level], str(i.title), str(i.detail), str(i.when)].filter(Boolean).join(". "))).join(". "), a.name)),
+            el("ul", { class: "rows" }, a.items.map(i => rowOf(i, true)))));
+        });
+      } else {
+        LVLS.forEach(l => {
+          if (!by[l].length) return;
+          ovBody.append(el("section", { class: "group lvl-" + l, id: "cl-" + l, "aria-labelledby": "clh-" + l, tabindex: "-1" },
+            el("div", { class: "g-head" },
+              el("h3", { id: "clh-" + l }, svgEl(TL_ICON[l]), el("span", {}, L[l]), el("span", { class: "g-hint" }, L[l + "_hint"])),
+              listenBtn(() => [L[l]].concat(by[l].map(i => [str(i.title), str(i.detail), str(i.when)].filter(Boolean).join(". "))).join(". "), L[l])),
+            el("ul", { class: "rows" }, by[l].map(i => rowOf(i, false)))));
+        });
+      }
+    };
+    const grpSw = canBody ? el("div", { class: "grp-switch", id: "grpSw", role: "group", "aria-label": t("groupBy"), lang: UI, dir: UIDIR() },
+      el("span", { class: "grp-lbl", "aria-hidden": "true" }, t("groupBy")),
+      ["body", "urgency"].map(g => el("button", { type: "button", "data-g": g, "aria-pressed": "false", onclick: () => { state.group = g; drawOverview(); } }, t(g === "body" ? "byBody" : "byUrgency")))) : null;
+    if (grpSw) panels.overview.append(grpSw);
+    panels.overview.append(ovBody);
+    drawOverview();
     if (overall !== "green") panels.overview.append(el("button", { class: "nudge", type: "button", lang: UI, dir: UIDIR(), onclick: () => goTo("next", "consultCard") },
       el("span", {}, t("nudgeNext")), el("span", { "aria-hidden": "true" }, "→")));
 
