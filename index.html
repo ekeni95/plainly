@@ -260,6 +260,13 @@
   .chat-panel{position:fixed;right:20px;bottom:88px;z-index:21;width:min(420px,calc(100vw - 40px));max-height:min(72dvh,620px);display:flex;flex-direction:column;background:#fff;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.3);padding:16px;border:1px solid var(--line)}
   .cp-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
   .cp-head h2{margin:0;font-size:1.1rem}
+  .chat-info{margin:8px 0 4px;border-radius:12px;background:rgba(59,76,202,.06)}
+  .chat-info summary{display:flex;align-items:center;gap:8px;cursor:pointer;padding:.45rem .7rem;min-height:36px;font-size:.92rem;font-weight:600;color:var(--teal-ink);list-style:none;border-radius:12px}
+  .chat-info summary::-webkit-details-marker{display:none}
+  .chat-info summary::after{content:"";margin-inline-start:auto;width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);transition:transform .15s}
+  .chat-info[open] summary::after{transform:rotate(-135deg)}
+  .chat-info summary:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+  .chat-info .hint{margin:0;padding:0 .7rem .6rem;font-size:.9rem}
   .chat-panel .hint{margin:4px 0 0}
   .chat-panel .chat{flex:1;overflow:auto;min-height:100px;margin:10px 0;padding-right:2px}
   .chat-empty{color:var(--muted);font-size:.92rem}
@@ -607,6 +614,13 @@
     .chat-panel{inset-inline:0;right:0;left:0}
   }
 
+  /* ---------- floating secondary: new document ---------- */
+  .fab.fab-new{bottom:90px;min-height:46px;padding:.6rem 1.05rem;font-size:.95rem;color:var(--teal-ink);
+    background:rgba(255,255,255,.88);-webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4);
+    border:1.5px solid rgba(59,76,202,.35);box-shadow:6px 6px 18px rgba(59,76,202,.18),-3px -3px 10px rgba(255,255,255,.8)}
+  .fab.fab-new:hover{background:#fff;color:var(--teal-ink);border-color:var(--teal)}
+  body.chat-open .fab.fab-new{display:none}
+  @media (max-width:600px){ .fab.fab-new{bottom:80px} }
   /* ---------- restart: explain a new document ---------- */
   .restart-bar{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap;margin:0 0 12px}
   .restart-btn{gap:10px;font-size:1rem;padding:.75rem 1.2rem;min-height:48px;color:var(--teal-ink);font-weight:600}
@@ -740,6 +754,11 @@
   <footer data-i18n="footer">Plainly is a prototype. It explains documents; it does not diagnose or give medical advice. Account and insurance features are a demo with made-up data.</footer>
 </div>
 
+<!-- FLOATING: NEW DOCUMENT (secondary) -->
+<button id="fabNew" class="fab fab-new hidden" type="button" data-i18n-aria="newDocBig" aria-label="Explain a new document">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 3.5h7l4.5 4.5V19a1.5 1.5 0 0 1-1.5 1.5H7A1.5 1.5 0 0 1 5.5 19V5A1.5 1.5 0 0 1 7 3.5z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="M14 3.5V8h4.5" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="M12 17v-6m0 0-2.5 2.5M12 11l2.5 2.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <span data-i18n="newDoc">New document</span>
+</button>
 <!-- FLOATING QUESTIONS -->
 <button id="fab" class="fab hidden" type="button" aria-expanded="false" aria-controls="chatPanel">
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M8.5 9.5h7M8.5 12.5h4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
@@ -750,7 +769,10 @@
     <h2 id="chatTitle" data-i18n="ask">Ask about your document</h2>
     <button class="btn small" type="button" id="chatClose"><span data-i18n="close">Close</span><span class="sr-only" data-i18n="questionsSr"> questions</span></button>
   </div>
-  <p class="hint" id="chatHint"></p>
+  <details class="chat-info" id="chatInfo" open>
+    <summary><svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 11v6M12 7.5v.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg><span data-i18n="chatAbout">About these answers</span></summary>
+    <p class="hint" id="chatHint"></p>
+  </details>
   <label class="switch"><input type="checkbox" id="voiceReplies"><span class="track" aria-hidden="true"></span><span data-i18n="speakAnswers">Read answers aloud</span></label>
   <div class="chat" id="chatLog" role="log" aria-live="polite"></div>
   <p class="mic-status hint" id="askMicStatus" role="status" aria-live="polite"></p>
@@ -804,7 +826,7 @@
       progress: "Progress", progRead: "Reading your document…", progReadSub: "Claude is reading it carefully. This usually takes under a minute.", progWrite: "Writing your explanation…", progWriteSub: "Almost there.", stop: "Stop",
       resultsRegion: "Your explanation", footer: "Plainly is a prototype. It explains documents; it does not diagnose or give medical advice. Account and insurance features are a demo with made-up data.",
       ask: "Ask about your document", close: "Close", questionsSr: " questions", yourQuestion: "Your question", askPh: "Type your question…", askBtn: "Ask",
-      chatEmpty: "For example: “What does this result mean for me?” or “Can I shower after the operation?”", chatHint: "Answers come in {lang}. For anything about your own treatment, your care team has the final word.",
+      chatAbout: "About these answers", chatEmpty: "For example: “What does this result mean for me?” or “Can I shower after the operation?”", chatHint: "Answers come in {lang}. For anything about your own treatment, your care team has the final word.",
       acctAnonT: "You are currently using Plainly without an account", acctAnonS: "Nothing is saved. Sign in to see what your health insurance covers.", signIn: "Sign in", demo: "Demo", hospitalPlan: "Hospital plan", increased: "Increased reimbursement", acctBtn: "Account & insurance", standardCover: "Standard cover", demoPatient: "Demo patient",
       cancel: "Cancel", back: "Back", dlgChooseT: "How do you want to use Plainly?", dlgChooseHint: "You can always explain documents without an account.", optAnonT: "Continue without an account", optAnonD: "Anonymous. Nothing is saved, and we don't know who you are. You won't see your insurance cover.", optSignT: "Sign in and link my health insurance", optSignD: "See which care is covered by your insurance and what you may have to pay yourself.",
       eidT: "Sign in", eidP: "In the real service you would sign in with your Belgian eID or a digital identity app. In this demo, nothing is checked.", idCard: "Identity card ending ••• 042", signInAs: "Sign in as Demo patient",
@@ -846,7 +868,7 @@
       progress: "Fortschritt", progRead: "Ihr Dokument wird gelesen…", progReadSub: "Claude liest es sorgfältig. Das dauert meist weniger als eine Minute.", progWrite: "Ihre Erklärung wird geschrieben…", progWriteSub: "Gleich fertig.", stop: "Abbrechen",
       resultsRegion: "Ihre Erklärung", footer: "Plainly ist ein Prototyp. Es erklärt Dokumente; es stellt keine Diagnosen und gibt keinen medizinischen Rat. Konto- und Versicherungsfunktionen sind eine Demo mit erfundenen Daten.",
       ask: "Fragen zu Ihrem Dokument", close: "Schließen", questionsSr: " (Fragen)", yourQuestion: "Ihre Frage", askPh: "Ihre Frage eingeben…", askBtn: "Fragen",
-      chatEmpty: "Zum Beispiel: „Was bedeutet dieser Wert für mich?“ oder „Darf ich nach der Operation duschen?“", chatHint: "Antworten kommen auf {lang}. Bei allem, was Ihre eigene Behandlung betrifft, hat Ihr Behandlungsteam das letzte Wort.",
+      chatAbout: "Über diese Antworten", chatEmpty: "Zum Beispiel: „Was bedeutet dieser Wert für mich?“ oder „Darf ich nach der Operation duschen?“", chatHint: "Antworten kommen auf {lang}. Bei allem, was Ihre eigene Behandlung betrifft, hat Ihr Behandlungsteam das letzte Wort.",
       acctAnonT: "Sie nutzen Plainly derzeit ohne Konto", acctAnonS: "Nichts wird gespeichert. Melden Sie sich an, um zu sehen, was Ihre Krankenkasse übernimmt.", signIn: "Anmelden", demo: "Demo", hospitalPlan: "Krankenhauszusatz", increased: "Erhöhte Kostenerstattung", acctBtn: "Konto & Versicherung", standardCover: "Grundversicherung", demoPatient: "Demo-Patient",
       cancel: "Abbrechen", back: "Zurück", dlgChooseT: "Wie möchten Sie Plainly nutzen?", dlgChooseHint: "Dokumente erklären lassen können Sie immer auch ohne Konto.", optAnonT: "Ohne Konto weiter", optAnonD: "Anonym. Nichts wird gespeichert und wir wissen nicht, wer Sie sind. Ihren Versicherungsschutz sehen Sie nicht.", optSignT: "Anmelden und Krankenkasse verknüpfen", optSignD: "Sehen Sie, welche Versorgung Ihre Kasse übernimmt und was Sie eventuell selbst zahlen.",
       eidT: "Anmelden", eidP: "Im echten Dienst würden Sie sich mit Ihrem belgischen eID oder einer digitalen Identitäts-App anmelden. In dieser Demo wird nichts geprüft.", idCard: "Personalausweis endet auf ••• 042", signInAs: "Als Demo-Patient anmelden",
@@ -888,7 +910,7 @@
       progress: "Progression", progRead: "Lecture de votre document…", progReadSub: "Claude le lit attentivement. Cela prend généralement moins d’une minute.", progWrite: "Rédaction de votre explication…", progWriteSub: "Presque terminé.", stop: "Arrêter",
       resultsRegion: "Votre explication", footer: "Plainly est un prototype. Il explique des documents ; il ne pose pas de diagnostic et ne donne pas d’avis médical. Les fonctions de compte et d’assurance sont une démonstration avec des données fictives.",
       ask: "Questions sur votre document", close: "Fermer", questionsSr: " (questions)", yourQuestion: "Votre question", askPh: "Tapez votre question…", askBtn: "Demander",
-      chatEmpty: "Par exemple : « Que signifie ce résultat pour moi ? » ou « Puis-je me doucher après l’opération ? »", chatHint: "Les réponses sont en {lang}. Pour tout ce qui concerne votre traitement, votre équipe soignante a le dernier mot.",
+      chatAbout: "À propos de ces réponses", chatEmpty: "Par exemple : « Que signifie ce résultat pour moi ? » ou « Puis-je me doucher après l’opération ? »", chatHint: "Les réponses sont en {lang}. Pour tout ce qui concerne votre traitement, votre équipe soignante a le dernier mot.",
       acctAnonT: "Vous utilisez actuellement Plainly sans compte", acctAnonS: "Rien n’est enregistré. Connectez-vous pour voir ce que couvre votre mutualité.", signIn: "Se connecter", demo: "Démo", hospitalPlan: "Assurance hospitalisation", increased: "Intervention majorée", acctBtn: "Compte et assurance", standardCover: "Couverture de base", demoPatient: "Patient de démo",
       cancel: "Annuler", back: "Retour", dlgChooseT: "Comment voulez-vous utiliser Plainly ?", dlgChooseHint: "Vous pouvez toujours faire expliquer des documents sans compte.", optAnonT: "Continuer sans compte", optAnonD: "Anonyme. Rien n’est enregistré et nous ne savons pas qui vous êtes. Vous ne verrez pas votre couverture.", optSignT: "Me connecter et lier ma mutualité", optSignD: "Voyez quels soins sont couverts par votre mutualité et ce que vous pourriez payer vous-même.",
       eidT: "Se connecter", eidP: "Dans le vrai service, vous vous connecteriez avec votre eID belge ou une application d’identité numérique. Dans cette démo, rien n’est vérifié.", idCard: "Carte d’identité se terminant par ••• 042", signInAs: "Se connecter comme patient de démo",
@@ -930,7 +952,7 @@
       progress: "Voortgang", progRead: "Uw document wordt gelezen…", progReadSub: "Claude leest het zorgvuldig. Dit duurt meestal minder dan een minuut.", progWrite: "Uw uitleg wordt geschreven…", progWriteSub: "Bijna klaar.", stop: "Stoppen",
       resultsRegion: "Uw uitleg", footer: "Plainly is een prototype. Het legt documenten uit; het stelt geen diagnose en geeft geen medisch advies. Account- en verzekeringsfuncties zijn een demo met verzonnen gegevens.",
       ask: "Vragen over uw document", close: "Sluiten", questionsSr: " (vragen)", yourQuestion: "Uw vraag", askPh: "Typ uw vraag…", askBtn: "Vragen",
-      chatEmpty: "Bijvoorbeeld: ‘Wat betekent deze uitslag voor mij?’ of ‘Mag ik douchen na de operatie?’", chatHint: "Antwoorden komen in het {lang}. Voor alles over uw eigen behandeling heeft uw zorgteam het laatste woord.",
+      chatAbout: "Over deze antwoorden", chatEmpty: "Bijvoorbeeld: ‘Wat betekent deze uitslag voor mij?’ of ‘Mag ik douchen na de operatie?’", chatHint: "Antwoorden komen in het {lang}. Voor alles over uw eigen behandeling heeft uw zorgteam het laatste woord.",
       acctAnonT: "U gebruikt Plainly momenteel zonder account", acctAnonS: "Er wordt niets bewaard. Meld u aan om te zien wat uw ziekenfonds terugbetaalt.", signIn: "Aanmelden", demo: "Demo", hospitalPlan: "Hospitalisatieverzekering", increased: "Verhoogde tegemoetkoming", acctBtn: "Account en verzekering", standardCover: "Basisdekking", demoPatient: "Demopatiënt",
       cancel: "Annuleren", back: "Terug", dlgChooseT: "Hoe wilt u Plainly gebruiken?", dlgChooseHint: "U kunt documenten altijd zonder account laten uitleggen.", optAnonT: "Verder zonder account", optAnonD: "Anoniem. Er wordt niets bewaard en we weten niet wie u bent. U ziet uw terugbetaling niet.", optSignT: "Aanmelden en mijn ziekenfonds koppelen", optSignD: "Zie welke zorg uw ziekenfonds terugbetaalt en wat u mogelijk zelf betaalt.",
       eidT: "Aanmelden", eidP: "In de echte dienst meldt u zich aan met uw Belgische eID of een app voor digitale identiteit. In deze demo wordt niets gecontroleerd.", idCard: "Identiteitskaart eindigend op ••• 042", signInAs: "Aanmelden als demopatiënt",
@@ -972,7 +994,7 @@
       progress: "Progreso", progRead: "Leyendo su documento…", progReadSub: "Claude lo lee con atención. Suele tardar menos de un minuto.", progWrite: "Redactando su explicación…", progWriteSub: "Casi listo.", stop: "Detener",
       resultsRegion: "Su explicación", footer: "Plainly es un prototipo. Explica documentos; no hace diagnósticos ni da consejos médicos. Las funciones de cuenta y seguro son una demostración con datos inventados.",
       ask: "Preguntas sobre su documento", close: "Cerrar", questionsSr: " (preguntas)", yourQuestion: "Su pregunta", askPh: "Escriba su pregunta…", askBtn: "Preguntar",
-      chatEmpty: "Por ejemplo: «¿Qué significa este resultado para mí?» o «¿Puedo ducharme después de la operación?»", chatHint: "Las respuestas llegan en {lang}. Para todo lo que afecte a su propio tratamiento, su equipo médico tiene la última palabra.",
+      chatAbout: "Sobre estas respuestas", chatEmpty: "Por ejemplo: «¿Qué significa este resultado para mí?» o «¿Puedo ducharme después de la operación?»", chatHint: "Las respuestas llegan en {lang}. Para todo lo que afecte a su propio tratamiento, su equipo médico tiene la última palabra.",
       acctAnonT: "Actualmente usa Plainly sin cuenta", acctAnonS: "No se guarda nada. Inicie sesión para ver qué cubre su seguro de salud.", signIn: "Iniciar sesión", demo: "Demo", hospitalPlan: "Seguro de hospitalización", increased: "Reembolso aumentado", acctBtn: "Cuenta y seguro", standardCover: "Cobertura básica", demoPatient: "Paciente de demo",
       cancel: "Cancelar", back: "Atrás", dlgChooseT: "¿Cómo quiere usar Plainly?", dlgChooseHint: "Siempre puede explicar documentos sin cuenta.", optAnonT: "Seguir sin cuenta", optAnonD: "Anónimo. No se guarda nada y no sabemos quién es. No verá su cobertura.", optSignT: "Iniciar sesión y vincular mi seguro de salud", optSignD: "Vea qué atención cubre su seguro y qué podría pagar usted.",
       eidT: "Iniciar sesión", eidP: "En el servicio real iniciaría sesión con su eID belga o una aplicación de identidad digital. En esta demo no se comprueba nada.", idCard: "Documento de identidad terminado en ••• 042", signInAs: "Entrar como paciente de demo",
@@ -1014,7 +1036,7 @@
       progress: "Хід виконання", progRead: "Читаємо ваш документ…", progReadSub: "Claude уважно його читає. Зазвичай це займає менше хвилини.", progWrite: "Пишемо ваше пояснення…", progWriteSub: "Майже готово.", stop: "Зупинити",
       resultsRegion: "Ваше пояснення", footer: "Plainly – це прототип. Він пояснює документи, але не ставить діагнозів і не дає медичних порад. Функції облікового запису та страхування – це демо з вигаданими даними.",
       ask: "Запитання про ваш документ", close: "Закрити", questionsSr: " (запитання)", yourQuestion: "Ваше запитання", askPh: "Введіть своє запитання…", askBtn: "Запитати",
-      chatEmpty: "Наприклад: «Що цей результат означає для мене?» або «Чи можна мені приймати душ після операції?»", chatHint: "Відповіді надходять мовою: {lang}. В усьому, що стосується вашого лікування, останнє слово за вашою медичною командою.",
+      chatAbout: "Про ці відповіді", chatEmpty: "Наприклад: «Що цей результат означає для мене?» або «Чи можна мені приймати душ після операції?»", chatHint: "Відповіді надходять мовою: {lang}. В усьому, що стосується вашого лікування, останнє слово за вашою медичною командою.",
       acctAnonT: "Зараз ви користуєтеся Plainly без облікового запису", acctAnonS: "Нічого не зберігається. Увійдіть, щоб побачити, що покриває ваша медична страховка.", signIn: "Увійти", demo: "Демо", hospitalPlan: "Страховка на госпіталізацію", increased: "Підвищене відшкодування", acctBtn: "Обліковий запис і страховка", standardCover: "Базове покриття", demoPatient: "Демо-пацієнт",
       cancel: "Скасувати", back: "Назад", dlgChooseT: "Як ви хочете користуватися Plainly?", dlgChooseHint: "Пояснювати документи завжди можна й без облікового запису.", optAnonT: "Продовжити без облікового запису", optAnonD: "Анонімно. Нічого не зберігається, і ми не знаємо, хто ви. Покриття страховки ви не побачите.", optSignT: "Увійти й підключити мою медичну страховку", optSignD: "Дізнайтеся, яку допомогу покриває страховка і скільки, можливо, доведеться платити самостійно.",
       eidT: "Увійти", eidP: "У справжньому сервісі ви входили б за допомогою бельгійської eID або застосунку цифрової ідентифікації. У цьому демо нічого не перевіряється.", idCard: "Посвідчення особи, що закінчується на ••• 042", signInAs: "Увійти як демо-пацієнт",
@@ -1056,7 +1078,7 @@
       progress: "التقدّم", progRead: "نقرأ مستندك…", progReadSub: "يقرؤه Claude بعناية. يستغرق ذلك عادةً أقل من دقيقة.", progWrite: "نكتب شرحك…", progWriteSub: "أوشكنا على الانتهاء.", stop: "إيقاف",
       resultsRegion: "شرحك", footer: "Plainly نموذج أولي. يشرح المستندات، ولا يشخّص ولا يقدّم نصيحة طبية. ميزات الحساب والتأمين تجريبية ببيانات مختلَقة.",
       ask: "أسئلة عن مستندك", close: "إغلاق", questionsSr: " (الأسئلة)", yourQuestion: "سؤالك", askPh: "اكتب سؤالك…", askBtn: "اسأل",
-      chatEmpty: "مثلًا: «ماذا تعني هذه النتيجة بالنسبة لي؟» أو «هل يمكنني الاستحمام بعد العملية؟»", chatHint: "تأتي الإجابات باللغة: {lang}. في كل ما يخص علاجك، الكلمة الأخيرة لفريق رعايتك.",
+      chatAbout: "عن هذه الإجابات", chatEmpty: "مثلًا: «ماذا تعني هذه النتيجة بالنسبة لي؟» أو «هل يمكنني الاستحمام بعد العملية؟»", chatHint: "تأتي الإجابات باللغة: {lang}. في كل ما يخص علاجك، الكلمة الأخيرة لفريق رعايتك.",
       acctAnonT: "أنت تستخدم Plainly حاليًا بدون حساب", acctAnonS: "لا يُحفَظ أي شيء. سجّل الدخول لترى ما يغطيه تأمينك الصحي.", signIn: "تسجيل الدخول", demo: "تجريبي", hospitalPlan: "تأمين الاستشفاء", increased: "تعويض مرتفع", acctBtn: "الحساب والتأمين", standardCover: "تغطية أساسية", demoPatient: "مريض تجريبي",
       cancel: "إلغاء", back: "رجوع", dlgChooseT: "كيف تريد استخدام Plainly؟", dlgChooseHint: "يمكنك دائمًا شرح المستندات بدون حساب.", optAnonT: "المتابعة بدون حساب", optAnonD: "مجهول الهوية. لا يُحفَظ أي شيء ولا نعرف من أنت. لن ترى تغطية تأمينك.", optSignT: "تسجيل الدخول وربط تأميني الصحي", optSignD: "اعرف ما يغطيه تأمينك من رعاية وما قد تدفعه بنفسك.",
       eidT: "تسجيل الدخول", eidP: "في الخدمة الحقيقية ستسجّل الدخول ببطاقة الهوية الإلكترونية البلجيكية أو بتطبيق هوية رقمية. في هذا العرض التجريبي لا يتم التحقق من شيء.", idCard: "بطاقة هوية تنتهي بـ ••• 042", signInAs: "الدخول كمريض تجريبي",
@@ -1098,7 +1120,7 @@
       progress: "İlerleme", progRead: "Belgeniz okunuyor…", progReadSub: "Claude dikkatle okuyor. Bu genellikle bir dakikadan kısa sürer.", progWrite: "Açıklamanız yazılıyor…", progWriteSub: "Neredeyse hazır.", stop: "Durdur",
       resultsRegion: "Açıklamanız", footer: "Plainly bir prototiptir. Belgeleri açıklar; teşhis koymaz ve tıbbi tavsiye vermez. Hesap ve sigorta özellikleri uydurma verilerle bir demodur.",
       ask: "Belgeniz hakkında sorular", close: "Kapat", questionsSr: " (sorular)", yourQuestion: "Sorunuz", askPh: "Sorunuzu yazın…", askBtn: "Sor",
-      chatEmpty: "Örneğin: “Bu sonuç benim için ne anlama geliyor?” veya “Ameliyattan sonra duş alabilir miyim?”", chatHint: "Yanıtlar şu dilde gelir: {lang}. Kendi tedavinizle ilgili her konuda son söz sağlık ekibinizindir.",
+      chatAbout: "Bu yanıtlar hakkında", chatEmpty: "Örneğin: “Bu sonuç benim için ne anlama geliyor?” veya “Ameliyattan sonra duş alabilir miyim?”", chatHint: "Yanıtlar şu dilde gelir: {lang}. Kendi tedavinizle ilgili her konuda son söz sağlık ekibinizindir.",
       acctAnonT: "Plainly'yi şu anda hesap olmadan kullanıyorsunuz", acctAnonS: "Hiçbir şey kaydedilmez. Sağlık sigortanızın neleri karşıladığını görmek için giriş yapın.", signIn: "Giriş yap", demo: "Demo", hospitalPlan: "Hastane sigortası", increased: "Artırılmış geri ödeme", acctBtn: "Hesap ve sigorta", standardCover: "Temel kapsam", demoPatient: "Demo hasta",
       cancel: "İptal", back: "Geri", dlgChooseT: "Plainly'yi nasıl kullanmak istersiniz?", dlgChooseHint: "Belgeleri her zaman hesap olmadan da açıklatabilirsiniz.", optAnonT: "Hesap olmadan devam et", optAnonD: "Anonim. Hiçbir şey kaydedilmez ve kim olduğunuzu bilmeyiz. Sigorta kapsamınızı göremezsiniz.", optSignT: "Giriş yap ve sağlık sigortamı bağla", optSignD: "Sigortanızın hangi bakımı karşıladığını ve sizin ne ödeyebileceğinizi görün.",
       eidT: "Giriş yap", eidP: "Gerçek hizmette Belçika eID'niz veya bir dijital kimlik uygulamasıyla giriş yaparsınız. Bu demoda hiçbir şey kontrol edilmez.", idCard: "••• 042 ile biten kimlik kartı", signInAs: "Demo hasta olarak giriş yap",
@@ -1569,7 +1591,7 @@ ${hasImages ? "The attached images are photos or scans of the document pages. Re
     }
   }
   function showProgress() {
-    closeChat(false); fab.classList.add("hidden");
+    closeChat(false); fab.classList.add("hidden"); fabNew.classList.add("hidden");
     $("#inputView").classList.add("hidden"); $("#resultView").classList.add("hidden");
     $("#progMsg").textContent = t("progRead"); $("#progSub").textContent = t("progReadSub");
     $("#progressView").classList.remove("hidden");
@@ -1643,7 +1665,6 @@ ${hasImages ? "The attached images are photos or scans of the document pages. Re
       el("p", { class: "ai-note", lang: UI, dir: UIDIR() }, svgEl('<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 11v6M12 7.5v.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>'), el("span", {}, t("aiLabel", { lang: state.lang })))
     );
     const restartBtn = cls => el("button", { class: "btn restart-btn " + (cls || ""), type: "button", onclick: startOver }, svgEl('<svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 3.5h7l4.5 4.5V19a1.5 1.5 0 0 1-1.5 1.5H7A1.5 1.5 0 0 1 5.5 19V5A1.5 1.5 0 0 1 7 3.5z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="M14 3.5V8h4.5" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="M12 17v-6m0 0-2.5 2.5M12 11l2.5 2.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>'), el("span", {}, t("newDocBig")));
-    out.append(el("div", { class: "restart-bar", lang: UI, dir: UIDIR() }, restartBtn(), el("span", { class: "restart-hint" }, t("newDocHint"))));
     const wrap = el("div", { dir, lang });
     wrap.append(hero);
     if (str(r.translation_caution)) wrap.append(el("div", { class: "notice warn" }, el("p", {}, str(r.translation_caution))));
@@ -1885,7 +1906,7 @@ ${hasImages ? "The attached images are photos or scans of the document pages. Re
     if (state.review) clearTimeout(state.review.timer);
     state.files = []; state.result = null; state.review = null; renderFiles(); pasteBox.value = "";
     $("#resultView").classList.add("hidden"); $("#results").replaceChildren();
-    closeChat(false); fab.classList.add("hidden");
+    closeChat(false); fab.classList.add("hidden"); fabNew.classList.add("hidden");
     $("#inputView").classList.remove("hidden"); hideError(); updateGo(); fileInput.focus();
   }
 
@@ -2026,6 +2047,7 @@ ${state.docText ? "Original document:\n<<<\n" + state.docText.slice(0, 30000) + 
   }
 
   /* ---------- floating questions panel ---------- */
+  const fabNew = $("#fabNew"); fabNew.addEventListener("click", () => startOver());
   const fab = $("#fab"), panel = $("#chatPanel"), chatLog = $("#chatLog"), askInput = $("#askInput"), askSend = $("#askSend");
   function openChat(prefill) {
     panel.classList.remove("hidden"); document.body.classList.add("chat-open");
@@ -2050,13 +2072,14 @@ ${state.docText ? "Original document:\n<<<\n" + state.docText.slice(0, 30000) + 
     state.chat = [];
     chatLog.setAttribute("dir", dir); if (lang) chatLog.setAttribute("lang", lang); else chatLog.removeAttribute("lang");
     chatLog.replaceChildren(el("p", { class: "chat-empty", lang: UI, dir: UIDIR() }, t("chatEmpty")));
-    $("#chatHint").textContent = t("chatHint", { lang: state.lang });
-    fab.classList.remove("hidden");
+    $("#chatHint").textContent = t("chatHint", { lang: state.lang }); $("#chatInfo").open = true;
+    fab.classList.remove("hidden"); fabNew.classList.remove("hidden");
   }
   async function submitChat() {
     const q = askInput.value.trim(); if (!q || askSend.disabled) return;
     askInput.value = ""; askSend.disabled = true;
     const empty = chatLog.querySelector(".chat-empty"); if (empty) empty.remove();
+    $("#chatInfo").open = false;
     chatLog.append(el("div", { class: "bubble me" }, q));
     const bubble = el("div", { class: "bubble ai" }, "…"); chatLog.append(bubble);
     chatLog.scrollTop = chatLog.scrollHeight;
