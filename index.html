@@ -606,6 +606,22 @@
     .fab{inset-inline-end:12px}
     .chat-panel{inset-inline:0;right:0;left:0}
   }
+
+  /* ---------- restart: explain a new document ---------- */
+  .restart-bar{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap;margin:0 0 12px}
+  .restart-btn{gap:10px;font-size:1rem;padding:.75rem 1.2rem;min-height:48px;color:var(--teal-ink);font-weight:600}
+  .restart-btn svg{flex:none}
+  .restart-hint{color:var(--muted);font-size:.9rem}
+  .restart-card{display:flex;align-items:center;justify-content:space-between;gap:12px 20px;flex-wrap:wrap;margin:6px 0 14px;padding:18px 22px;border-radius:var(--radius);
+    background:rgba(238,240,253,.75);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1.5px dashed #9AA6EE}
+  .restart-card .rc-text{display:flex;flex-direction:column;gap:2px;min-width:200px;flex:1}
+  .restart-card .rc-text b{font-size:1.05rem}
+  .restart-card .rc-text span{color:var(--muted);font-size:.92rem}
+  .restart-card .restart-btn.primary{color:#fff}
+  @media (max-width:600px){
+    .restart-bar .restart-btn,.restart-card .restart-btn{width:100%;justify-content:center}
+    .restart-hint{display:none}
+  }
 </style>
 </head>
 <body>
@@ -772,6 +788,7 @@
   const UIDIR = () => RTL_UI.includes(UI) ? "rtl" : "ltr";
   const I18N = {
     en: {
+      newDocBig: "Explain a new document", newDocHint: "Start again with another letter, result or report.", doneHere: "Finished with this document?",
       openInClaude: "Open Plainly in Claude",
       speakAnswers: "Read answers aloud", micStart: "Speak your question", micStop: "Stop listening", dictate: "Dictate the text", listening: "Listening… speak now.", micDenied: "The microphone isn\u2019t available here. Allow it in your browser, or open Plainly in a normal browser tab. You can also type.", micUnavailable: "Speech input doesn\u2019t work in this browser. Please type instead.", micNoSpeech: "We didn\u2019t hear anything. Try again.", listen: "Listen", listenX: "Listen: {what}", stopShort: "Stop",
       spacing: "Extra spacing",
@@ -813,6 +830,7 @@
       aiWritten: "AI-written – check with your care team.", more: "Tell me more", less: "Show less", askAbout: "Ask a question about this"
     },
     de: {
+      newDocBig: "Neues Dokument erklären", newDocHint: "Neu beginnen mit einem anderen Brief, Befund oder Bericht.", doneHere: "Fertig mit diesem Dokument?",
       openInClaude: "Plainly in Claude öffnen",
       speakAnswers: "Antworten vorlesen", micStart: "Frage sprechen", micStop: "Zuhören beenden", dictate: "Text diktieren", listening: "Ich höre zu … sprechen Sie jetzt.", micDenied: "Das Mikrofon ist hier nicht verfügbar. Erlauben Sie es im Browser oder öffnen Sie Plainly in einem normalen Browser-Tab. Sie können auch tippen.", micUnavailable: "Spracheingabe funktioniert in diesem Browser nicht. Bitte tippen Sie.", micNoSpeech: "Wir haben nichts gehört. Bitte noch einmal.", listen: "Anhören", listenX: "Anhören: {what}", stopShort: "Stopp",
       spacing: "Mehr Abstand",
@@ -854,6 +872,7 @@
       aiWritten: "Von KI geschrieben – mit Ihrem Behandlungsteam prüfen.", more: "Mehr dazu", less: "Weniger anzeigen", askAbout: "Eine Frage dazu stellen"
     },
     fr: {
+      newDocBig: "Expliquer un nouveau document", newDocHint: "Recommencer avec une autre lettre, un autre résultat ou compte rendu.", doneHere: "Vous avez terminé avec ce document ?",
       openInClaude: "Ouvrir Plainly dans Claude",
       speakAnswers: "Lire les réponses à voix haute", micStart: "Dire votre question", micStop: "Arrêter l’écoute", dictate: "Dicter le texte", listening: "J’écoute… parlez maintenant.", micDenied: "Le micro n’est pas disponible ici. Autorisez-le dans votre navigateur ou ouvrez Plainly dans un onglet normal. Vous pouvez aussi taper.", micUnavailable: "La saisie vocale ne fonctionne pas dans ce navigateur. Veuillez taper.", micNoSpeech: "Nous n’avons rien entendu. Réessayez.", listen: "Écouter", listenX: "Écouter : {what}", stopShort: "Arrêter",
       spacing: "Plus d’espace",
@@ -895,6 +914,7 @@
       aiWritten: "Rédigé par une IA – à vérifier avec votre équipe soignante.", more: "En savoir plus", less: "Afficher moins", askAbout: "Poser une question à ce sujet"
     },
     nl: {
+      newDocBig: "Een nieuw document laten uitleggen", newDocHint: "Opnieuw beginnen met een andere brief, uitslag of verslag.", doneHere: "Klaar met dit document?",
       openInClaude: "Plainly openen in Claude",
       speakAnswers: "Antwoorden voorlezen", micStart: "Spreek uw vraag in", micStop: "Stoppen met luisteren", dictate: "Tekst inspreken", listening: "Ik luister… spreek nu.", micDenied: "De microfoon is hier niet beschikbaar. Sta hem toe in uw browser of open Plainly in een gewoon browsertabblad. U kunt ook typen.", micUnavailable: "Spraakinvoer werkt niet in deze browser. Typ alstublieft.", micNoSpeech: "We hoorden niets. Probeer opnieuw.", listen: "Beluisteren", listenX: "Beluisteren: {what}", stopShort: "Stop",
       spacing: "Meer ruimte",
@@ -936,6 +956,7 @@
       aiWritten: "Geschreven door AI – controleer bij uw zorgteam.", more: "Meer uitleg", less: "Minder tonen", askAbout: "Hier een vraag over stellen"
     },
     es: {
+      newDocBig: "Explicar un documento nuevo", newDocHint: "Empezar de nuevo con otra carta, resultado o informe.", doneHere: "¿Ha terminado con este documento?",
       openInClaude: "Abrir Plainly en Claude",
       speakAnswers: "Leer las respuestas en voz alta", micStart: "Diga su pregunta", micStop: "Dejar de escuchar", dictate: "Dictar el texto", listening: "Escuchando… hable ahora.", micDenied: "El micrófono no está disponible aquí. Permítalo en su navegador o abra Plainly en una pestaña normal. También puede escribir.", micUnavailable: "La entrada de voz no funciona en este navegador. Escriba, por favor.", micNoSpeech: "No hemos oído nada. Inténtelo de nuevo.", listen: "Escuchar", listenX: "Escuchar: {what}", stopShort: "Parar",
       spacing: "Más espacio",
@@ -977,6 +998,7 @@
       aiWritten: "Redactado por IA – compruébelo con su equipo médico.", more: "Saber más", less: "Mostrar menos", askAbout: "Hacer una pregunta sobre esto"
     },
     uk: {
+      newDocBig: "Пояснити новий документ", newDocHint: "Почати знову з іншим листом, результатом чи висновком.", doneHere: "Закінчили з цим документом?",
       openInClaude: "Відкрити Plainly у Claude",
       speakAnswers: "Читати відповіді вголос", micStart: "Скажіть своє запитання", micStop: "Зупинити прослуховування", dictate: "Надиктувати текст", listening: "Слухаю… говоріть.", micDenied: "Мікрофон тут недоступний. Дозвольте його в браузері або відкрийте Plainly у звичайній вкладці браузера. Ви також можете ввести текст.", micUnavailable: "Голосове введення не працює в цьому браузері. Будь ласка, введіть текст.", micNoSpeech: "Ми нічого не почули. Спробуйте ще раз.", listen: "Слухати", listenX: "Слухати: {what}", stopShort: "Стоп",
       spacing: "Більші інтервали",
@@ -1018,6 +1040,7 @@
       aiWritten: "Написано ШІ – перевірте з вашою медичною командою.", more: "Докладніше", less: "Згорнути", askAbout: "Поставити запитання про це"
     },
     ar: {
+      newDocBig: "اشرح مستندًا جديدًا", newDocHint: "ابدأ من جديد برسالة أو نتيجة أو تقرير آخر.", doneHere: "هل انتهيت من هذا المستند؟",
       openInClaude: "افتح Plainly في Claude",
       speakAnswers: "قراءة الإجابات بصوت عالٍ", micStart: "قل سؤالك", micStop: "إيقاف الاستماع", dictate: "إملاء النص", listening: "أستمع… تحدّث الآن.", micDenied: "الميكروفون غير متاح هنا. اسمح به في متصفحك، أو افتح Plainly في علامة تبويب عادية. يمكنك أيضًا الكتابة.", micUnavailable: "الإدخال الصوتي لا يعمل في هذا المتصفح. يُرجى الكتابة بدلًا من ذلك.", micNoSpeech: "لم نسمع شيئًا. حاول مرة أخرى.", listen: "استمع", listenX: "استمع: {what}", stopShort: "إيقاف",
       spacing: "مسافات أكبر",
@@ -1059,6 +1082,7 @@
       aiWritten: "كتبه الذكاء الاصطناعي – تحقّق منه مع فريق رعايتك.", more: "المزيد", less: "عرض أقل", askAbout: "اطرح سؤالًا عن هذا"
     },
     tr: {
+      newDocBig: "Yeni bir belge açıklat", newDocHint: "Başka bir mektup, sonuç veya raporla yeniden başlayın.", doneHere: "Bu belgeyle işiniz bitti mi?",
       openInClaude: "Plainly'yi Claude'da aç",
       speakAnswers: "Yanıtları sesli oku", micStart: "Sorunuzu söyleyin", micStop: "Dinlemeyi durdur", dictate: "Metni dikte edin", listening: "Dinliyorum… şimdi konuşun.", micDenied: "Mikrofon burada kullanılamıyor. Tarayıcınızda izin verin veya Plainly'yi normal bir tarayıcı sekmesinde açın. Yazabilirsiniz de.", micUnavailable: "Sesli giriş bu tarayıcıda çalışmıyor. Lütfen yazın.", micNoSpeech: "Hiçbir şey duyamadık. Tekrar deneyin.", listen: "Dinle", listenX: "Dinle: {what}", stopShort: "Durdur",
       spacing: "Daha fazla boşluk",
@@ -1610,8 +1634,8 @@ ${hasImages ? "The attached images are photos or scans of the document pages. Re
         str(r.document_type) ? el("span", { class: "doc-type" }, str(r.document_type)) : el("span"),
         el("div", { class: "hero-actions", dir: UIDIR(), lang: UI },
           iconBtn(t("readAloud").replace(/^\S+\s/, ""), '<path d="M4 9v6h4l5 4V5L8 9zM16.5 8.5a5 5 0 0 1 0 7" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>', e => speakBtn(e.currentTarget.querySelector("span"), [str(r.title), str(r.summary)].join(". "), true)),
-          iconBtn(t("copyText"), '<rect x="8" y="8" width="12" height="12" rx="2" stroke="currentColor" stroke-width="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3" stroke="currentColor" stroke-width="2"/>', e => copyAll(e.currentTarget.querySelector("span"))),
-          iconBtn(t("newDoc"), '<path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>', startOver))),
+          iconBtn(t("copyText"), '<rect x="8" y="8" width="12" height="12" rx="2" stroke="currentColor" stroke-width="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3" stroke="currentColor" stroke-width="2"/>', e => copyAll(e.currentTarget.querySelector("span")))
+        )),
       el("h2", { class: "res-title", id: "resTitle", tabindex: "-1" }, str(r.title) || t("yourDoc")),
       el("p", { class: "summary" }, str(r.summary)),
       el("div", { class: "overall lvl-" + overall }, svgEl(TL_ICON[overall]), el("span", {}, L["overall_" + overall])),
@@ -1619,6 +1643,8 @@ ${hasImages ? "The attached images are photos or scans of the document pages. Re
         el("a", { href: "#cl-" + l, class: "count lvl-" + l, onclick: e => { e.preventDefault(); goTo("overview", "cl-" + l); } }, svgEl(TL_ICON[l]), el("b", {}, String(by[l].length)), " ", L[l])))) : null,
       el("p", { class: "ai-note", lang: UI, dir: UIDIR() }, svgEl('<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 11v6M12 7.5v.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>'), el("span", {}, t("aiLabel", { lang: state.lang })))
     );
+    const restartBtn = cls => el("button", { class: "btn restart-btn " + (cls || ""), type: "button", onclick: startOver }, svgEl('<svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 3.5h7l4.5 4.5V19a1.5 1.5 0 0 1-1.5 1.5H7A1.5 1.5 0 0 1 5.5 19V5A1.5 1.5 0 0 1 7 3.5z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="M14 3.5V8h4.5" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="M12 17v-6m0 0-2.5 2.5M12 11l2.5 2.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>'), el("span", {}, t("newDocBig")));
+    out.append(el("div", { class: "restart-bar", lang: UI, dir: UIDIR() }, restartBtn(), el("span", { class: "restart-hint" }, t("newDocHint"))));
     const wrap = el("div", { dir, lang });
     wrap.append(hero);
     if (str(r.translation_caution)) wrap.append(el("div", { class: "notice warn" }, el("p", {}, str(r.translation_caution))));
@@ -1689,6 +1715,9 @@ ${hasImages ? "The attached images are photos or scans of the document pages. Re
       el("details", { class: "more", lang: UI, dir: UIDIR() }, el("summary", {}, t("original")), el("div", {}, state.docText ? el("pre", { class: "origtext" }, state.docText) : el("p", { class: "hint" }, state.images.length === 1 ? t("picsOne") : t("picsMany", { n: state.images.length }))))));
 
     out.append(wrap);
+    out.append(el("section", { class: "restart-card", lang: UI, dir: UIDIR(), "aria-label": t("newDocBig") },
+      el("div", { class: "rc-text" }, el("b", {}, t("doneHere")), el("span", {}, t("newDocHint"))),
+      restartBtn("primary")));
     if (rerender) refreshChatTexts(); else resetChat(dir, lang);
     renderServices(); renderConsult(); renderReview();
     selectTab(keepTab || "overview", false);
