@@ -76,6 +76,7 @@ export async function POST(request) {
           headers: { "content-type": "application/json", authorization: `Bearer ${env.OPENROUTER_API_KEY}`, "x-title": "Plainly" },
           body: JSON.stringify({
             model, models: models.length > 1 ? models : undefined, max_tokens: MAX_TOKENS[tier], stream: true,
+            reasoning: { effort: "low" },  // hidden reasoning delays the first visible word and uses up max_tokens
             messages: system ? [{ role: "system", content: system }, ...messages] : messages
           })
         })
@@ -94,14 +95,20 @@ export async function POST(request) {
     const code = busy ? "rate_limited" : upstream.status === 413 ? "prompt_too_large" : upstream.status === 400 ? "invalid_request" : "upstream_error";
     return json({ error: code }, busy ? 429 : 502);
   }
-  const stream = provider === "openrouter" ? upstream.body.pipeThrough(openRouterToAnthropic()) : upstream.body;
+  const started = Date.now();
+  const stream = provider === "openrouter"
+    ? upstream.body.pipeThrough(openRouterToAnthropic(info => console.log(`[openrouter] ${info.model} ${info.event} after ${Date.now() - started} ms${info.finish ? " (" + info.finish + ")" : ""}`)))
+    : upstream.body;
   return new Response(stream, { status: 200, headers: { "Content-Type": "text/event-stream; charset=utf-8", "Cache-Control": "no-store" } });
 }
 
-/** Turns OpenRouter's OpenAI-style SSE chunks into the Anthropic-style events index.html reads. */
-export function openRouterToAnthropic() {
+/**
+ * Turns OpenRouter's OpenAI-style SSE chunks into the Anthropic-style events index.html reads.
+ * `log` (optional) hears which model answered, when the first text arrived and how it finished – never the text.
+ */
+export function openRouterToAnthropic(log = () => {}) {
   const dec = new TextDecoder(), enc = new TextEncoder();
-  let buf = "";
+  let buf = "", gotText = false;
   const send = (ctl, ev) => ctl.enqueue(enc.encode(`data: ${JSON.stringify(ev)}\n\n`));
   const handle = (ctl, line) => {
     if (!line.startsWith("data:")) return;  // ": OPENROUTER PROCESSING" keep-alives and blank lines
@@ -115,7 +122,9 @@ export function openRouterToAnthropic() {
     const choice = chunk.choices && chunk.choices[0];
     if (!choice) return;
     const text = choice.delta && choice.delta.content;
+    if (text && !gotText) { gotText = true; log({ model: chunk.model, event: "first text" }); }
     if (text) send(ctl, { type: "content_block_delta", delta: { type: "text_delta", text } });
+    if (choice.finish_reason) log({ model: chunk.model, event: "finished", finish: choice.finish_reason });
     if (choice.finish_reason) send(ctl, { type: "message_delta", delta: { stop_reason: choice.finish_reason === "length" ? "max_tokens" : "end_turn" } });
   };
   return new TransformStream({

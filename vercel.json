@@ -1,6 +1,6 @@
 {
   "regions": ["fra1"],
   "functions": {
-    "api/sample.js": { "maxDuration": 60 }
+    "api/sample.js": { "maxDuration": 300 }
   }
 }
