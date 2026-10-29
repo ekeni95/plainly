@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- Address of your Plainly API (Cloudflare Worker). Leave empty when the page runs inside Claude. -->
+<!-- Plainly API address. Leave empty: inside Claude the app uses Claude directly, and on Vercel it finds
+     its own /api automatically. Only fill this in for a separate backend, e.g. a Cloudflare Worker URL. -->
 <meta name="plainly-api" content="">
 <title>Plainly – your medical papers, explained</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1007,6 +1008,10 @@
   (async () => {
     try { state.sample = window.claude ? await window.claude.use("sample") : null; } catch { state.sample = null; }
     if (!state.sample && API_URL) state.sample = makeApiSample(API_URL);
+    if (!state.sample && /^https?:$/.test(location.protocol)) {
+      // Same-site backend (e.g. Vercel): use it if /api/health answers.
+      try { const h = await fetch("api/health", { cache: "no-store" }); if (h.ok && (await h.json()).ok) state.sample = makeApiSample("."); } catch {}
+    }
     if (!state.sample) { $("#unavailable").classList.remove("hidden"); return; }
     try { state.limits = await state.sample.limits(); } catch { state.limits = null; }
     updateGo();
