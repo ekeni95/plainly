@@ -39,7 +39,7 @@ Optional: add `MODEL_COMPLEX`, `MODEL_DEFAULT`, `MODEL_QUICK` as environment var
 ### Using OpenRouter (free models)
 If `OPENROUTER_API_KEY` is set, the Vercel backend uses OpenRouter instead of Anthropic, and
 `/api/health` shows `"provider":"openrouter"`. Create the key at <https://openrouter.ai/keys>.
-Default models: `google/gemma-4-31b-it:free` (explanations and questions) and
+Default models: `google/gemma-4-31b-it:free` (explanations and questions; falls back to the 26B model when busy) and
 `google/gemma-4-26b-a4b-it:free` (quick calls); both read images. Override them with the same
 `MODEL_*` variables, using OpenRouter model names.
 

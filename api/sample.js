@@ -21,12 +21,13 @@ const JSON_SYSTEM = "Reply with only the JSON value requested, no other text. It
 
 // Default models per tier. Any of them can be overridden with MODEL_COMPLEX / MODEL_DEFAULT / MODEL_QUICK.
 // For OpenRouter a tier can list up to 3 models (comma-separated in the env variable): if the first is busy,
-// OpenRouter tries the next. Free models are often rate-limited by their provider, so the defaults all read images.
+// OpenRouter tries the next. Free models are often rate-limited by their provider. Both defaults read images and
+// let reasoning be switched off; reasoning-first models (e.g. Nemotron) spent the whole token budget thinking.
 const DEFAULT_MODELS = {
   openrouter: {
-    complex: "google/gemma-4-31b-it:free,nvidia/nemotron-3.5-super-vl:free,google/gemma-4-26b-a4b-it:free",
-    default: "google/gemma-4-31b-it:free,nvidia/nemotron-3.5-super-vl:free,google/gemma-4-26b-a4b-it:free",
-    quick: "google/gemma-4-26b-a4b-it:free,google/gemma-4-31b-it:free,nvidia/nemotron-3.5-super-vl:free"
+    complex: "google/gemma-4-31b-it:free,google/gemma-4-26b-a4b-it:free",
+    default: "google/gemma-4-31b-it:free,google/gemma-4-26b-a4b-it:free",
+    quick: "google/gemma-4-26b-a4b-it:free,google/gemma-4-31b-it:free"
   },
   anthropic: { complex: "claude-sonnet-5-5", default: "claude-sonnet-5-5", quick: "claude-haiku-5-5" }
 };
@@ -76,7 +77,7 @@ export async function POST(request) {
           headers: { "content-type": "application/json", authorization: `Bearer ${env.OPENROUTER_API_KEY}`, "x-title": "Plainly" },
           body: JSON.stringify({
             model, models: models.length > 1 ? models : undefined, max_tokens: MAX_TOKENS[tier], stream: true,
-            reasoning: { effort: "low" },  // hidden reasoning delays the first visible word and uses up max_tokens
+            reasoning: { effort: "none" },  // hidden reasoning delays the first visible word and uses up max_tokens
             messages: system ? [{ role: "system", content: system }, ...messages] : messages
           })
         })
@@ -108,7 +109,7 @@ export async function POST(request) {
  */
 export function openRouterToAnthropic(log = () => {}) {
   const dec = new TextDecoder(), enc = new TextEncoder();
-  let buf = "", gotText = false;
+  let buf = "", gotText = false, finished = false;
   const send = (ctl, ev) => ctl.enqueue(enc.encode(`data: ${JSON.stringify(ev)}\n\n`));
   const handle = (ctl, line) => {
     if (!line.startsWith("data:")) return;  // ": OPENROUTER PROCESSING" keep-alives and blank lines
@@ -124,8 +125,11 @@ export function openRouterToAnthropic(log = () => {}) {
     const text = choice.delta && choice.delta.content;
     if (text && !gotText) { gotText = true; log({ model: chunk.model, event: "first text" }); }
     if (text) send(ctl, { type: "content_block_delta", delta: { type: "text_delta", text } });
-    if (choice.finish_reason) log({ model: chunk.model, event: "finished", finish: choice.finish_reason });
-    if (choice.finish_reason) send(ctl, { type: "message_delta", delta: { stop_reason: choice.finish_reason === "length" ? "max_tokens" : "end_turn" } });
+    if (choice.finish_reason && !finished) {  // some providers repeat the final chunk
+      finished = true;
+      log({ model: chunk.model, event: "finished", finish: choice.finish_reason });
+      send(ctl, { type: "message_delta", delta: { stop_reason: choice.finish_reason === "length" ? "max_tokens" : "end_turn" } });
+    }
   };
   return new TransformStream({
     transform(bytes, ctl) {
